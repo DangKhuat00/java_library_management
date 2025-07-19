@@ -47,7 +47,7 @@ public class Document {
     }
 
     public static void deleteDocument(){
-        for(Document x : documents){
+        for(Document x : documents){ // in ra danh sach cho nguoi xem muon xoa document nao
             x.inFor();
         }
         System.out.print("Enter ID you want to remove: "); // xoa document theo id
@@ -88,7 +88,7 @@ public class Document {
             i++;
         }
         deleteDocument();
-        for(Document x : documents){
+        for(Document x : documents){ // in ra danh sach document sau khi xoa
             x.inFor();
         }
     }
