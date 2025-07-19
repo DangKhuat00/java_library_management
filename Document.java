@@ -1,8 +1,5 @@
 package librarymanage.java_library_management;
-
-import java.sql.SQLOutput;
-import java.util.ArrayList;
-import java.util.Scanner;
+import java.util.*;
 
 public class Document {
     //ArrayList<Document> documents = new ArrayList<>();
@@ -15,14 +12,32 @@ public class Document {
     private int year;
     private int numbers;
     private boolean isAvailable;
-    public Document(String id,String title,String author,String publisher,int year,String category,int numbers,boolean isAvailable){
-        this.id = id;
-        this.title = title;
-        this.author = author;
-        this.publisher = publisher;
-        this.year = year;
-        this.category = category;
-        this.numbers = numbers;
+    public void addDocument(){
+        Scanner sc =new Scanner(System.in);
+        count++;
+        boolean tmp;
+        this.id = String.valueOf(count);
+        do{
+            tmp = false;
+            try {
+                System.out.println("Enter name title: ");
+                this.title = sc.nextLine();
+                System.out.println("Enter name author: ");
+                this.author = sc.nextLine();
+                System.out.println("Enter name publisher: ");
+                this.publisher = sc.nextLine();
+                System.out.println("Enter name category: ");
+                this.category = sc.nextLine();
+                System.out.println("Enter year: ");
+                this.year = sc.nextInt();
+                System.out.println("Enter numbers of book: ");
+                this.numbers = sc.nextInt();
+            }
+            catch(InputMismatchException imp){
+                System.out.println("Enter correct data,please");
+                tmp = true;
+            }
+        }while(tmp);
         if(numbers != 0){
             this.isAvailable = true;
         }
@@ -30,18 +45,21 @@ public class Document {
             this.isAvailable = false;
         }
     }
-//    public void addDocument(){
-//        Scanner sc =new Scanner(System.in);
-//
-//        System.out.print("Nhap ten tac gia");
-//
-//    }
-
-
-
-    public static void main(String[] args) {
-
+    public void inFor(){
+        System.out.println("Id: " + this.id);
+        System.out.println("Title: " + this.title);
+        System.out.println("Author: " + this.author);
+        System.out.println("Publisher: " + this.publisher);
+        System.out.println("Category: " + this.category);
+        System.out.println("Year: " + this.year);
+        System.out.println("Numbers: " + this.numbers);
+        System.out.println("Is Available: " + this.isAvailable);
     }
 
 
+    public static void main(String[] args) {
+        Document document = new Document();
+        document.addDocument();
+        document.inFor();
+    }
 }
