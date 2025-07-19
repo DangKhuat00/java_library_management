@@ -3,7 +3,6 @@ import java.util.*;
 
 public class Document {
     static ArrayList<Document> documents = new ArrayList<>();
-    public static int count = 0;
     private String id;
     private String title;
     private String author;
@@ -12,14 +11,27 @@ public class Document {
     private int year;
     private int numbers;
     private boolean isAvailable;
+    public Document(){
+    }
+    public Document(String id,String title,String author,String publisher,String category,int year,int numbers,boolean isAvailable){
+        this.id = id;
+        this.title = title;
+        this.author = author;
+        this.publisher = publisher;
+        this.category = category;
+        this.year = year;
+        this.numbers = numbers;
+        this.isAvailable = isAvailable;
+    }
+
     public void addDocument(){
         Scanner sc =new Scanner(System.in);
-        count++;
         boolean tmp;
-        this.id = String.valueOf(count);
         do{
             tmp = false;
             try {
+                System.out.println("Enter ID: ");
+                this.id = sc.nextLine();
                 System.out.println("Enter name title: ");
                 this.title = new Scanner(System.in).nextLine();
                 System.out.println("Enter name author: ");
@@ -45,25 +57,29 @@ public class Document {
             this.isAvailable = false;
         }
     }
-
-    public static void deleteDocument(){
-        for(Document x : documents){ // in ra danh sach cho nguoi xem muon xoa document nao
-            x.inFor();
-        }
-        System.out.print("Enter ID you want to remove: "); // xoa document theo id
-        int idDelete = new Scanner(System.in).nextInt();
-        if(idDelete > documents.size()){
-            System.out.println("Document not exist");
-        }
-        else if(documents.isEmpty()){
-            System.out.println("Enter document");
-        }
-        else
-        {
-            documents.remove( idDelete- 1);
-        }
+    public String getId(){
+        return id;
     }
 
+
+    public static void deleteDocument(){
+        System.out.println("Enter ID you want to remove: ");
+        String id = new Scanner(System.in).nextLine();
+        Document doc= new Document(id,"","","","",0,0,true);
+        int tmp = 0;
+        for(Document x : documents){
+            if(Objects.equals(x.getId(), doc.getId())){
+                break;
+            }
+            tmp++;
+        }
+        if(tmp == documents.size()){
+            System.out.println("Document not exist");
+        }
+        else{
+            documents.remove(tmp);
+        }
+    }
     public void inFor(){
         System.out.print("Id: " + this.id);
         System.out.print(" - Title: " + this.title);
@@ -78,7 +94,7 @@ public class Document {
 
 
     public static void main(String[] args) {
-        System.out.println("Enter numbers of document: "); // thu nhap vao mot danh sach document bat ky
+        System.out.println("Enter numbers of document: ");// nhap mot danh sach document bat ky
         int n = new Scanner(System.in).nextInt();
         int i = 0;
         while(i < n) {
@@ -88,7 +104,7 @@ public class Document {
             i++;
         }
         deleteDocument();
-        for(Document x : documents){ // in ra danh sach document sau khi xoa
+        for(Document x : documents){ 
             x.inFor();
         }
     }
