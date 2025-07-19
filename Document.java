@@ -1,4 +1,5 @@
 package librarymanage.java_library_management;
+
 import java.util.*;
 
 public class Document {
@@ -79,7 +80,26 @@ public class Document {
         else{
             documents.remove(tmp);
         }
+    } // xoa
+
+    public static void updateDocument(Document doc){
+        int tmp = 0;
+        boolean error = true;
+        for(Document x : documents){
+            if(x.getId().equals(doc.getId())){
+                documents.set(tmp,doc);
+                error = false;
+            }
+            tmp++;
+        }
+        if(error){
+            System.out.println("Document not exist");
+        }
     }
+    /*
+    C2:nhap moi id di duyet documents roi dung set get;
+    */
+
     public void inFor(){
         System.out.print("Id: " + this.id);
         System.out.print(" - Title: " + this.title);
@@ -103,9 +123,17 @@ public class Document {
             documents.add(document);
             i++;
         }
-        deleteDocument();
-        for(Document x : documents){ 
+//       deleteDocument(); //xoa di mot tai lieu
+//       for(Document x : documents){
+//           x.inFor();
+//       }
+        Document doc = new Document();
+        System.out.println("Enter document you want to update");
+        doc.addDocument();
+        updateDocument(doc);
+        for(Document x : documents){
             x.inFor();
         }
+
     }
 }
