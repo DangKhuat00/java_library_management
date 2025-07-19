@@ -2,7 +2,7 @@ package librarymanage.java_library_management;
 import java.util.*;
 
 public class Document {
-    //ArrayList<Document> documents = new ArrayList<>();
+    static ArrayList<Document> documents = new ArrayList<>();
     public static int count = 0;
     private String id;
     private String title;
@@ -45,21 +45,51 @@ public class Document {
             this.isAvailable = false;
         }
     }
+
+    public static void deleteDocument(){
+        for(Document x : documents){
+            x.inFor();
+        }
+        System.out.print("Enter ID you want to remove: "); // xoa document theo id
+        int idDelete = new Scanner(System.in).nextInt();
+        if(idDelete > documents.size()){
+            System.out.println("Document not exist");
+        }
+        else if(documents.isEmpty()){
+            System.out.println("Enter document");
+        }
+        else
+        {
+            documents.remove( idDelete- 1);
+        }
+    }
+
     public void inFor(){
-        System.out.println("Id: " + this.id);
-        System.out.println("Title: " + this.title);
-        System.out.println("Author: " + this.author);
-        System.out.println("Publisher: " + this.publisher);
-        System.out.println("Category: " + this.category);
-        System.out.println("Year: " + this.year);
-        System.out.println("Numbers: " + this.numbers);
-        System.out.println("Is Available: " + this.isAvailable);
+        System.out.print("Id: " + this.id);
+        System.out.print(" - Title: " + this.title);
+        System.out.print(" - Author: " + this.author);
+        System.out.print(" - Publisher: " + this.publisher);
+        System.out.print(" - Category: " + this.category);
+        System.out.print(" - Year: " + this.year);
+        System.out.print(" - Numbers: " + this.numbers);
+        System.out.print(" - Is Available: " + this.isAvailable + "\n");
     }
 
 
+
     public static void main(String[] args) {
-        Document document = new Document();
-        document.addDocument();
-        document.inFor();
+        System.out.println("Enter numbers of document: "); // thu nhap vao mot danh sach document bat ky
+        int n = new Scanner(System.in).nextInt();
+        int i = 0;
+        while(i < n) {
+            Document document = new Document();
+            document.addDocument();
+            documents.add(document);
+            i++;
+        }
+        deleteDocument();
+        for(Document x : documents){
+            x.inFor();
+        }
     }
 }
