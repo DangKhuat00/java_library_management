@@ -21,7 +21,7 @@ public class Document {
             tmp = false;
             try {
                 System.out.println("Enter name title: ");
-                this.title = sc.nextLine();
+                this.title = new Scanner(System.in).nextLine();
                 System.out.println("Enter name author: ");
                 this.author = sc.nextLine();
                 System.out.println("Enter name publisher: ");
