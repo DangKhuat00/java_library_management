@@ -189,13 +189,17 @@ public class Document {
 //       for(Document x : documents){
 //           x.inFor();
 //       }
-//        Document doc = new Document();
+//        Document doc = new Document(); // chuc nang sua document
 //        System.out.println("Enter document you want to update");
 //        doc.addDocument();
 //        updateDocument(doc);
 //        for(Document x : documents){
 //            x.inFor();
 //        }
-        findDocument();
+        findDocument(); // tim kiem document
     }
+    /*
+    toi chua cai dat duoc no thanh da hinh voi ke thua, truu tuong
+    
+     */
 }
