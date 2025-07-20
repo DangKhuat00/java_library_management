@@ -96,6 +96,68 @@ public class Document {
             System.out.println("Document not exist");
         }
     }
+
+    public String getTitle(){
+        return title;
+    }
+
+    public String getAuthor() {
+        return author;
+    }
+
+    public String getCategory() {
+        return category;
+    }
+
+    public void setTitle(String title){
+        this.title = title;
+    }
+    public void setAuthor(String author){
+        this.author = author;
+    }
+    public void setCategory(String category){
+        this.category = category;
+    }
+    public static void findDocument(){
+        System.out.println("You want to search for document by:\n1.title\n2.author\n3.category");
+        Scanner sc = new Scanner(System.in);
+        String luachon = sc.nextLine();
+        Document doc = new Document();
+        switch(luachon){
+            case "1":
+                String name = sc.nextLine();
+                doc.setTitle(name);
+                for(Document x : documents){
+                    if(x.getTitle().equals(doc.getTitle())){
+                        x.inFor();
+                    }
+                }
+                break;
+            case "2":
+                String author = sc.nextLine();
+                doc.setAuthor(author);
+                for(Document x : documents){
+                    if(x.getAuthor().equals(doc.getAuthor())){
+                        x.inFor();
+                    }
+                }
+                break;
+            case "3":
+                String category = sc.nextLine();
+                doc.setCategory(category);
+                for(Document x : documents){
+                    if(x.getCategory().equals(doc.getCategory())){
+                        x.inFor();
+                    }
+                }
+                break;
+
+
+        }
+    }
+
+
+
     /*
     C2:nhap moi id di duyet documents roi dung set get;
     */
@@ -127,13 +189,13 @@ public class Document {
 //       for(Document x : documents){
 //           x.inFor();
 //       }
-        Document doc = new Document();
-        System.out.println("Enter document you want to update");
-        doc.addDocument();
-        updateDocument(doc);
-        for(Document x : documents){
-            x.inFor();
-        }
-
+//        Document doc = new Document();
+//        System.out.println("Enter document you want to update");
+//        doc.addDocument();
+//        updateDocument(doc);
+//        for(Document x : documents){
+//            x.inFor();
+//        }
+        findDocument();
     }
 }
