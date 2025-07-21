@@ -3,7 +3,7 @@ package librarymanage.java_library_management;
 import java.util.*;
 
 public class Document {
-    static ArrayList<Document> documents = new ArrayList<>();
+    private List<Document> documents = new ArrayList<>();
     private String id;
     private String title;
     private String author;
@@ -77,12 +77,10 @@ public class Document {
     public void setTitle(String title) {this.title = title; }
     public void setAuthor(String author) { this.author = author; }
     public void setCategory(String category) { this.category = category;}
-
-
-
+    public void setAvailable(boolean available) {isAvailable = available;}
 
     // ================================ Cac chuc nang cua chuong trinh =========================================
-    public static void deleteDocument() {
+    public void deleteDocument() {
         System.out.println("Enter ID you want to remove: ");
         String id = new Scanner(System.in).nextLine();
         Document doc = new Document(id, "", "", "", "", 0, 0, true);
@@ -99,7 +97,7 @@ public class Document {
             documents.remove(tmp);
         }
     }
-    public static void updateDocument() {
+    public void updateDocument() {
         Document doc = new Document(); // chuc nang sua document
         System.out.println("Enter document you want to update");
         doc.addDocument();
@@ -116,7 +114,7 @@ public class Document {
             System.out.println("Document not exist");
         }
     }
-    public static void findDocument() {
+    public void findDocument() {
         System.out.println("You want to search for document by:\n1.title\n2.author\n3.category");
         Scanner sc = new Scanner(System.in);
         String luachon = sc.nextLine();
@@ -169,6 +167,6 @@ public class Document {
     }
 
     public static void main(String[] args) {
-        
+
     }
 }
