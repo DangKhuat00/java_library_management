@@ -12,9 +12,11 @@ public class Document {
     private int year;
     private int numbers;
     private boolean isAvailable;
-    public Document(){
+
+    public Document() {
     }
-    public Document(String id,String title,String author,String publisher,String category,int year,int numbers,boolean isAvailable){
+
+    public Document(String id, String title, String author, String publisher, String category, int year, int numbers, boolean isAvailable) {
         this.id = id;
         this.title = title;
         this.author = author;
@@ -24,11 +26,11 @@ public class Document {
         this.numbers = numbers;
         this.isAvailable = isAvailable;
     }
-
-    public void addDocument(){
-        Scanner sc =new Scanner(System.in);
+    // ================================ them tai lieu ==========================================================
+    public void addDocument() {
+        Scanner sc = new Scanner(System.in);
         boolean tmp;
-        do{
+        do {
             tmp = false;
             try {
                 System.out.println("Enter ID: ");
@@ -45,109 +47,105 @@ public class Document {
                 this.year = sc.nextInt();
                 System.out.println("Enter numbers of book: ");
                 this.numbers = sc.nextInt();
-            }
-            catch(InputMismatchException imp){
+            } catch (InputMismatchException imp) {
                 System.out.println("Enter correct data,please");
                 tmp = true;
             }
-        }while(tmp);
-        if(numbers != 0){
+        } while (tmp);
+        if (numbers != 0) {
             this.isAvailable = true;
-        }
-        else{
+        } else {
             this.isAvailable = false;
         }
     }
-    public String getId(){
-        return id;
-    }
+    // =====================================================================================================
+    public String getId() { return id;}
+    public String getTitle() { return title; }
+    public String getAuthor() { return author; }
+    public String getPublisher() { return publisher; }
+    public int getYear() { return year; }
+    public String getCategory() { return category; }
+    public int getNumbers(){ return numbers; }
+    public boolean isAvailable() { return isAvailable; }
+
+    // ==========================================================================================
+
+    public void setId(String id) {this.id = id;}
+    public void setPublisher(String publisher) {this.publisher = publisher;}
+    public void setNumbers(int numbers) {this.numbers = numbers;}
+    public void setYear(int year) {this.year = year;}
+    public void setTitle(String title) {this.title = title; }
+    public void setAuthor(String author) { this.author = author; }
+    public void setCategory(String category) { this.category = category;}
 
 
-    public static void deleteDocument(){
+
+
+    // ================================ Cac chuc nang cua chuong trinh =========================================
+    public static void deleteDocument() {
         System.out.println("Enter ID you want to remove: ");
         String id = new Scanner(System.in).nextLine();
-        Document doc= new Document(id,"","","","",0,0,true);
+        Document doc = new Document(id, "", "", "", "", 0, 0, true);
         int tmp = 0;
-        for(Document x : documents){
-            if(Objects.equals(x.getId(), doc.getId())){
+        for (Document x : documents) {
+            if (Objects.equals(x.getId(), doc.getId())) {
                 break;
             }
             tmp++;
         }
-        if(tmp == documents.size()){
+        if (tmp == documents.size()) {
             System.out.println("Document not exist");
-        }
-        else{
+        } else {
             documents.remove(tmp);
         }
-    } // xoa
-
-    public static void updateDocument(Document doc){
+    }
+    public static void updateDocument() {
+        Document doc = new Document(); // chuc nang sua document
+        System.out.println("Enter document you want to update");
+        doc.addDocument();
         int tmp = 0;
         boolean error = true;
-        for(Document x : documents){
-            if(x.getId().equals(doc.getId())){
-                documents.set(tmp,doc);
+        for (Document x : documents) {
+            if (x.getId().equals(doc.getId())) {
+                documents.set(tmp, doc);
                 error = false;
             }
             tmp++;
         }
-        if(error){
+        if (error) {
             System.out.println("Document not exist");
         }
     }
-
-    public String getTitle(){
-        return title;
-    }
-
-    public String getAuthor() {
-        return author;
-    }
-
-    public String getCategory() {
-        return category;
-    }
-
-    public void setTitle(String title){
-        this.title = title;
-    }
-    public void setAuthor(String author){
-        this.author = author;
-    }
-    public void setCategory(String category){
-        this.category = category;
-    }
-    public static void findDocument(){
+    public static void findDocument() {
         System.out.println("You want to search for document by:\n1.title\n2.author\n3.category");
         Scanner sc = new Scanner(System.in);
         String luachon = sc.nextLine();
         Document doc = new Document();
-        switch(luachon){
+        switch (luachon) {
             case "1":
                 String name = sc.nextLine();
                 doc.setTitle(name);
-                for(Document x : documents){
-                    if(x.getTitle().equals(doc.getTitle())){
-                        x.inFor();
+                for (Document x : documents) {
+                    if (x.getTitle().equals(doc.getTitle())) {
+                        x.printFor();
                     }
                 }
                 break;
             case "2":
                 String author = sc.nextLine();
                 doc.setAuthor(author);
-                for(Document x : documents){
-                    if(x.getAuthor().equals(doc.getAuthor())){
-                        x.inFor();
+                for (Document x : documents) {
+                    if (x.getAuthor().equals(doc.getAuthor())) {
+                        x.printFor();
                     }
                 }
                 break;
             case "3":
                 String category = sc.nextLine();
                 doc.setCategory(category);
-                for(Document x : documents){
-                    if(x.getCategory().equals(doc.getCategory())){
-                        x.inFor();
+                for (Document x : documents) {
+                    if (x.getCategory().equals(doc.getCategory())) {
+                        x.printFor();
                     }
                 }
                 break;
@@ -158,11 +156,8 @@ public class Document {
 
 
 
-    /*
-    C2:nhap moi id di duyet documents roi dung set get;
-    */
-
-    public void inFor(){
+    // ======================= in ra =====================================
+    public void printFor() {
         System.out.print("Id: " + this.id);
         System.out.print(" - Title: " + this.title);
         System.out.print(" - Author: " + this.author);
@@ -173,33 +168,7 @@ public class Document {
         System.out.print(" - Is Available: " + this.isAvailable + "\n");
     }
 
-
-
     public static void main(String[] args) {
-        System.out.println("Enter numbers of document: ");// nhap mot danh sach document bat ky
-        int n = new Scanner(System.in).nextInt();
-        int i = 0;
-        while(i < n) {
-            Document document = new Document();
-            document.addDocument();
-            documents.add(document);
-            i++;
-        }
-//       deleteDocument(); //xoa di mot tai lieu
-//       for(Document x : documents){
-//           x.inFor();
-//       }
-//        Document doc = new Document(); // chuc nang sua document
-//        System.out.println("Enter document you want to update");
-//        doc.addDocument();
-//        updateDocument(doc);
-//        for(Document x : documents){
-//            x.inFor();
-//        }
-        findDocument(); // tim kiem document
+        
     }
-    /*
-    toi chua cai dat duoc no thanh da hinh voi ke thua, truu tuong
-    
-     */
 }
