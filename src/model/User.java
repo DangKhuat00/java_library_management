@@ -11,6 +11,7 @@ public class User {
     private int borrowLimit;
     private List<Document> borrowedDocuments;
 
+    // Constructor - Thêm thành viên đã khởi tạo
     public User(String id, String name, String email, String phoneNumber, int borrowLimit){
         this.id = id;
         this.name = name;
@@ -58,22 +59,6 @@ public class User {
         return true;
     }
     
-    // ========== CHỨC NĂNG QUẢN LÝ THÔNG TIN THÀNH VIÊN ==========
-    
-    public void updatePersonalInfo(String name, String email, String phoneNumber) {
-        if (name != null && !name.trim().isEmpty()) {
-            this.name = name;
-        }
-        if (email != null && !email.trim().isEmpty()) {
-            this.email = email;
-        }
-        if (phoneNumber != null && !phoneNumber.trim().isEmpty()) {
-            this.phoneNumber = phoneNumber;
-        }
-    }
-    
-    // ========== UTILITY METHODS ==========
-    
     public boolean canBorrowMore() {
         return borrowedDocuments.size() < borrowLimit;
     }
@@ -81,16 +66,6 @@ public class User {
     public int getBorrowedCount() {
         return borrowedDocuments.size();
     }
-    
-    public boolean isValidUser() {
-        return id != null && !id.trim().isEmpty() &&
-               name != null && !name.trim().isEmpty() &&
-               email != null && email.contains("@") &&
-               phoneNumber != null && !phoneNumber.trim().isEmpty() &&
-               borrowLimit > 0;
-    }
-    
-    // ========== GETTERS ==========
     
     public String getId() { return id; }
     public String getName() { return name; }
