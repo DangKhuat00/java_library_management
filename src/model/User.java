@@ -11,7 +11,7 @@ public class User {
     private int borrowLimit;
     private List<Document> borrowedDocuments;
 
-    // Constructor - Thêm thành viên đã khởi tạo
+    // Constructor - Add initialized member
     public User(String id, String name, String email, String phoneNumber, int borrowLimit){
         this.id = id;
         this.name = name;
@@ -21,43 +21,59 @@ public class User {
         this.borrowedDocuments = new ArrayList<>();
     }
     
-    // ========== CHỨC NĂNG MƯỢN TÀI LIỆU ==========
+    // ========== DOCUMENT BORROWING FUNCTIONS ==========
     
     public boolean borrowDocument(Document document) {
-        // Kiểm tra giới hạn mượn
+        // Check borrowing limit
         if (borrowedDocuments.size() >= borrowLimit) {
             return false;
         }
         
-        // Kiểm tra tài liệu có sẵn
+        // Check if document is available
         if (!document.isAvailable()) {
             return false;
         }
         
-        // Kiểm tra đã mượn tài liệu này chưa
+        // Check if already borrowed this document
         if (borrowedDocuments.contains(document)) {
             return false;
         }
         
-        // Thực hiện mượn
+        // Execute borrowing
         borrowedDocuments.add(document);
         document.setAvailable(false);
         return true;
     }
     
-    // ========== CHỨC NĂNG TRẢ TÀI LIỆU ==========
+    // ========== DOCUMENT RETURN FUNCTIONS ==========
     
     public boolean returnDocument(Document document) {
-        // Kiểm tra có mượn tài liệu này không
+        // Check if borrowed this document
         if (!borrowedDocuments.contains(document)) {
             return false;
         }
         
-        // Thực hiện trả
+        // Execute return
         borrowedDocuments.remove(document);
         document.setAvailable(true);
         return true;
     }
+    
+    // ========== MEMBER INFORMATION MANAGEMENT FUNCTIONS ==========
+    
+    public void updatePersonalInfo(String name, String email, String phoneNumber) {
+        if (name != null && !name.trim().isEmpty()) {
+            this.name = name;
+        }
+        if (email != null && !email.trim().isEmpty()) {
+            this.email = email;
+        }
+        if (phoneNumber != null && !phoneNumber.trim().isEmpty()) {
+            this.phoneNumber = phoneNumber;
+        }
+    }
+    
+    // ========== UTILITY METHODS ==========
     
     public boolean canBorrowMore() {
         return borrowedDocuments.size() < borrowLimit;
@@ -66,6 +82,16 @@ public class User {
     public int getBorrowedCount() {
         return borrowedDocuments.size();
     }
+    
+    public boolean isValidUser() {
+        return id != null && !id.trim().isEmpty() &&
+               name != null && !name.trim().isEmpty() &&
+               email != null && email.contains("@") &&
+               phoneNumber != null && !phoneNumber.trim().isEmpty() &&
+               borrowLimit > 0;
+    }
+    
+    // ========== GETTERS ==========
     
     public String getId() { return id; }
     public String getName() { return name; }
