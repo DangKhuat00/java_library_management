@@ -361,5 +361,11 @@ public class Library {
                              " | Borrowed: " + user.getBorrowedDocuments().size() + "/" + user.getBorrowLimit());
         }
     }
-    
+    public List<User> getUsers() {
+        return users;
+    }
+
+    public List<Document> getDocuments() {
+        return documents;
+    }
 }

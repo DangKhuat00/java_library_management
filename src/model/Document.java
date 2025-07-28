@@ -57,6 +57,5 @@ public class Document {
         System.out.print(" - Numbers: " + this.numbers);
         System.out.print(" - Is Available: " + this.isAvailable + "\n");
     }
-    public static void main(String[] args) {
-    }
+
 }
