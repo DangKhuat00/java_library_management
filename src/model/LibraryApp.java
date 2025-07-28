@@ -10,14 +10,14 @@ public class LibraryApp {
 
   public static void main(String[] args) {
     // Set up encoding for console
+
     try {
       System.setOut(new PrintStream(System.out, true, "UTF-8"));
     } catch (UnsupportedEncodingException e) {
       // Fallback if UTF-8 not supported
     }
 
-    // Initialize sample documents
-    initializeSampleDocuments();
+
     // Initialize sample users
     initializeSampleUsers();
 

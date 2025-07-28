@@ -8,10 +8,13 @@ public class Library {
     private String name;
     private List<Document> documents;
     private List<User> users;
-    
+    private Documentsql documentSQL = new Documentsql();
+
     public Library() {
+        documentSQL.createTableIfNotExists();
         this.documents = new ArrayList<>();
         this.users = new ArrayList<>();
+        this.documents = documentSQL.getAllDocuments();
     }
     /**
      * Borrow document - check conditions before lending
@@ -186,6 +189,7 @@ public class Library {
      */
     public void addDocument(Document document) {
         documents.add(document);
+        documentSQL.addDocument(document); // Ghi vào database
     }
     
     // ========== DOCUMENT MANAGEMENT FUNCTIONS ==========
@@ -198,7 +202,7 @@ public class Library {
         String id = "", title = "", author = "", publisher = "", category = "";
         int year = 0, numbers = 0;
         boolean isAvailable;
-        
+
         do {
             tmp = false;
             try {
@@ -223,9 +227,11 @@ public class Library {
                 tmp = true;
             }
         } while (tmp);
-        
+
         isAvailable = numbers > 0;
-        documents.add(new Document(id, title, author, publisher, category, year, numbers, isAvailable));
+        Document newDoc = new Document(id, title, author, publisher, category, year, numbers, isAvailable);
+        documents.add(newDoc);
+        documentSQL.addDocument(newDoc); // <-- Ghi vào DB
         System.out.println("✅ Document added successfully!");
     }
     
@@ -239,6 +245,7 @@ public class Library {
         for (int i = 0; i < documents.size(); i++) {
             if (documents.get(i).getId().equals(id)) {
                 documents.remove(i);
+                documentSQL.deleteDocument(id);
                 System.out.println("✅ Document removed successfully!");
                 return;
             }
@@ -272,6 +279,8 @@ public class Library {
                 
                 doc.setAvailable(doc.getNumbers() > 0);
                 System.out.println("✅ Document updated successfully!");
+                documentSQL.updateDocument(doc);
+
                 return;
             }
         }
