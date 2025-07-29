@@ -237,6 +237,7 @@ public class Library implements dfDocument {
      * Delete document by ID
      */
     public void deleteDocument(Scanner scanner) {
+        displayAllDocuments();
         System.out.print("Enter ID you want to remove: ");
         String id = scanner.nextLine();
         
@@ -254,6 +255,7 @@ public class Library implements dfDocument {
      * Update document information
      */
     public void updateDocument(Scanner scanner) {
+        displayAllDocuments();
         System.out.print("Enter the ID you want to update: ");
         String id = scanner.nextLine();
         
