@@ -1,4 +1,4 @@
-package librarymanage.java_library_management.src.model;
+package librarymanage.java_library_management;
 
 import java.util.*;
 
@@ -46,7 +46,7 @@ public class Document {
     public void setCategory(String category) { this.category = category;}
     public void setAvailable(boolean available) {isAvailable = available;}
 
-    // ======================= Print Output =====================================
+    // ======================= in ra =====================================
     public void printFor() {
         System.out.print("Id: " + this.id);
         System.out.print(" - Title: " + this.title);
@@ -57,5 +57,6 @@ public class Document {
         System.out.print(" - Numbers: " + this.numbers);
         System.out.print(" - Is Available: " + this.isAvailable + "\n");
     }
-
+    public static void main(String[] args) {
+    }
 }

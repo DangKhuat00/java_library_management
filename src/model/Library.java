@@ -1,10 +1,15 @@
-package model;
+package librarymanage.java_library_management.src.model;
+
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
-
-public class Library {
+interface dfDocument{
+    public final String TITLE = "1";
+    public final String AUTHOR= "2";
+    public final String CATEGORY = "3";
+}
+public class Library implements dfDocument {
     private String name;
     private List<Document> documents;
     private List<User> users;
@@ -188,22 +193,33 @@ public class Library {
         documents.add(document);
     }
     
-    // ========== DOCUMENT MANAGEMENT FUNCTIONS ==========
-    
+    // ========== DOCUMENT MANAGEMENT FUNCTIONS =======================================================================\
+    //==========================================================================\
+     //==========================================================================\
+     //==================================================================================\
+     //===============================================================================\
+     //======================================================================================================\
+     //
+
+
+
+
     /**
      * Add new document with console input
      */
+    public String generateId(){
+        return String.format("DOC%03d",documents.size()+1);
+    }
+
     public void addDocumentInteractive(Scanner scanner) {
         boolean tmp;
         String id = "", title = "", author = "", publisher = "", category = "";
         int year = 0, numbers = 0;
         boolean isAvailable;
-        
+        id = generateId(); //ID duoc tu dong dinh dang theo DOC001
         do {
             tmp = false;
             try {
-                System.out.print("Enter ID: ");
-                id = scanner.nextLine();
                 System.out.print("Enter title: ");
                 title = scanner.nextLine();
                 System.out.print("Enter author: ");
@@ -233,6 +249,7 @@ public class Library {
      * Delete document by ID
      */
     public void deleteDocument(Scanner scanner) {
+        displayAllDocuments();
         System.out.print("Enter ID you want to remove: ");
         String id = scanner.nextLine();
         
@@ -250,6 +267,7 @@ public class Library {
      * Update document information
      */
     public void updateDocument(Scanner scanner) {
+        displayAllDocuments();
         System.out.print("Enter the ID you want to update: ");
         String id = scanner.nextLine();
         
@@ -281,13 +299,24 @@ public class Library {
     /**
      * Search documents
      */
-    public void findDocument(Scanner scanner) {
+
+
+    public void findDocument(Scanner scanner){
         System.out.println("Search document by:\n1. Title\n2. Author\n3. Category");
-        System.out.print("Choose option: ");
-        String choice = scanner.nextLine();
-        
-        switch (choice) {
-            case "1":
+        System.out.print("Choose option number: ");
+        String choice = "";
+        int tmp;
+        do {
+            tmp = scanner.nextInt();
+            if(tmp < 1 || tmp > 3){
+                System.out.println("You just enter: 1 - 3");
+            }
+            else{
+                choice = String.valueOf(tmp);
+            }
+        }while(tmp < 1 || tmp > 3);
+            switch (choice) {
+            case dfDocument.TITLE:
                 System.out.print("Enter title to search: ");
                 String title = scanner.nextLine();
                 boolean found1 = false;
@@ -300,7 +329,7 @@ public class Library {
                 if (!found1) System.out.println("❌ No documents found with that title!");
                 break;
                 
-            case "2":
+            case dfDocument.AUTHOR:
                 System.out.print("Enter author to search: ");
                 String author = scanner.nextLine();
                 boolean found2 = false;
@@ -313,7 +342,7 @@ public class Library {
                 if (!found2) System.out.println("❌ No documents found with that author!");
                 break;
                 
-            case "3":
+            case dfDocument.CATEGORY:
                 System.out.print("Enter category to search: ");
                 String category = scanner.nextLine();
                 boolean found3 = false;
