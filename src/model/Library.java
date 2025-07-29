@@ -298,10 +298,10 @@ public class Library implements dfDocument {
     public void deleteDocument(Scanner scanner) {
         displayAllDocuments();
         System.out.print("Enter ID you want to remove: ");
-        String id = readFormattedId(scanner);
+        String iddelete = readFormattedId(scanner);
         
         for (int i = 0; i < documents.size(); i++) {
-            if (documents.get(i).getId().equals(id)) {
+            if (documents.get(i).getId().equals(iddelete)) {
                 documents.remove(i);
                 System.out.println("✅ Document removed successfully!");
                 return;
@@ -423,6 +423,7 @@ public class Library implements dfDocument {
             doc.printFor();
         }
     }
+
     
     /**
      * Display all users
