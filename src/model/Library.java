@@ -193,21 +193,33 @@ public class Library implements dfDocument {
         documents.add(document);
     }
     
-    // ========== DOCUMENT MANAGEMENT FUNCTIONS ==========
-    
+    // ========== DOCUMENT MANAGEMENT FUNCTIONS =======================================================================\
+    //==========================================================================\
+     //==========================================================================\
+     //==================================================================================\
+     //===============================================================================\
+     //======================================================================================================\
+     //
+
+
+
+
     /**
      * Add new document with console input
      */
+    public String generateId(){
+        return String.format("DOC%03d",documents.size()+1);
+    }
+
     public void addDocumentInteractive(Scanner scanner) {
         boolean tmp;
         String id = "", title = "", author = "", publisher = "", category = "";
         int year = 0, numbers = 0;
         boolean isAvailable;
+        id = generateId(); //ID duoc tu dong dinh dang theo DOC001
         do {
             tmp = false;
             try {
-                System.out.print("Enter ID: ");
-                id = scanner.nextLine();
                 System.out.print("Enter title: ");
                 title = scanner.nextLine();
                 System.out.print("Enter author: ");
@@ -292,9 +304,18 @@ public class Library implements dfDocument {
     public void findDocument(Scanner scanner){
         System.out.println("Search document by:\n1. Title\n2. Author\n3. Category");
         System.out.print("Choose option number: ");
-        String choice = scanner.nextLine();
-        
-        switch (choice) {
+        String choice = "";
+        int tmp;
+        do {
+            tmp = scanner.nextInt();
+            if(tmp < 1 || tmp > 3){
+                System.out.println("You just enter: 1 - 3");
+            }
+            else{
+                choice = String.valueOf(tmp);
+            }
+        }while(tmp < 1 || tmp > 3);
+            switch (choice) {
             case dfDocument.TITLE:
                 System.out.print("Enter title to search: ");
                 String title = scanner.nextLine();
