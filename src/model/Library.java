@@ -537,7 +537,7 @@ public class Library implements dfDocument {
  * Nhap vao nhung tai lieu trung nhau -xong
  * Khi xoa mot tai lieu thi ID cua cac tai lieu con lai phai thay the thu tu cua ID sach ma minh xoa -xong
  * Nhap vao khong trang -Xong
- * Xay dung cac lop ke thua Book va Magazine
+ * Xay dung cac lop ke thua Book va Magazine -Xong
  */
 
 
