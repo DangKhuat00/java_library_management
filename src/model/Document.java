@@ -45,6 +45,6 @@ public abstract class Document {
     public void setAvailable(boolean available) {isAvailable = available;}
 
     // ======================= Print Output =====================================
-    public abstract void printFor(Document doc) ;
+    public  abstract void printFor(Document doc);
 
 }

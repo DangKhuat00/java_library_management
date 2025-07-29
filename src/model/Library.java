@@ -279,7 +279,7 @@ public class Library implements dfDocument {
                 year = readScannerInt(scanner,"Enter year: ");
                 System.out.print("Enter numbers of book: ");
                 numbers = readScannerInt(scanner,"Enter numbers of book: ");
-                scanner.nextLine(); // consume newline
+                //scanner.nextLine(); // consume newline
             } catch (Exception e) {
                 System.out.println("Enter correct data, please");
                 scanner.nextLine(); // clear invalid input
@@ -300,9 +300,11 @@ public class Library implements dfDocument {
             }while(!(access.equals("Book")) && !(access.equals("Magazine")));
             if(access.equals("Book")) {
                 documents.add(new Book(id, title, author, publisher, category, year, numbers, isAvailable));
+                Book.upCount();
             }
             if(access.equals("Magazine")){
                 documents.add(new Magazine(id, title, author, publisher, category, year, numbers, isAvailable));
+                Magazine.upPage();
             }
             System.out.println("✅ Document added successfully!");
         }
@@ -507,7 +509,7 @@ public class Library implements dfDocument {
                 break;
             case dfDocument.ALLDOC:
                 for(Document doc : documents){
-                    
+                    doc.printFor(doc);
                 }
         }
     }
@@ -528,7 +530,6 @@ public class Library implements dfDocument {
                              " | Borrowed: " + user.getBorrowedDocuments().size() + "/" + user.getBorrowLimit());
         }
     }
-
 }
 
 /**

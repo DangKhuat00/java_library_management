@@ -195,8 +195,11 @@ public class LibraryApp {
     // Initialize sample documents
     private static void initializeSampleDocuments() {
         library.addDocument(new Book("DOC001", "Java Programming", "John Smith", "Education Publisher", "IT", 2023, 5, true));
+        Book.upCount();
         library.addDocument(new Book("DOC002", "Database Systems", "Jane Doe", "Science Publisher", "IT", 2022, 3, true));
+        Book.upCount();
         library.addDocument(new Magazine("DOC003", "Computer Networks", "Bob Wilson", "Technology Publisher", "IT", 2023, 2, true));
+        Magazine.upPage();
     }
     
     // Initialize sample users
