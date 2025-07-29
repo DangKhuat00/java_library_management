@@ -222,7 +222,7 @@ public class Library implements dfDocument {
      * @param scanner khong nhap vao khoang trang===============================================
      */
     public String readScannerString(Scanner scanner,String message){
-        String input = "";
+        String input;
         do {
 
             input = scanner.nextLine().trim();
@@ -236,7 +236,7 @@ public class Library implements dfDocument {
         return input;
     }
      public int readScannerInt(Scanner scanner,String message){
-        String input= "";
+        String input;
          do {
              input = scanner.nextLine().trim();
              if (input.isEmpty()){
@@ -260,7 +260,7 @@ public class Library implements dfDocument {
 
     public void addDocumentInteractive(Scanner scanner) {
         boolean tmp;
-        String id = "", title = "", author = "", publisher = "", category = "";
+        String id, title = "", author = "", publisher = "", category = "";
         int year = 0, numbers = 0;
         boolean isAvailable;
 
@@ -291,7 +291,7 @@ public class Library implements dfDocument {
         if(!isValidDocument(title,author,publisher,category,year)){
             id = generateId(); //ID duoc tu dong dinh dang theo DOC001
             System.out.println("You want to enter document is Book or Magazine");
-            String access = "";
+            String access;
             do {
                 access = readScannerString(scanner, "You want to enter document is Book or Magazine");
                 if(!(access.equals("Book")) && !(access.equals("Magazine"))){
@@ -317,11 +317,6 @@ public class Library implements dfDocument {
 
     /**
      *  Kiem tra xem da co tai lieu day chua
-     * @param title
-     * @param author
-     * @param publisher
-     * @param category
-     * @param year
      */
     public boolean isValidDocument(String title,String author,String publisher,String category,int year){
         for(Document doc : documents){
@@ -335,7 +330,7 @@ public class Library implements dfDocument {
         }
         return false;
     }
-
+//====================================================================================================================
     /**
     CHUAN HOA VIEC NHAP ID THEO DINH DANG
 
@@ -509,7 +504,7 @@ public class Library implements dfDocument {
                 break;
             case dfDocument.ALLDOC:
                 for(Document doc : documents){
-                    doc.printFor(doc);
+                   doc.prinAll();
                 }
         }
     }
@@ -538,7 +533,7 @@ public class Library implements dfDocument {
  * Khi xoa mot tai lieu thi ID cua cac tai lieu con lai phai thay the thu tu cua ID sach ma minh xoa -xong
  * Nhap vao khong trang -Xong
  * Xay dung cac lop ke thua Book va Magazine -Xong
- * Khi in ra tat ca tai lieu thi se gach bo Magazine va Book
+ * Khi in ra tat ca tai lieu thi se gach bo Magazine va Book -xong
  */
 
 

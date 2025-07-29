@@ -45,6 +45,16 @@ public abstract class Document {
     public void setAvailable(boolean available) {isAvailable = available;}
 
     // ======================= Print Output =====================================
+    public void prinAll(){
+        System.out.print("Id: " + this.id);
+        System.out.print(" - Title: " + this.title);
+        System.out.print(" - Author: " + this.author);
+        System.out.print(" - Publisher: " + this.publisher);
+        System.out.print(" - Category: " + this.category);
+        System.out.print(" - Year: " + this.year);
+        System.out.print(" - Numbers: " + this.numbers);
+        System.out.print(" - Is Available: " + this.isAvailable + "\n");
+    }
     public  abstract void printFor(Document doc);
 
 }
