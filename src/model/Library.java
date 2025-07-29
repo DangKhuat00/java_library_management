@@ -1,4 +1,5 @@
-package model;
+package librarymanage.java_library_management.src.model;
+
 
 import java.util.ArrayList;
 import java.util.List;
@@ -198,7 +199,6 @@ public class Library {
         String id = "", title = "", author = "", publisher = "", category = "";
         int year = 0, numbers = 0;
         boolean isAvailable;
-        
         do {
             tmp = false;
             try {
