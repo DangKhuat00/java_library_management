@@ -6,9 +6,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 interface dfDocument{
-    String TITLE = "1";
-    String AUTHOR= "2";
-    String CATEGORY = "3";
+    int TITLE = 1;
+    int AUTHOR= 2;
+    int CATEGORY = 3;
+    int BOOK = 1;
+    int MAGAZINE =2;
+    int ALLDOC = 3;
 }
 public class Library implements dfDocument {
     private List<Document> documents;
@@ -205,18 +208,18 @@ public class Library implements dfDocument {
 
 
     /**
-     *
+     *================================================================
      */
     public String generateId(){
         return String.format("DOC%03d",documents.size()+1);
     }
     /**
-     * Tao ding dang ID
+     * Tao ding dang ID=================================================
      */
 
 
     /**
-     * @param scanner khong nhap vao khoang trang
+     * @param scanner khong nhap vao khoang trang===============================================
      */
     public String readScannerString(Scanner scanner,String message){
         String input = "";
@@ -235,7 +238,6 @@ public class Library implements dfDocument {
      public int readScannerInt(Scanner scanner,String message){
         String input= "";
          do {
-
              input = scanner.nextLine().trim();
              if (input.isEmpty()){
                  System.out.println("Enter correct data,please");
@@ -243,12 +245,17 @@ public class Library implements dfDocument {
              }
 
          }while(input.isEmpty());
-
-         Integer tmp = Integer.parseInt(input);
-         return  tmp;
+         return Integer.parseInt(input);
     }
     /**
-    *
+    *===============================================================================
+     */
+
+
+
+    /**
+     * Them tai lieu tu terminal=================================================================================
+     *
      */
 
     public void addDocumentInteractive(Scanner scanner) {
@@ -283,7 +290,20 @@ public class Library implements dfDocument {
         isAvailable = numbers > 0;
         if(!isValidDocument(title,author,publisher,category,year)){
             id = generateId(); //ID duoc tu dong dinh dang theo DOC001
-            documents.add(new Document(id, title, author, publisher, category, year, numbers, isAvailable));
+            System.out.println("You want to enter document is Book or Magazine");
+            String access = "";
+            do {
+                access = readScannerString(scanner, "You want to enter document is Book or Magazine");
+                if(!(access.equals("Book")) && !(access.equals("Magazine"))){
+                    System.out.println("You just enter Book or Magazine. Please, enter correct data!");
+                }
+            }while(!(access.equals("Book")) && !(access.equals("Magazine")));
+            if(access.equals("Book")) {
+                documents.add(new Book(id, title, author, publisher, category, year, numbers, isAvailable));
+            }
+            if(access.equals("Magazine")){
+                documents.add(new Magazine(id, title, author, publisher, category, year, numbers, isAvailable));
+            }
             System.out.println("✅ Document added successfully!");
         }
         else{
@@ -332,10 +352,10 @@ public class Library implements dfDocument {
     }
     
     /**
-     * Delete document by ID
+     * Delete document by ID===========================================================
      */
     public void deleteDocument(Scanner scanner) {
-        displayAllDocuments();
+        displayAllDocuments(scanner);
         System.out.print("Enter ID you want to remove: ");
         String idDelete = readFormattedId(scanner);
         int tmp = -1;
@@ -363,10 +383,10 @@ public class Library implements dfDocument {
     }
     
     /**
-     * Update document information
+     * Update document information============================================================
      */
     public void updateDocument(Scanner scanner) {
-        displayAllDocuments();
+        displayAllDocuments(scanner);
         System.out.print("Enter the ID you want to update: ");
         String id = readFormattedId(scanner);
         
@@ -396,32 +416,26 @@ public class Library implements dfDocument {
     }
     
     /**
-     * Search documents
+     * Search documents=======================================================================================
      */
-
-
     public void findDocument(Scanner scanner){
         System.out.println("Search document by:\n1. Title\n2. Author\n3. Category");
         System.out.print("Choose option number: ");
-        String choice = "";
-        int tmp;
+        int tmp ;
         do {
-            tmp = scanner.nextInt();
+            tmp = readScannerInt(scanner,"Choose option number: ");
             if(tmp < 1 || tmp > 3){
                 System.out.println("You just enter: 1 - 3");
             }
-            else{
-                choice = String.valueOf(tmp);
-            }
         }while(tmp < 1 || tmp > 3);
-            switch (choice) {
+            switch (tmp) {
             case dfDocument.TITLE:
                 System.out.print("Enter title to search: ");
                 String title = scanner.nextLine();
                 boolean found1 = false;
                 for (Document doc : documents) {
                     if (doc.getTitle().toLowerCase().contains(title.toLowerCase())) {
-                        doc.printFor();
+                        doc.printFor(doc);
                         found1 = true;
                     }
                 }
@@ -434,7 +448,7 @@ public class Library implements dfDocument {
                 boolean found2 = false;
                 for (Document doc : documents) {
                     if (doc.getAuthor().toLowerCase().contains(author.toLowerCase())) {
-                        doc.printFor();
+                        doc.printFor(doc);
                         found2 = true;
                     }
                 }
@@ -447,13 +461,12 @@ public class Library implements dfDocument {
                 boolean found3 = false;
                 for (Document doc : documents) {
                     if (doc.getCategory().toLowerCase().contains(category.toLowerCase())) {
-                        doc.printFor();
+                        doc.printFor(doc);
                         found3 = true;
                     }
                 }
                 if (!found3) System.out.println("❌ No documents found in that category!");
                 break;
-                
             default:
                 System.out.println("❌ Invalid choice!");
                 break;
@@ -461,22 +474,47 @@ public class Library implements dfDocument {
     }
     
     /**
-     * Display all documents
+     * Display all documents=================================================================================
      */
-    public void displayAllDocuments() {
+    public void displayAllDocuments(Scanner scanner) {
         if (documents.isEmpty()) {
             System.out.println("❌ No documents available.");
             return;
         }
-        System.out.println("===== ALL DOCUMENTS =====");
-        for (Document doc : documents) {
-            doc.printFor();
+        System.out.println("You want to watch:\n1. Book\n2. Magazine\n3. All document");
+        System.out.print("Choose option number: ");
+        int tmp ;
+        do {
+            tmp = readScannerInt(scanner,"Choose option number: ");
+            if(tmp < 1 || tmp > 3){
+                System.out.println("You just enter: 1 - 3");
+            }
+        }while(tmp < 1 || tmp > 3);
+        switch(tmp){
+            case dfDocument.BOOK:
+                for(Document doc : documents){
+                    if(doc instanceof Book){
+                        doc.printFor(doc);
+                    }
+                }
+                break;
+            case dfDocument.MAGAZINE:
+                for(Document doc : documents){
+                    if(doc instanceof Magazine){
+                        doc.printFor(doc);
+                    }
+                }
+                break;
+            case dfDocument.ALLDOC:
+                for(Document doc : documents){
+                    
+                }
         }
     }
 
     
     /**
-     * Display all users
+     * Display all users=========================================================================================
      */
     public void displayAllUsers() {
         if (users.isEmpty()) {
@@ -491,10 +529,6 @@ public class Library implements dfDocument {
         }
     }
 
-    public static void main(String[] args) {
-
-    }
-    
 }
 
 /**
