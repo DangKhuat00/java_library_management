@@ -223,16 +223,14 @@ public class Library implements dfDocument {
      */
     public String readScannerString(Scanner scanner,String message){
         String input;
-        do {
-
+        while(true){
             input = scanner.nextLine().trim();
-            if (input.isEmpty()){
-                System.out.println("Enter correct data,please");
-                System.out.print(message);
+            if (!(input.isEmpty())){
+                break;
             }
-
-        }while(input.isEmpty());
-
+            System.out.println("Enter correct data,please");
+            System.out.print(message);
+        }
         return input;
     }
      public int readScannerInt(Scanner scanner,String message){
@@ -290,12 +288,12 @@ public class Library implements dfDocument {
         isAvailable = numbers > 0;
         if(!isValidDocument(title,author,publisher,category,year)){
             id = generateId(); //ID duoc tu dong dinh dang theo DOC001
-            System.out.println("You want to enter document is Book or Magazine");
+            System.out.println("You want to enter document is Book or Magazine ");
             String access;
             do {
-                access = readScannerString(scanner, "You want to enter document is Book or Magazine");
-                if(!(access.equals("Book")) && !(access.equals("Magazine"))){
-                    System.out.println("You just enter Book or Magazine. Please, enter correct data!");
+                access = readScannerString(scanner, "You want to enter document is Book or Magazine ");
+                if(!(access.equalsIgnoreCase("book")) && !(access.equalsIgnoreCase("magazine"))){
+                    System.out.println("You just enter Book or Magazine. Please, enter correct data! ");
                 }
             }while(!(access.equals("Book")) && !(access.equals("Magazine")));
             if(access.equals("Book")) {
