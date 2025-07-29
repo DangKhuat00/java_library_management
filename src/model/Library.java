@@ -1,16 +1,16 @@
 package librarymanage.java_library_management.src.model;
 
 
+import java.sql.SQLOutput;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 interface dfDocument{
-    public final String TITLE = "1";
-    public final String AUTHOR= "2";
-    public final String CATEGORY = "3";
+    String TITLE = "1";
+    String AUTHOR= "2";
+    String CATEGORY = "3";
 }
 public class Library implements dfDocument {
-    private String name;
     private List<Document> documents;
     private List<User> users;
     
@@ -205,11 +205,51 @@ public class Library implements dfDocument {
 
 
     /**
-     * Add new document with console input
+     *
      */
     public String generateId(){
         return String.format("DOC%03d",documents.size()+1);
     }
+    /**
+     * Tao ding dang ID
+     */
+
+
+    /**
+     * @param scanner khong nhap vao khoang trang
+     */
+    public String readScannerString(Scanner scanner,String message){
+        String input = "";
+        do {
+
+            input = scanner.nextLine().trim();
+            if (input.isEmpty()){
+                System.out.println("Enter correct data,please");
+                System.out.print(message);
+            }
+
+        }while(input.isEmpty());
+
+        return input;
+    }
+     public int readScannerInt(Scanner scanner,String message){
+        String input= "";
+         do {
+
+             input = scanner.nextLine().trim();
+             if (input.isEmpty()){
+                 System.out.println("Enter correct data,please");
+                 System.out.print(message);
+             }
+
+         }while(input.isEmpty());
+
+         Integer tmp = Integer.parseInt(input);
+         return  tmp;
+    }
+    /**
+    *
+     */
 
     public void addDocumentInteractive(Scanner scanner) {
         boolean tmp;
@@ -221,17 +261,17 @@ public class Library implements dfDocument {
             tmp = false;
             try {
                 System.out.print("Enter title: ");
-                title = scanner.nextLine();
+                title = readScannerString(scanner,"Enter title: ");
                 System.out.print("Enter author: ");
-                author = scanner.nextLine();
+                author = readScannerString(scanner,"Enter author: ");
                 System.out.print("Enter publisher: ");
-                publisher = scanner.nextLine();
+                publisher = readScannerString(scanner,"Enter publisher: ");
                 System.out.print("Enter category: ");
-                category = scanner.nextLine();
+                category = readScannerString(scanner,"Enter category: ");
                 System.out.print("Enter year: ");
-                year = scanner.nextInt();
+                year = readScannerInt(scanner,"Enter year: ");
                 System.out.print("Enter numbers of book: ");
-                numbers = scanner.nextInt();
+                numbers = readScannerInt(scanner,"Enter numbers of book: ");
                 scanner.nextLine(); // consume newline
             } catch (Exception e) {
                 System.out.println("Enter correct data, please");
@@ -260,7 +300,6 @@ public class Library implements dfDocument {
      * @param publisher
      * @param category
      * @param year
-     * @return
      */
     public boolean isValidDocument(String title,String author,String publisher,String category,int year){
         for(Document doc : documents){
@@ -326,8 +365,6 @@ public class Library implements dfDocument {
     /**
      * Update document information
      */
-
-
     public void updateDocument(Scanner scanner) {
         displayAllDocuments();
         System.out.print("Enter the ID you want to update: ");
@@ -453,6 +490,10 @@ public class Library implements dfDocument {
                              " | Borrowed: " + user.getBorrowedDocuments().size() + "/" + user.getBorrowLimit());
         }
     }
+
+    public static void main(String[] args) {
+
+    }
     
 }
 
@@ -460,7 +501,7 @@ public class Library implements dfDocument {
  * Nhung van de o phan document:
  * Nhap vao nhung tai lieu trung nhau -xong
  * Khi xoa mot tai lieu thi ID cua cac tai lieu con lai phai thay the thu tu cua ID sach ma minh xoa -xong
- * Nhap vao khong trang
+ * Nhap vao khong trang -Xong
  * Xay dung cac lop ke thua Book va Magazine
  */
 
