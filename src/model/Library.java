@@ -216,7 +216,7 @@ public class Library implements dfDocument {
         String id = "", title = "", author = "", publisher = "", category = "";
         int year = 0, numbers = 0;
         boolean isAvailable;
-        id = generateId(); //ID duoc tu dong dinh dang theo DOC001
+
         do {
             tmp = false;
             try {
@@ -241,8 +241,38 @@ public class Library implements dfDocument {
         } while (tmp);
         
         isAvailable = numbers > 0;
-        documents.add(new Document(id, title, author, publisher, category, year, numbers, isAvailable));
-        System.out.println("✅ Document added successfully!");
+        if(!isValidDocument(title,author,publisher,category,year)){
+            id = generateId(); //ID duoc tu dong dinh dang theo DOC001
+            documents.add(new Document(id, title, author, publisher, category, year, numbers, isAvailable));
+            System.out.println("✅ Document added successfully!");
+        }
+        else{
+            System.out.println("Document existed in list document");
+        }
+
+
+    }
+
+    /**
+     *  Kiem tra xem da co tai lieu day chua
+     * @param title
+     * @param author
+     * @param publisher
+     * @param category
+     * @param year
+     * @return
+     */
+    public boolean isValidDocument(String title,String author,String publisher,String category,int year){
+        for(Document doc : documents){
+            if(doc.getAuthor().equals(author) && doc.getTitle().equals(title)){
+                if(doc.getCategory().equals(category) && doc.getPublisher().equals(publisher)){
+                    if(doc.getYear() == year){
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
     }
 
     /**
@@ -283,6 +313,8 @@ public class Library implements dfDocument {
     /**
      * Update document information
      */
+
+
     public void updateDocument(Scanner scanner) {
         displayAllDocuments();
         System.out.print("Enter the ID you want to update: ");
@@ -412,7 +444,7 @@ public class Library implements dfDocument {
 
 /**
  * Con ba van de o phan document:
- * Nhap vao nhung tai lieu trung nhau
+ * Nhap vao nhung tai lieu trung nhau -xong
  * Khi xoa mot tai lieu thi ID cua cac tai lieu con lai phai thay the thu tu cua ID sach ma minh xoa
  * Xay dung cac lop ke thua Book va Magazine
  */
