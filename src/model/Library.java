@@ -298,16 +298,29 @@ public class Library implements dfDocument {
     public void deleteDocument(Scanner scanner) {
         displayAllDocuments();
         System.out.print("Enter ID you want to remove: ");
-        String iddelete = readFormattedId(scanner);
-        
+        String idDelete = readFormattedId(scanner);
+        int tmp = -1;
         for (int i = 0; i < documents.size(); i++) {
-            if (documents.get(i).getId().equals(iddelete)) {
+            if (documents.get(i).getId().equals(idDelete)) {
+                tmp = i;
                 documents.remove(i);
                 System.out.println("✅ Document removed successfully!");
-                return;
+                break;
             }
         }
-        System.out.println("❌ Document not found!");
+        if(tmp == -1) {
+            System.out.println("❌ Document not found!");
+        }
+        else {
+            /**
+             * Reset lai ID sach ve dung thu tu
+             */
+            for (int i = tmp; i < documents.size(); i++) {
+                String res2 = documents.get(i).getId();
+                documents.get(i).setId(idDelete);
+                idDelete = res2;
+            }
+        }
     }
     
     /**
@@ -444,9 +457,10 @@ public class Library implements dfDocument {
 }
 
 /**
- * Con ba van de o phan document:
+ * Nhung van de o phan document:
  * Nhap vao nhung tai lieu trung nhau -xong
- * Khi xoa mot tai lieu thi ID cua cac tai lieu con lai phai thay the thu tu cua ID sach ma minh xoa
+ * Khi xoa mot tai lieu thi ID cua cac tai lieu con lai phai thay the thu tu cua ID sach ma minh xoa -xong
+ * Nhap vao khong trang
  * Xay dung cac lop ke thua Book va Magazine
  */
 
