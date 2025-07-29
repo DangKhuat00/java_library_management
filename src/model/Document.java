@@ -1,7 +1,5 @@
 package librarymanage.java_library_management.src.model;
 
-import java.util.*;
-
 public class Document {
     private String id;
     private String title;

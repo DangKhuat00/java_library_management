@@ -244,6 +244,23 @@ public class Library implements dfDocument {
         documents.add(new Document(id, title, author, publisher, category, year, numbers, isAvailable));
         System.out.println("✅ Document added successfully!");
     }
+
+    /**
+    CHUAN HOA VIEC NHAP ID THEO DINH DANG
+
+     */
+    private String readFormattedId(Scanner scanner) {
+        String input;
+        while (true) {
+            System.out.print("Enter the document ID in the format 'DOCxxx' (e.g., DOC001): ");
+            input = scanner.nextLine().trim();
+            if (input.matches("^DOC\\d{3}$")) {
+                return input;
+            } else {
+                System.out.println("Invalid format! Please enter something like DOC001, DOC123...");
+            }
+        }
+    }
     
     /**
      * Delete document by ID
@@ -251,7 +268,7 @@ public class Library implements dfDocument {
     public void deleteDocument(Scanner scanner) {
         displayAllDocuments();
         System.out.print("Enter ID you want to remove: ");
-        String id = scanner.nextLine();
+        String id = readFormattedId(scanner);
         
         for (int i = 0; i < documents.size(); i++) {
             if (documents.get(i).getId().equals(id)) {
@@ -269,7 +286,7 @@ public class Library implements dfDocument {
     public void updateDocument(Scanner scanner) {
         displayAllDocuments();
         System.out.print("Enter the ID you want to update: ");
-        String id = scanner.nextLine();
+        String id = readFormattedId(scanner);
         
         for (Document doc : documents) {
             if (doc.getId().equals(id)) {
@@ -392,3 +409,12 @@ public class Library implements dfDocument {
     }
     
 }
+
+/**
+ * Con ba van de o phan document:
+ * Nhap vao nhung tai lieu trung nhau
+ * Khi xoa mot tai lieu thi ID cua cac tai lieu con lai phai thay the thu tu cua ID sach ma minh xoa
+ * Xay dung cac lop ke thua Book va Magazine
+ */
+
+
