@@ -1,4 +1,5 @@
-package model;
+package librarymanage.java_library_management.src.model;
+
 
 import java.util.Scanner;
 import java.io.PrintStream;
@@ -44,7 +45,7 @@ public class LibraryApp {
                     library.findDocument(scanner);
                     break;
                 case 5:
-                    library.displayAllDocuments();
+                    library.displayAllDocuments(scanner);
                     break;
                 case 6:
                     addUser();
@@ -154,7 +155,7 @@ public class LibraryApp {
         System.out.print("Enter user ID: ");
         String userId = scanner.nextLine();
         
-        library.displayAllDocuments();
+        library.displayAllDocuments(scanner);
         System.out.print("Enter document ID to borrow: ");
         String documentId = scanner.nextLine();
         
@@ -193,9 +194,12 @@ public class LibraryApp {
     
     // Initialize sample documents
     private static void initializeSampleDocuments() {
-        library.addDocument(new Document("DOC001", "Java Programming", "John Smith", "Education Publisher", "IT", 2023, 5, true));
-        library.addDocument(new Document("DOC002", "Database Systems", "Jane Doe", "Science Publisher", "IT", 2022, 3, true));
-        library.addDocument(new Document("DOC003", "Computer Networks", "Bob Wilson", "Technology Publisher", "IT", 2023, 2, true));
+        library.addDocument(new Book("DOC001", "Java Programming", "John Smith", "Education Publisher", "IT", 2023, 5, true));
+        Book.upCount();
+        library.addDocument(new Book("DOC002", "Database Systems", "Jane Doe", "Science Publisher", "IT", 2022, 3, true));
+        Book.upCount();
+        library.addDocument(new Magazine("DOC003", "Computer Networks", "Bob Wilson", "Technology Publisher", "IT", 2023, 2, true));
+        Magazine.upPage();
     }
     
     // Initialize sample users

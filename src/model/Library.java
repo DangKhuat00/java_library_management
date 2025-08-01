@@ -1,11 +1,19 @@
-package model;
+package librarymanage.java_library_management.src.model;
 
+
+import java.sql.SQLOutput;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
-
-public class Library {
-    private String name;
+interface dfDocument{
+    int TITLE = 1;
+    int AUTHOR= 2;
+    int CATEGORY = 3;
+    int BOOK = 1;
+    int MAGAZINE =2;
+    int ALLDOC = 3;
+}
+public class Library implements dfDocument {
     private List<Document> documents;
     private List<User> users;
     
@@ -188,35 +196,88 @@ public class Library {
         documents.add(document);
     }
     
-    // ========== DOCUMENT MANAGEMENT FUNCTIONS ==========
-    
+    // ========== DOCUMENT MANAGEMENT FUNCTIONS =======================================================================\
+    //==========================================================================\
+     //==========================================================================\
+     //==================================================================================\
+     //===============================================================================\
+     //======================================================================================================\
+     //
+
+
+
+
     /**
-     * Add new document with console input
+     *================================================================
      */
+    public String generateId(){
+        return String.format("DOC%03d",documents.size()+1);
+    }
+    /**
+     * Tao ding dang ID=================================================
+     */
+
+
+    /**
+     * @param scanner khong nhap vao khoang trang===============================================
+     */
+    public String readScannerString(Scanner scanner,String message){
+        String input;
+        while(true){
+            input = scanner.nextLine().trim();
+            if (!(input.isEmpty())){
+                break;
+            }
+            System.out.println("Enter correct data,please");
+            System.out.print(message);
+        }
+        return input;
+    }
+     public int readScannerInt(Scanner scanner,String message){
+        String input;
+         do {
+             input = scanner.nextLine().trim();
+             if (input.isEmpty()){
+                 System.out.println("Enter correct data,please");
+                 System.out.print(message);
+             }
+
+         }while(input.isEmpty());
+         return Integer.parseInt(input);
+    }
+    /**
+    *===============================================================================
+     */
+
+
+
+    /**
+     * Them tai lieu tu terminal=================================================================================
+     *
+     */
+
     public void addDocumentInteractive(Scanner scanner) {
         boolean tmp;
-        String id = "", title = "", author = "", publisher = "", category = "";
+        String id, title = "", author = "", publisher = "", category = "";
         int year = 0, numbers = 0;
         boolean isAvailable;
-        
+
         do {
             tmp = false;
             try {
-                System.out.print("Enter ID: ");
-                id = scanner.nextLine();
                 System.out.print("Enter title: ");
-                title = scanner.nextLine();
+                title = readScannerString(scanner,"Enter title: ");
                 System.out.print("Enter author: ");
-                author = scanner.nextLine();
+                author = readScannerString(scanner,"Enter author: ");
                 System.out.print("Enter publisher: ");
-                publisher = scanner.nextLine();
+                publisher = readScannerString(scanner,"Enter publisher: ");
                 System.out.print("Enter category: ");
-                category = scanner.nextLine();
+                category = readScannerString(scanner,"Enter category: ");
                 System.out.print("Enter year: ");
-                year = scanner.nextInt();
+                year = readScannerInt(scanner,"Enter year: ");
                 System.out.print("Enter numbers of book: ");
-                numbers = scanner.nextInt();
-                scanner.nextLine(); // consume newline
+                numbers = readScannerInt(scanner,"Enter numbers of book: ");
+                //scanner.nextLine(); // consume newline
             } catch (Exception e) {
                 System.out.println("Enter correct data, please");
                 scanner.nextLine(); // clear invalid input
@@ -225,33 +286,104 @@ public class Library {
         } while (tmp);
         
         isAvailable = numbers > 0;
-        documents.add(new Document(id, title, author, publisher, category, year, numbers, isAvailable));
-        System.out.println("✅ Document added successfully!");
+        if(!isValidDocument(title,author,publisher,category,year)){
+            id = generateId(); //ID duoc tu dong dinh dang theo DOC001
+            System.out.println("You want to enter document is Book or Magazine ");
+            String access;
+            do {
+                access = readScannerString(scanner, "You want to enter document is Book or Magazine ");
+                if(!(access.equalsIgnoreCase("book")) && !(access.equalsIgnoreCase("magazine"))){
+                    System.out.println("You just enter Book or Magazine. Please, enter correct data! ");
+                }
+            }while(!(access.equals("Book")) && !(access.equals("Magazine")));
+            if(access.equals("Book")) {
+                documents.add(new Book(id, title, author, publisher, category, year, numbers, isAvailable));
+                Book.upCount();
+            }
+            if(access.equals("Magazine")){
+                documents.add(new Magazine(id, title, author, publisher, category, year, numbers, isAvailable));
+                Magazine.upPage();
+            }
+            System.out.println("✅ Document added successfully!");
+        }
+        else{
+            System.out.println("Document existed in list document");
+        }
+
+
     }
-    
+
     /**
-     * Delete document by ID
+     *  Kiem tra xem da co tai lieu day chua
      */
-    public void deleteDocument(Scanner scanner) {
-        System.out.print("Enter ID you want to remove: ");
-        String id = scanner.nextLine();
-        
-        for (int i = 0; i < documents.size(); i++) {
-            if (documents.get(i).getId().equals(id)) {
-                documents.remove(i);
-                System.out.println("✅ Document removed successfully!");
-                return;
+    public boolean isValidDocument(String title,String author,String publisher,String category,int year){
+        for(Document doc : documents){
+            if(doc.getAuthor().equals(author) && doc.getTitle().equals(title)){
+                if(doc.getCategory().equals(category) && doc.getPublisher().equals(publisher)){
+                    if(doc.getYear() == year){
+                        return true;
+                    }
+                }
             }
         }
-        System.out.println("❌ Document not found!");
+        return false;
+    }
+//====================================================================================================================
+    /**
+    CHUAN HOA VIEC NHAP ID THEO DINH DANG
+
+     */
+    private String readFormattedId(Scanner scanner) {
+        String input;
+        while (true) {
+            System.out.print("Enter the document ID in the format 'DOCxxx' (e.g., DOC001): ");
+            input = scanner.nextLine().trim();
+            if (input.matches("^DOC\\d{3}$")) {
+                return input;
+            } else {
+                System.out.println("Invalid format! Please enter something like DOC001, DOC123...");
+            }
+        }
     }
     
     /**
-     * Update document information
+     * Delete document by ID===========================================================
+     */
+    public void deleteDocument(Scanner scanner) {
+        displayAllDocuments(scanner);
+        System.out.print("Enter ID you want to remove: ");
+        String idDelete = readFormattedId(scanner);
+        int tmp = -1;
+        for (int i = 0; i < documents.size(); i++) {
+            if (documents.get(i).getId().equals(idDelete)) {
+                tmp = i;
+                documents.remove(i);
+                System.out.println("✅ Document removed successfully!");
+                break;
+            }
+        }
+        if(tmp == -1) {
+            System.out.println("❌ Document not found!");
+        }
+        else {
+            /**
+             * Reset lai ID sach ve dung thu tu
+             */
+            for (int i = tmp; i < documents.size(); i++) {
+                String res2 = documents.get(i).getId();
+                documents.get(i).setId(idDelete);
+                idDelete = res2;
+            }
+        }
+    }
+    
+    /**
+     * Update document information============================================================
      */
     public void updateDocument(Scanner scanner) {
+        displayAllDocuments(scanner);
         System.out.print("Enter the ID you want to update: ");
-        String id = scanner.nextLine();
+        String id = readFormattedId(scanner);
         
         for (Document doc : documents) {
             if (doc.getId().equals(id)) {
@@ -279,53 +411,57 @@ public class Library {
     }
     
     /**
-     * Search documents
+     * Search documents=======================================================================================
      */
-    public void findDocument(Scanner scanner) {
+    public void findDocument(Scanner scanner){
         System.out.println("Search document by:\n1. Title\n2. Author\n3. Category");
-        System.out.print("Choose option: ");
-        String choice = scanner.nextLine();
-        
-        switch (choice) {
-            case "1":
+        System.out.print("Choose option number: ");
+        int tmp ;
+        do {
+            tmp = readScannerInt(scanner,"Choose option number: ");
+            if(tmp < 1 || tmp > 3){
+                System.out.println("You just enter: 1 - 3");
+            }
+        }while(tmp < 1 || tmp > 3);
+            switch (tmp) {
+            case dfDocument.TITLE:
                 System.out.print("Enter title to search: ");
                 String title = scanner.nextLine();
                 boolean found1 = false;
                 for (Document doc : documents) {
                     if (doc.getTitle().toLowerCase().contains(title.toLowerCase())) {
-                        doc.printFor();
+                        doc.printFor(doc);
                         found1 = true;
                     }
                 }
                 if (!found1) System.out.println("❌ No documents found with that title!");
                 break;
                 
-            case "2":
+            case dfDocument.AUTHOR:
                 System.out.print("Enter author to search: ");
                 String author = scanner.nextLine();
                 boolean found2 = false;
                 for (Document doc : documents) {
                     if (doc.getAuthor().toLowerCase().contains(author.toLowerCase())) {
-                        doc.printFor();
+                        doc.printFor(doc);
                         found2 = true;
                     }
                 }
                 if (!found2) System.out.println("❌ No documents found with that author!");
                 break;
                 
-            case "3":
+            case dfDocument.CATEGORY:
                 System.out.print("Enter category to search: ");
                 String category = scanner.nextLine();
                 boolean found3 = false;
                 for (Document doc : documents) {
                     if (doc.getCategory().toLowerCase().contains(category.toLowerCase())) {
-                        doc.printFor();
+                        doc.printFor(doc);
                         found3 = true;
                     }
                 }
                 if (!found3) System.out.println("❌ No documents found in that category!");
                 break;
-                
             default:
                 System.out.println("❌ Invalid choice!");
                 break;
@@ -333,21 +469,47 @@ public class Library {
     }
     
     /**
-     * Display all documents
+     * Display all documents=================================================================================
      */
-    public void displayAllDocuments() {
+    public void displayAllDocuments(Scanner scanner) {
         if (documents.isEmpty()) {
             System.out.println("❌ No documents available.");
             return;
         }
-        System.out.println("===== ALL DOCUMENTS =====");
-        for (Document doc : documents) {
-            doc.printFor();
+        System.out.println("You want to watch:\n1. Book\n2. Magazine\n3. All document");
+        System.out.print("Choose option number: ");
+        int tmp ;
+        do {
+            tmp = readScannerInt(scanner,"Choose option number: ");
+            if(tmp < 1 || tmp > 3){
+                System.out.println("You just enter: 1 - 3");
+            }
+        }while(tmp < 1 || tmp > 3);
+        switch(tmp){
+            case dfDocument.BOOK:
+                for(Document doc : documents){
+                    if(doc instanceof Book){
+                        doc.printFor(doc);
+                    }
+                }
+                break;
+            case dfDocument.MAGAZINE:
+                for(Document doc : documents){
+                    if(doc instanceof Magazine){
+                        doc.printFor(doc);
+                    }
+                }
+                break;
+            case dfDocument.ALLDOC:
+                for(Document doc : documents){
+                   doc.prinAll();
+                }
         }
     }
+
     
     /**
-     * Display all users
+     * Display all users=========================================================================================
      */
     public void displayAllUsers() {
         if (users.isEmpty()) {
@@ -361,5 +523,16 @@ public class Library {
                              " | Borrowed: " + user.getBorrowedDocuments().size() + "/" + user.getBorrowLimit());
         }
     }
-    
 }
+
+/**
+ * Nhung van de o phan document:
+ * Nhap vao nhung tai lieu trung nhau -xong
+ * Khi xoa mot tai lieu thi ID cua cac tai lieu con lai phai thay the thu tu cua ID sach ma minh xoa -xong
+ * Nhap vao khong trang -Xong
+ * Xay dung cac lop ke thua Book va Magazine -Xong
+ * Khi in ra tat ca tai lieu thi se gach bo Magazine va Book -xong
+ * Dang tim kiem loi
+ */
+
+
