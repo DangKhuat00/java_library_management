@@ -21,6 +21,13 @@ public class User {
         this.borrowedDocuments = new ArrayList<>();
     }
     
+    // Constructor to match parameters used in UserDAO
+    public User(String id, String name, String email) {
+        this.id = id;
+        this.name = name;
+        this.email = email;
+    }
+    
     // ========== DOCUMENT BORROWING FUNCTIONS ==========
     
     public boolean borrowDocument(Document document) {

@@ -5,6 +5,11 @@ public class Magazine extends Document {
     public Magazine(String id, String title, String author, String publisher, String category, int year, int numbers, boolean isAvailable) {
         super(id, title, author, publisher, category, year, numbers, isAvailable);
     }
+
+    // constructor rút gọn cho chỗ gọi new Magazine(id, title, author, year, "MAGAZINE")
+    public Magazine(String id, String title, String author, int year, String category) {
+        super(id, title, author, "", category, year, 1, true);
+    }
     
     @Override
     public void displayInfo() {

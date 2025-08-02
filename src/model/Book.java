@@ -6,6 +6,11 @@ public class Book extends Document {
         super(id, title, author, publisher, category, year, numbers, isAvailable);
     }
     
+    // thêm constructor mới cho chỗ gọi new Book(id, title, author, year, "BOOK")
+    public Book(String id, String title, String author, int year, String category) {
+        super(id, title, author, "", category, year, 1, true);
+    }
+
     @Override
     public void displayInfo() {
         System.out.println("===== BOOK INFORMATION =====");

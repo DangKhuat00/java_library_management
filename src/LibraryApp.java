@@ -1,19 +1,30 @@
+import config.DatabaseConfig;
+import dao.DocumentDAO;
+import dao.UserDAO;
+import model.Document;
+import model.User;
 import model.Library;
 import java.util.Scanner;
 
 /**
  * Main application class - Library Management System
- * Command line version with basic OOP implementation
+ * MySQL Database version with OOP implementation
+ * Persistent storage using MySQL database
  */
 public class LibraryApp {
     private static Library library = new Library();
     private static Scanner scanner = new Scanner(System.in);
     
     public static void main(String[] args) {
-        // Initialize sample data
-        library.initializeSampleData();
+        System.out.println("========================================");
+        System.out.println("    LIBRARY MANAGEMENT SYSTEM");
+        System.out.println("         MySQL Database Edition");
+        System.out.println("========================================");
         
-        System.out.println("Welcome to My Application!");
+        // Initialize database tables
+        DatabaseConfig.initializeDatabase();
+        
+        System.out.println("Welcome to Library Management System!");
         
         // Main application loop
         while (true) {
@@ -110,6 +121,92 @@ public class LibraryApp {
             } catch (Exception e) {
                 System.out.println("Action is not supported");
             }
+        }
+    }
+
+    private static void manageDocuments(Scanner scanner, DocumentDAO documentDAO) {
+        System.out.println("\nDocument Management");
+        System.out.println("1. View All Documents");
+        System.out.println("2. Search Documents");
+        System.out.println("3. Add Document");
+        System.out.println("4. Exit");
+        System.out.print("Choose an option: ");
+
+        int choice = scanner.nextInt();
+        scanner.nextLine();
+
+        switch (choice) {
+            case 1:
+                documentDAO.getAllDocuments().forEach(System.out::println);
+                break;
+            case 2:
+                System.out.print("Enter keyword: ");
+                String keyword = scanner.nextLine();
+                documentDAO.searchDocuments(keyword).forEach(System.out::println);
+                break;
+            case 3:
+                System.out.print("Enter document ID: ");
+                String id = scanner.nextLine();
+                System.out.print("Enter title: ");
+                String title = scanner.nextLine();
+                System.out.print("Enter author: ");
+                String author = scanner.nextLine();
+                System.out.print("Enter publication year: ");
+                int year = scanner.nextInt();
+                scanner.nextLine();
+                System.out.print("Enter type (BOOK/MAGAZINE): ");
+                String type = scanner.nextLine();
+
+                Document document = type.equalsIgnoreCase("BOOK") ?
+                        new model.Book(id, title, author, "", "", year, 1, true) :
+                        new model.Magazine(id, title, author, "", "", year, 1, true);
+
+                if (documentDAO.insertDocument(document)) {
+                    System.out.println("Document added successfully.");
+                } else {
+                    System.out.println("Failed to add document.");
+                }
+                break;
+            case 4:
+                return;
+            default:
+                System.out.println("Invalid choice.");
+        }
+    }
+
+    private static void manageUsers(Scanner scanner, UserDAO userDAO) {
+        System.out.println("\nUser Management");
+        System.out.println("1. View All Users");
+        System.out.println("2. Add User");
+        System.out.println("3. Exit");
+        System.out.print("Choose an option: ");
+
+        int choice = scanner.nextInt();
+        scanner.nextLine();
+
+        switch (choice) {
+            case 1:
+                userDAO.getAllUsers().forEach(System.out::println);
+                break;
+            case 2:
+                System.out.print("Enter user ID: ");
+                String id = scanner.nextLine();
+                System.out.print("Enter name: ");
+                String name = scanner.nextLine();
+                System.out.print("Enter email: ");
+                String email = scanner.nextLine();
+
+                User user = new User(id, name, email);
+                if (userDAO.insertUser(user)) {
+                    System.out.println("User added successfully.");
+                } else {
+                    System.out.println("Failed to add user.");
+                }
+                break;
+            case 3:
+                return;
+            default:
+                System.out.println("Invalid choice.");
         }
     }
 }
