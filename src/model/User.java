@@ -4,109 +4,34 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class User {
-    private String id;
+    private int id;
     private String name;
     private String email;
     private String phoneNumber;
     private int borrowLimit;
     private List<Document> borrowedDocuments;
-    private static int userCounter = 1;
 
-    /*  Constructor - Add initialized member
-    public User(String id, String name, String email, String phoneNumber, int borrowLimit){
-        this.id = id;
-        this.name = name;
-        this.email = email;
-        this.phoneNumber = phoneNumber;
-        this.borrowLimit = borrowLimit;
-        this.borrowedDocuments = new ArrayList<>();
-    }
-    */
+    public User(int id, String name, String email, String phoneNumber) {
+    this.id = id;
+    this.name = name;
+    this.email = email;
+    this.phoneNumber = phoneNumber;
+    this.borrowLimit = borrowLimit;
+    this.borrowedDocuments = new ArrayList<>();
+}
+
     // Constructor to match parameters used in UserDAO
     public User(String name, String email, String phoneNumber) {
-    this.id = "USER" + String.format("%04d", userCounter++);
     this.name = name;
     this.email = email;
     this.phoneNumber = phoneNumber;
     this.borrowLimit = 10;
     this.borrowedDocuments = new ArrayList<>();
 }
-
-    /* 
-    // ========== DOCUMENT BORROWING FUNCTIONS ==========
-    
-    public boolean borrowDocument(Document document) {
-        // Check borrowing limit
-        if (borrowedDocuments.size() >= borrowLimit) {
-            return false;
-        }
-        
-        // Check if document is available
-        if (!document.isAvailable()) {
-            return false;
-        }
-        
-        // Check if already borrowed this document
-        if (borrowedDocuments.contains(document)) {
-            return false;
-        }
-        
-        // Execute borrowing
-        borrowedDocuments.add(document);
-        document.setAvailable(false);
-        return true;
-    }
-    
-    // ========== DOCUMENT RETURN FUNCTIONS ==========
-    
-    public boolean returnDocument(Document document) {
-        // Check if borrowed this document
-        if (!borrowedDocuments.contains(document)) {
-            return false;
-        }
-        
-        // Execute return
-        borrowedDocuments.remove(document);
-        document.setAvailable(true);
-        return true;
-    }
-    
-    // ========== MEMBER INFORMATION MANAGEMENT FUNCTIONS ==========
-    
-    public void updatePersonalInfo(String name, String email, String phoneNumber) {
-        if (name != null && !name.trim().isEmpty()) {
-            this.name = name;
-        }
-        if (email != null && !email.trim().isEmpty()) {
-            this.email = email;
-        }
-        if (phoneNumber != null && !phoneNumber.trim().isEmpty()) {
-            this.phoneNumber = phoneNumber;
-        }
-    }
-    
-    // ========== UTILITY METHODS ==========
-    
-    public boolean canBorrowMore() {
-        return borrowedDocuments.size() < borrowLimit;
-    }
-    
-    public int getBorrowedCount() {
-        return borrowedDocuments.size();
-    }
-    
-    public boolean isValidUser() {
-        return id != null && !id.trim().isEmpty() &&
-               name != null && !name.trim().isEmpty() &&
-               email != null && email.contains("@") &&
-               phoneNumber != null && !phoneNumber.trim().isEmpty() &&
-               borrowLimit > 0;
-    }
-    */
     
     // ========== GETTERS AND SETTERS ==========
     
-    public String getId() { return id; }
+    public int getId() { return id; }
     
     public String getName() { return name; }
     public void setName(String name) { this.name = name; }
@@ -121,4 +46,10 @@ public class User {
     public void setBorrowLimit(int borrowLimit) { this.borrowLimit = borrowLimit; }
     
     public List<Document> getBorrowedDocuments() { return new ArrayList<>(borrowedDocuments); }
+
+    @Override
+    public String toString() {
+        return "User{id=" + id + ", name=" + name + ", email=" + email + "}";
+    }
 }
+

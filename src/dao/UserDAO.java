@@ -17,16 +17,15 @@ public class UserDAO {
      * Insert a new user into database
      */
     public boolean insertUser(User user) {
-        String sql = "INSERT INTO users (id, name, email, phoneNumber, borrowLimit) VALUES (?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO users ( name, email, phoneNumber, borrowLimit) VALUES ( ?, ?, ?, ?)";
 
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
-            stmt.setString(1, user.getId());
-            stmt.setString(2, user.getName());
-            stmt.setString(3, user.getEmail());
-            stmt.setString(4, user.getPhoneNumber());
-            stmt.setInt(5, user.getBorrowLimit());
+            stmt.setString(1, user.getName());
+            stmt.setString(2, user.getEmail());
+            stmt.setString(3, user.getPhoneNumber());
+            stmt.setInt(4, user.getBorrowLimit());
 
             int result = stmt.executeUpdate();
             return result > 0;
@@ -63,20 +62,21 @@ public class UserDAO {
         /**
      * Lấy user theo ID
      */
-    public User getUserById(String id) {
+    public User getUserById(int id) {
         String sql = "SELECT * FROM users WHERE id = ?";
         try (Connection conn = DriverManager.getConnection(
                  DatabaseConfig.DB_URL,
                  DatabaseConfig.DB_USERNAME,
                  DatabaseConfig.DB_PASSWORD);
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            pstmt.setString(1, id);
+            pstmt.setInt(1, id);
             try (ResultSet rs = pstmt.executeQuery()) {
                 if (rs.next()) {
                     return new User(
-                        rs.getString("id"),
+                        rs.getInt("id"),
                         rs.getString("name"),
-                        rs.getString("email"));
+                        rs.getString("email"),
+                        rs.getString("phoneNumber"));
                 }
             }
         } catch (SQLException e) {
@@ -86,40 +86,18 @@ public class UserDAO {
     }
 
     /**
-     * Find user by ID
-     */
-    public User findUserById(String id) {
-        String sql = "SELECT * FROM users WHERE id = ?";
-
-        try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-
-            stmt.setString(1, id);
-            ResultSet rs = stmt.executeQuery();
-
-            if (rs.next()) {
-                return new User(rs.getString("id"), rs.getString("name"), rs.getString("email"));
-            }
-
-        } catch (SQLException e) {
-            System.err.println("Error finding user: " + e.getMessage());
-        }
-
-        return null;
-    }
-
-    /**
      * Update user in database
      */
     public boolean updateUser(User user) {
-        String sql = "UPDATE users SET name = ?, email = ? WHERE id = ?";
+        String sql = "UPDATE users SET name = ?, email = ?, phoneNumber = ? WHERE id = ?";
 
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setString(1, user.getName());
             stmt.setString(2, user.getEmail());
-            stmt.setString(3, user.getId());
+            stmt.setString(4, user.getPhoneNumber());
+            stmt.setInt(3, user.getId());
 
             int result = stmt.executeUpdate();
             return result > 0;

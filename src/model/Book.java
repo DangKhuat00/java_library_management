@@ -8,7 +8,7 @@ public class Book extends Document {
         this.numberOfPages = numberOfPages;
     }
 
-     public Book( String id, String title, String author, int publication_year, int numberOfPages) {
+     public Book( int id, String title, String author, int publication_year, int numberOfPages) {
         super( id, title, author, publication_year, DocumentType.BOOK);
         this.numberOfPages = numberOfPages;
     }

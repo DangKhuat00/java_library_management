@@ -1,16 +1,14 @@
 package model;
 
 public abstract class Document {
-    protected String id;
+    protected int id;
     protected String title;
     protected String author;
     protected int publication_year;
     protected boolean isAvailable;
     protected DocumentType documentType; // ← Loại tài liệu
-    private static int docCounter = 1;
 
     public Document( String title, String author, int publication_year, DocumentType documentType) {
-        this.id = "DOC" + String.format("%04d", docCounter++);
         this.title = title;
         this.author = author;
         this.publication_year = publication_year;
@@ -18,7 +16,7 @@ public abstract class Document {
         this.isAvailable = false;
     }
 
-    public Document( String id, String title, String author, int publication_year, DocumentType documentType) {
+    public Document( int id, String title, String author, int publication_year, DocumentType documentType) {
         this.id = id;
         this.title = title;
         this.author = author;
@@ -30,7 +28,7 @@ public abstract class Document {
     public abstract void displayInfo();
 
     // Getters
-    public String getId() { return id; }
+    public int getId() { return id; }
     public String getTitle() { return title; }
     public String getAuthor() { return author; }
     public int getYear() { return publication_year; }
@@ -46,6 +44,7 @@ public abstract class Document {
 
     @Override
     public String toString() {
-        return "[" + documentType + "] " + title + " by " + author;
+        return "[" + documentType + "] " + " " + id + " " +
+        title + " " + author + " " + publication_year + " " +isAvailable;
     }
 }

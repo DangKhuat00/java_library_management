@@ -8,7 +8,7 @@ public class Magazine extends Document {
         this.issueNumber = issueNumber;
     }
 
-    public Magazine( String id, String title, String author, int publication_year, int issueNumber) {
+    public Magazine( int id, String title, String author, int publication_year, int issueNumber) {
         super( id, title, author, publication_year, DocumentType.MAGAZINE);
         this.issueNumber = issueNumber;
     }

@@ -7,40 +7,43 @@ import java.util.List;
 
 public class DocumentDAO {
 
-    public boolean insertDocument(Document document) {
-        String sql = "INSERT INTO documents (id, title, author, publication_year, document_type, number_of_pages, issue_number) VALUES (?, ?, ?, ?, ?, ?, ?)";
+   public boolean insertDocument(Document document) {
+    String sql = "INSERT INTO documents (title, author, publication_year, document_type, number_of_pages, issue_number) " +
+                 "VALUES (?, ?, ?, ?, ?, ?)";
 
-        try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
+    try (Connection conn = DatabaseConnection.getConnection();
+         PreparedStatement stmt = conn.prepareStatement(sql)) {
 
-            stmt.setString(1, document.getId());
-            stmt.setString(2, document.getTitle());
-            stmt.setString(3, document.getAuthor());
-            stmt.setInt(4, document.getYear());
-            stmt.setString(5, document.getDocumentType().name());
+        // Không cần set ID nếu để AUTO_INCREMENT trong SQL
+        stmt.setString(1, document.getTitle());
+        stmt.setString(2, document.getAuthor());
+        stmt.setInt(3, document.getYear());
+        stmt.setString(4, document.getDocumentType().name());
 
-            if (document instanceof Book book) {
-                stmt.setInt(6, book.getNumberOfPages());
-                stmt.setNull(7, Types.INTEGER);
-            } else if (document instanceof Magazine magazine) {
-                stmt.setNull(6, Types.INTEGER);
-                stmt.setInt(7, magazine.getIssueNumber());
-            } else {
-                stmt.setNull(6, Types.INTEGER);
-                stmt.setNull(7, Types.INTEGER);
-            }
+        // Gán thuộc tính đặc trưng của từng loại tài liệu
+        if (document instanceof Book book) {
+            stmt.setInt(5, book.getNumberOfPages());
+            stmt.setNull(6, Types.INTEGER);
+        } else if (document instanceof Magazine magazine) {
+            stmt.setNull(5, Types.INTEGER);
+            stmt.setInt(6, magazine.getIssueNumber());
+        } else {
+            stmt.setNull(5, Types.INTEGER);
+            stmt.setNull(6, Types.INTEGER);
+        }
 
-            return stmt.executeUpdate() > 0;
-
+        int rowsAffected = stmt.executeUpdate();
+        return rowsAffected > 0;
         } catch (SQLException e) {
-            System.err.println("Error inserting document: " + e.getMessage());
-            return false;
+        System.err.println(" Error inserting document: " + e.getMessage());
+        return false;
         }
     }
 
+
     public List<Document> getAllDocuments() {
         List<Document> documents = new ArrayList<>();
-        String sql = "SELECT * FROM documents ORDER BY created_at DESC";
+        String sql = "SELECT * FROM documents ORDER BY id DESC";
 
         try (Connection conn = DatabaseConnection.getConnection();
              Statement stmt = conn.createStatement();
@@ -58,26 +61,6 @@ public class DocumentDAO {
         }
 
         return documents;
-    }
-
-    public Document findDocumentById(String id) {
-        String sql = "SELECT * FROM documents WHERE id = ?";
-
-        try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-
-            stmt.setString(1, id);
-            ResultSet rs = stmt.executeQuery();
-
-            if (rs.next()) {
-                return createDocumentFromResultSet(rs);
-            }
-
-        } catch (SQLException e) {
-            System.err.println("Error finding document: " + e.getMessage());
-        }
-
-        return null;
     }
 
     public boolean updateDocument(Document document) {
@@ -101,7 +84,7 @@ public class DocumentDAO {
                 stmt.setNull(5, Types.INTEGER);
             }
 
-            stmt.setString(6, document.getId());
+            stmt.setInt(6, document.getId());
 
             return stmt.executeUpdate() > 0;
 
@@ -126,7 +109,7 @@ public class DocumentDAO {
         }
     }
 
-    public List<Document> searchDocuments(String keyword) {
+    public List<Document> findDocument(String keyword) {
         List<Document> documents = new ArrayList<>();
         String sql = "SELECT * FROM documents WHERE title LIKE ? OR author LIKE ? ORDER BY title";
 

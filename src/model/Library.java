@@ -4,6 +4,7 @@ import dao.DocumentDAO;
 import dao.UserDAO;
 import dao.BorrowDAO;
 
+import java.util.List;
 import java.util.Scanner;
 
 /**
@@ -65,7 +66,7 @@ public class Library {
 
     public void updateDocument(Scanner scanner) {
         System.out.print("Enter ID of document to update: ");
-        String id = scanner.nextLine();
+        int id = Integer.parseInt(scanner.nextLine());;;
         System.out.print("Enter new title: ");
         String title = scanner.nextLine();
         System.out.print("Enter new author: ");
@@ -97,16 +98,20 @@ public class Library {
         }
     }
 
-    public void findDocument(Scanner scanner) {
-        System.out.print("Enter document ID to find: ");
-        String id = scanner.nextLine();
-        Document document = documentDAO.findDocumentById(id);
-        if (document != null) {
-            System.out.println(document);
-        } else {
-            System.out.println("Document not found.");
+   public void findDocument(Scanner scanner) {
+    System.out.print("Enter document keyword(title or author) to find: ");
+    String keyword = scanner.nextLine();
+    List<Document> documents = documentDAO.findDocument(keyword);
+
+    if (documents.isEmpty()) {
+        System.out.println("Document not found.");
+    } else {
+        // Hiển thị toàn bộ tài liệu tìm thấy
+        for (Document doc : documents) {
+            System.out.println(doc);
         }
     }
+}
 
     public void displayAllDocuments() {
         documentDAO.getAllDocuments().forEach(System.out::println);
@@ -130,7 +135,7 @@ public class Library {
 
     public void displayUserInfo(Scanner scanner) {
         System.out.print("Enter user ID to display: ");
-        String id = scanner.nextLine();
+        int id = Integer.parseInt(scanner.nextLine());;
         User user = userDAO.getUserById(id);
         if (user != null) {
             System.out.println(user);
