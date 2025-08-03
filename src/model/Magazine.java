@@ -3,8 +3,13 @@ package model;
 public class Magazine extends Document {
     private int issueNumber;
 
-    public Magazine(String id, String title, String author, int publication_year, int issueNumber) {
-        super(id, title, author, publication_year, DocumentType.MAGAZINE);
+    public Magazine( String title, String author, int publication_year, int issueNumber) {
+        super( title, author, publication_year, DocumentType.MAGAZINE);
+        this.issueNumber = issueNumber;
+    }
+
+    public Magazine( String id, String title, String author, int publication_year, int issueNumber) {
+        super( id, title, author, publication_year, DocumentType.MAGAZINE);
         this.issueNumber = issueNumber;
     }
 

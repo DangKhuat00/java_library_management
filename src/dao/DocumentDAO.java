@@ -164,8 +164,8 @@ public class DocumentDAO {
         DocumentType type = DocumentType.valueOf(typeStr);
 
         return switch (type) {
-            case BOOK -> new Book(id, title, author, year, rs.getInt("number_of_pages"));
-            case MAGAZINE -> new Magazine(id, title, author, year, rs.getInt("issue_number"));
+            case BOOK -> new Book( title, author, year, rs.getInt("number_of_pages"));
+            case MAGAZINE -> new Magazine( title, author, year, rs.getInt("issue_number"));
             default -> throw new IllegalArgumentException("Unknown document type: " + type);
         };
     }

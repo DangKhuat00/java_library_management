@@ -149,12 +149,12 @@ public class LibraryApp {
                     System.out.print("Enter number of pages: ");
                     int pages = scanner.nextInt();
                     scanner.nextLine();
-                    document = new Book(id, title, author, year, pages);
+                    document = new Book( title, author, year, pages);
                 } else if (type == DocumentType.MAGAZINE) {
                     System.out.print("Enter issue number: ");
                     int issue = scanner.nextInt();
                     scanner.nextLine();
-                    document = new Magazine(id, title, author, year, issue);
+                    document = new Magazine( title, author, year, issue);
                 }
 
                 if (documentDAO.insertDocument(document)) {

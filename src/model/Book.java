@@ -3,11 +3,15 @@ package model;
 public class Book extends Document {
     private int numberOfPages;
 
-    public Book(String id, String title, String author, int publication_year, int numberOfPages) {
-        super(id, title, author, publication_year, DocumentType.BOOK);
+    public Book( String title, String author, int publication_year, int numberOfPages) {
+        super( title, author, publication_year, DocumentType.BOOK);
         this.numberOfPages = numberOfPages;
     }
 
+     public Book( String id, String title, String author, int publication_year, int numberOfPages) {
+        super( id, title, author, publication_year, DocumentType.BOOK);
+        this.numberOfPages = numberOfPages;
+    }
     @Override
     public void displayInfo() {
         System.out.println("===== BOOK INFORMATION =====");

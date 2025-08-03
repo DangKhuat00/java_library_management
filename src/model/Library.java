@@ -22,8 +22,6 @@ public class Library {
     }
 
     public void addDocument(Scanner scanner) {
-        System.out.print("Enter document ID: ");
-        String id = scanner.nextLine();
         System.out.print("Enter title: ");
         String title = scanner.nextLine();
         System.out.print("Enter author: ");
@@ -38,11 +36,11 @@ public class Library {
         if (type.equals("BOOK")) {
             System.out.print("Enter number of pages: ");
             int pages = Integer.parseInt(scanner.nextLine());
-            document = new Book(id, title, author, year, pages);
+            document = new Book( title, author, year, pages);
         } else if (type.equals("MAGAZINE")) {
             System.out.print("Enter issue number: ");
             int issue = Integer.parseInt(scanner.nextLine());
-            document = new Magazine(id, title, author, year, issue);
+            document = new Magazine( title, author, year, issue);
         } else {
             System.out.println("Invalid document type.");
             return;
@@ -66,7 +64,7 @@ public class Library {
     }
 
     public void updateDocument(Scanner scanner) {
-        System.out.print("Enter document ID to update: ");
+        System.out.print("Enter ID of document to update: ");
         String id = scanner.nextLine();
         System.out.print("Enter new title: ");
         String title = scanner.nextLine();
@@ -82,11 +80,11 @@ public class Library {
         if (type.equals("BOOK")) {
             System.out.print("Enter number of pages: ");
             int pages = Integer.parseInt(scanner.nextLine());
-            updatedDocument = new Book(id, title, author, year, pages);
+            updatedDocument = new Book( id, title, author, year, pages);
         } else if (type.equals("MAGAZINE")) {
             System.out.print("Enter issue number: ");
             int issue = Integer.parseInt(scanner.nextLine());
-            updatedDocument = new Magazine(id, title, author, year, issue);
+            updatedDocument = new Magazine( id, title, author, year, issue);
         } else {
             System.out.println("Invalid document type.");
             return;
@@ -115,14 +113,14 @@ public class Library {
     }
 
     public void addUser(Scanner scanner) {
-        System.out.print("Enter user ID: ");
-        String id = scanner.nextLine();
         System.out.print("Enter name: ");
         String name = scanner.nextLine();
         System.out.print("Enter email: ");
         String email = scanner.nextLine();
+         System.out.print("Enter phoneNumber: ");
+        String phoneNumber = scanner.nextLine();
 
-        User user = new User(id, name, email);
+        User user = new User(name, email, phoneNumber);
         if (userDAO.insertUser(user)) {
             System.out.println("User added successfully.");
         } else {

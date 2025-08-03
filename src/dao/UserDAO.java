@@ -17,7 +17,7 @@ public class UserDAO {
      * Insert a new user into database
      */
     public boolean insertUser(User user) {
-        String sql = "INSERT INTO users (id, name, email) VALUES (?, ?, ?)";
+        String sql = "INSERT INTO users (id, name, email, phoneNumber, borrowLimit) VALUES (?, ?, ?, ?, ?)";
 
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -25,6 +25,8 @@ public class UserDAO {
             stmt.setString(1, user.getId());
             stmt.setString(2, user.getName());
             stmt.setString(3, user.getEmail());
+            stmt.setString(4, user.getPhoneNumber());
+            stmt.setInt(5, user.getBorrowLimit());
 
             int result = stmt.executeUpdate();
             return result > 0;

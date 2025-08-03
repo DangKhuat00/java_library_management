@@ -10,8 +10,9 @@ public class User {
     private String phoneNumber;
     private int borrowLimit;
     private List<Document> borrowedDocuments;
+    private static int userCounter = 1;
 
-    // Constructor - Add initialized member
+    /*  Constructor - Add initialized member
     public User(String id, String name, String email, String phoneNumber, int borrowLimit){
         this.id = id;
         this.name = name;
@@ -20,13 +21,17 @@ public class User {
         this.borrowLimit = borrowLimit;
         this.borrowedDocuments = new ArrayList<>();
     }
-    
+    */
     // Constructor to match parameters used in UserDAO
-    public User(String id, String name, String email) {
-        this.id = id;
-        this.name = name;
-        this.email = email;
-    }
+    public User(String name, String email, String phoneNumber) {
+    this.id = "USER" + String.format("%04d", userCounter++);
+    this.name = name;
+    this.email = email;
+    this.phoneNumber = phoneNumber;
+    this.borrowLimit = 10;
+    this.borrowedDocuments = new ArrayList<>();
+}
+
     /* 
     // ========== DOCUMENT BORROWING FUNCTIONS ==========
     
@@ -102,7 +107,6 @@ public class User {
     // ========== GETTERS AND SETTERS ==========
     
     public String getId() { return id; }
-    public void setId(String id) { this.id = id; }
     
     public String getName() { return name; }
     public void setName(String name) { this.name = name; }

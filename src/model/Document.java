@@ -7,16 +7,25 @@ public abstract class Document {
     protected int publication_year;
     protected boolean isAvailable;
     protected DocumentType documentType; // ← Loại tài liệu
+    private static int docCounter = 1;
 
-    public Document(String id, String title, String author, int publication_year, DocumentType documentType) {
+    public Document( String title, String author, int publication_year, DocumentType documentType) {
+        this.id = "DOC" + String.format("%04d", docCounter++);
+        this.title = title;
+        this.author = author;
+        this.publication_year = publication_year;
+        this.documentType = documentType;
+        this.isAvailable = false;
+    }
+
+    public Document( String id, String title, String author, int publication_year, DocumentType documentType) {
         this.id = id;
         this.title = title;
         this.author = author;
         this.publication_year = publication_year;
         this.documentType = documentType;
-        this.isAvailable = true;
+        this.isAvailable = false;
     }
-
     // Abstract method
     public abstract void displayInfo();
 
@@ -29,7 +38,6 @@ public abstract class Document {
     public DocumentType getDocumentType() { return documentType; }
 
     // Setters
-    public void setId(String id) { this.id = id; }
     public void setTitle(String title) { this.title = title; }
     public void setAuthor(String author) { this.author = author; }
     public void setYear(int publication_year) { this.publication_year = publication_year; }
