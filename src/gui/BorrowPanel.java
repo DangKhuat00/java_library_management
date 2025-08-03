@@ -1,59 +1,55 @@
 package gui;
 
+import model.User;
+import model.Document;
+import dao.UserDAO;
+
 import javax.swing.*;
 import java.awt.*;
+import java.util.List;
 
 public class BorrowPanel extends JPanel {
-  private JComboBox<String> userComboBox;
-  private JComboBox<String> documentComboBox;
-  private JButton borrowButton;
-  private JButton returnButton;
-  private JTextArea messageArea;
+
+  private JTextArea borrowTextArea;
 
   public BorrowPanel() {
     setLayout(new BorderLayout());
 
-    // === Top panel: chọn user và tài liệu ===
-    JPanel topPanel = new JPanel(new GridLayout(2, 2, 10, 10));
-    topPanel.setBorder(BorderFactory.createTitledBorder("Borrow/Return"));
+    JLabel titleLabel = new JLabel("Danh sách mượn tài liệu");
+    titleLabel.setHorizontalAlignment(JLabel.CENTER);
+    titleLabel.setFont(new Font("Arial", Font.BOLD, 16));
 
-    userComboBox = new JComboBox<>(new String[]{"User 1", "User 2", "User 3"});
-    documentComboBox = new JComboBox<>(new String[]{"Document A", "Document B", "Document C"});
+    borrowTextArea = new JTextArea();
+    borrowTextArea.setEditable(false);
+    borrowTextArea.setFont(new Font("Monospaced", Font.PLAIN, 14));
+    JScrollPane scrollPane = new JScrollPane(borrowTextArea);
 
-    topPanel.add(new JLabel("Select User:"));
-    topPanel.add(userComboBox);
-    topPanel.add(new JLabel("Select Document:"));
-    topPanel.add(documentComboBox);
+    add(titleLabel, BorderLayout.NORTH);
+    add(scrollPane, BorderLayout.CENTER);
 
-    // === Middle panel: các nút ===
-    JPanel buttonPanel = new JPanel();
-    borrowButton = new JButton("Borrow");
-    returnButton = new JButton("Return");
+    loadBorrowedData();
+  }
 
-    buttonPanel.add(borrowButton);
-    buttonPanel.add(returnButton);
+  private void loadBorrowedData() {
+    UserDAO userDAO = new UserDAO();
+    List<User> users = userDAO.getAllUsers(); // gọi non-static method đúng cách
+    StringBuilder sb = new StringBuilder();
 
-    // === Bottom panel: hiển thị thông báo ===
-    messageArea = new JTextArea(5, 40);
-    messageArea.setEditable(false);
-    JScrollPane scrollPane = new JScrollPane(messageArea);
+    for (User user : users) {
+      List<Document> borrowedDocs = user.getBorrowedDocuments();
+      if (!borrowedDocs.isEmpty()) {
+        sb.append("Người dùng: ").append(user.getName()).append(" (ID: ").append(user.getId()).append(")\n");
+        for (Document doc : borrowedDocs) {
+          sb.append("   - ").append(doc.getTitle()).append(" (ID: ").append(doc.getId()).append(")\n");
+        }
+        sb.append("\n");
+      }
+    }
 
-    // === Action listeners đơn giản ===
-    borrowButton.addActionListener(e -> {
-      String user = (String) userComboBox.getSelectedItem();
-      String doc = (String) documentComboBox.getSelectedItem();
-      messageArea.append("✔ " + user + " borrowed " + doc + "\n");
-    });
+    if (sb.length() == 0) {
+      sb.append("Không có tài liệu nào được mượn.");
+    }
 
-    returnButton.addActionListener(e -> {
-      String user = (String) userComboBox.getSelectedItem();
-      String doc = (String) documentComboBox.getSelectedItem();
-      messageArea.append("↩ " + user + " returned " + doc + "\n");
-    });
-
-    // Add everything to main panel
-    add(topPanel, BorderLayout.NORTH);
-    add(buttonPanel, BorderLayout.CENTER);
-    add(scrollPane, BorderLayout.SOUTH);
+    borrowTextArea.setText(sb.toString());
   }
 }

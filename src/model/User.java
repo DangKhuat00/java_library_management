@@ -121,4 +121,9 @@ public class User {
     public void setBorrowLimit(int borrowLimit) { this.borrowLimit = borrowLimit; }
     
     public List<Document> getBorrowedDocuments() { return new ArrayList<>(borrowedDocuments); }
+    @Override
+    public String toString() {
+        return String.format("ID: %s | Tên: %s | Email: %s | SĐT: %s | Số tài liệu tối đa: %d",
+            id, name, email, phoneNumber, borrowLimit);
+    }
 }
