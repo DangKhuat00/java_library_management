@@ -1,0 +1,37 @@
+-- Library Management System Database Schema
+-- Run this script in MySQL to create the database structure
+
+CREATE DATABASE IF NOT EXISTS library_management;
+USE library_management;
+
+-- Create users table
+CREATE TABLE users (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    email VARCHAR(255) NOT NULL UNIQUE,
+    phoneNumber VARCHAR(20) NOT NULL,
+    borrowLimit INT NOT NULL 
+);
+
+-- Create documents table
+-- Create documents table
+CREATE TABLE documents (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    title VARCHAR(255) NOT NULL,
+    author VARCHAR(255) NOT NULL,
+    publication_year INT NOT NULL,
+    document_type ENUM('BOOK', 'MAGAZINE') NOT NULL,
+    number_of_pages INT, -- Thuộc tính riêng cho Book
+    issue_number INT     -- Thuộc tính riêng cho Magazine
+);
+
+-- Create borrows table
+CREATE TABLE borrowed_documents (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    document_id INT NOT NULL,
+    borrow_date DATE NOT NULL,
+    return_date DATE,
+    FOREIGN KEY (user_id) REFERENCES users(id),
+    FOREIGN KEY (document_id) REFERENCES documents(id)
+);
