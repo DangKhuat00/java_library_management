@@ -29,14 +29,24 @@ public class Library {
         System.out.print("Enter author: ");
         String author = scanner.nextLine();
         System.out.print("Enter publication year: ");
-        int year = scanner.nextInt();
-        scanner.nextLine();
+        int year = Integer.parseInt(scanner.nextLine());
         System.out.print("Enter type (BOOK/MAGAZINE): ");
-        String type = scanner.nextLine();
+        String type = scanner.nextLine().trim().toUpperCase();
 
-       Document document = type.equalsIgnoreCase("BOOK") ?
-        new Book(id, title, author, "", "", year, 1, true) :
-        new Magazine(id, title, author, "", "", year, 1, true);
+        Document document = null;
+
+        if (type.equals("BOOK")) {
+            System.out.print("Enter number of pages: ");
+            int pages = Integer.parseInt(scanner.nextLine());
+            document = new Book(id, title, author, year, pages);
+        } else if (type.equals("MAGAZINE")) {
+            System.out.print("Enter issue number: ");
+            int issue = Integer.parseInt(scanner.nextLine());
+            document = new Magazine(id, title, author, year, issue);
+        } else {
+            System.out.println("Invalid document type.");
+            return;
+        }
 
         if (documentDAO.insertDocument(document)) {
             System.out.println("Document added successfully.");
@@ -63,14 +73,24 @@ public class Library {
         System.out.print("Enter new author: ");
         String author = scanner.nextLine();
         System.out.print("Enter new publication year: ");
-        int year = scanner.nextInt();
-        scanner.nextLine();
+        int year = Integer.parseInt(scanner.nextLine());
         System.out.print("Enter new type (BOOK/MAGAZINE): ");
-        String type = scanner.nextLine();
+        String type = scanner.nextLine().trim().toUpperCase();
 
-        Document updatedDocument = type.equalsIgnoreCase("BOOK") ?
-                new Book(id, title, author, year, "BOOK") :
-                new Magazine(id, title, author, year, "MAGAZINE");
+        Document updatedDocument = null;
+
+        if (type.equals("BOOK")) {
+            System.out.print("Enter number of pages: ");
+            int pages = Integer.parseInt(scanner.nextLine());
+            updatedDocument = new Book(id, title, author, year, pages);
+        } else if (type.equals("MAGAZINE")) {
+            System.out.print("Enter issue number: ");
+            int issue = Integer.parseInt(scanner.nextLine());
+            updatedDocument = new Magazine(id, title, author, year, issue);
+        } else {
+            System.out.println("Invalid document type.");
+            return;
+        }
 
         if (documentDAO.updateDocument(updatedDocument)) {
             System.out.println("Document updated successfully.");
@@ -82,7 +102,7 @@ public class Library {
     public void findDocument(Scanner scanner) {
         System.out.print("Enter document ID to find: ");
         String id = scanner.nextLine();
-        Document document = documentDAO.getDocumentById(id);
+        Document document = documentDAO.findDocumentById(id);
         if (document != null) {
             System.out.println(document);
         } else {

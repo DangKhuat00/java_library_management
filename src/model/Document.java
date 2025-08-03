@@ -4,48 +4,40 @@ public abstract class Document {
     protected String id;
     protected String title;
     protected String author;
-    protected String publisher;
-    protected String category;
-    protected int year;
-    protected int numbers;
+    protected int publication_year;
     protected boolean isAvailable;
+    protected DocumentType documentType; // ← Loại tài liệu
 
-    public Document(String id, String title, String author, String publisher, String category, int year, int numbers, boolean isAvailable) {
+    public Document(String id, String title, String author, int publication_year, DocumentType documentType) {
         this.id = id;
         this.title = title;
         this.author = author;
-        this.publisher = publisher;
-        this.category = category;
-        this.year = year;
-        this.numbers = numbers;
-        this.isAvailable = isAvailable;
+        this.publication_year = publication_year;
+        this.documentType = documentType;
+        this.isAvailable = true;
     }
-    
+
     // Abstract method
     public abstract void displayInfo();
-    
+
     // Getters
     public String getId() { return id; }
     public String getTitle() { return title; }
     public String getAuthor() { return author; }
-    public String getPublisher() { return publisher; }
-    public String getCategory() { return category; }
-    public int getYear() { return year; }
-    public int getNumbers() { return numbers; }
+    public int getYear() { return publication_year; }
     public boolean isAvailable() { return isAvailable; }
+    public DocumentType getDocumentType() { return documentType; }
 
     // Setters
     public void setId(String id) { this.id = id; }
     public void setTitle(String title) { this.title = title; }
     public void setAuthor(String author) { this.author = author; }
-    public void setPublisher(String publisher) { this.publisher = publisher; }
-    public void setCategory(String category) { this.category = category; }
-    public void setYear(int year) { this.year = year; }
-    public void setNumbers(int numbers) { this.numbers = numbers; }
+    public void setYear(int publication_year) { this.publication_year = publication_year; }
     public void setAvailable(boolean available) { this.isAvailable = available; }
+    public void setDocumentType(DocumentType documentType) { this.documentType = documentType; }
 
     @Override
     public String toString() {
-        return title + " by " + author;
+        return "[" + documentType + "] " + title + " by " + author;
     }
 }

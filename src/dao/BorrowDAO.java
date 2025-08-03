@@ -14,22 +14,23 @@ public class BorrowDAO {
      * Record a document borrowing
      */
     public boolean borrowDocument(String userId, String documentId) {
-        String sql = "INSERT INTO borrowed_documents (user_id, document_id) VALUES (?, ?)";
+    String sql = "INSERT INTO borrowed_documents (user_id, document_id, borrow_date) VALUES (?, ?, ?)";
+    
+    try (Connection conn = DatabaseConnection.getConnection();
+         PreparedStatement stmt = conn.prepareStatement(sql)) {
         
-        try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-            
-            stmt.setString(1, userId);
-            stmt.setString(2, documentId);
-            
-            int result = stmt.executeUpdate();
-            return result > 0;
-            
-        } catch (SQLException e) {
-            System.err.println("Error recording borrow: " + e.getMessage());
-            return false;
-        }
+        stmt.setString(1, userId);
+        stmt.setString(2, documentId);
+        stmt.setDate(3, new java.sql.Date(System.currentTimeMillis())); // Ngày mượn hiện tại
+        
+        int result = stmt.executeUpdate();
+        return result > 0;
+        
+    } catch (SQLException e) {
+        System.err.println("Error recording borrow: " + e.getMessage());
+        return false;
     }
+}
     
     /**
      * Return a borrowed document

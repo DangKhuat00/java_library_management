@@ -27,7 +27,7 @@ public class User {
         this.name = name;
         this.email = email;
     }
-    
+    /* 
     // ========== DOCUMENT BORROWING FUNCTIONS ==========
     
     public boolean borrowDocument(Document document) {
@@ -97,6 +97,7 @@ public class User {
                phoneNumber != null && !phoneNumber.trim().isEmpty() &&
                borrowLimit > 0;
     }
+    */
     
     // ========== GETTERS AND SETTERS ==========
     

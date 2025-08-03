@@ -1,40 +1,36 @@
 import config.DatabaseConfig;
 import dao.DocumentDAO;
 import dao.UserDAO;
+import model.Book;
 import model.Document;
-import model.User;
+import model.DocumentType;
 import model.Library;
+import model.Magazine;
+import model.User;
 import java.util.Scanner;
 
-/**
- * Main application class - Library Management System
- * MySQL Database version with OOP implementation
- * Persistent storage using MySQL database
- */
 public class LibraryApp {
     private static Library library = new Library();
     private static Scanner scanner = new Scanner(System.in);
-    
+
     public static void main(String[] args) {
         System.out.println("========================================");
         System.out.println("    LIBRARY MANAGEMENT SYSTEM");
         System.out.println("         MySQL Database Edition");
         System.out.println("========================================");
-        
-        // Initialize database tables
-        DatabaseConfig.initializeDatabase();
-        
+
+        // Optional: Initialize database tables
+        // DatabaseConfig.initializeDatabase();
+
         System.out.println("Welcome to Library Management System!");
-        
-        // Main application loop
+
         while (true) {
             showMainMenu();
             int choice = getValidChoice();
-            
             handleMenuChoice(choice);
         }
     }
-    
+
     private static void showMainMenu() {
         System.out.println("\n[0] Exit");
         System.out.println("[1] Add Document");
@@ -48,7 +44,7 @@ public class LibraryApp {
         System.out.println("[9] Display User Info");
         System.out.print("Enter your choice: ");
     }
-    
+
     private static void handleMenuChoice(int choice) {
         switch (choice) {
             case 0:
@@ -86,38 +82,21 @@ public class LibraryApp {
                 System.out.println("Action is not supported");
         }
     }
-    
+
     private static int getValidChoice() {
         while (true) {
             try {
                 String input = scanner.nextLine().trim();
-                
-                if (input.isEmpty()) {
+                if (input.length() != 1 || !Character.isDigit(input.charAt(0))) {
                     System.out.println("Action is not supported");
                     continue;
                 }
-                
-                if (input.length() != 1) {
-                    System.out.println("Action is not supported");
-                    continue;
-                }
-                
-                char c = input.charAt(0);
-                
-                if (!Character.isDigit(c)) {
-                    System.out.println("Action is not supported");
-                    continue;
-                }
-                
-                int choice = Character.getNumericValue(c);
-                
+                int choice = Character.getNumericValue(input.charAt(0));
                 if (choice < 0 || choice > 9) {
                     System.out.println("Action is not supported");
                     continue;
                 }
-                
                 return choice;
-                
             } catch (Exception e) {
                 System.out.println("Action is not supported");
             }
@@ -155,11 +134,28 @@ public class LibraryApp {
                 int year = scanner.nextInt();
                 scanner.nextLine();
                 System.out.print("Enter type (BOOK/MAGAZINE): ");
-                String type = scanner.nextLine();
+                String typeStr = scanner.nextLine();
 
-                Document document = type.equalsIgnoreCase("BOOK") ?
-                        new model.Book(id, title, author, "", "", year, 1, true) :
-                        new model.Magazine(id, title, author, "", "", year, 1, true);
+                DocumentType type;
+                try {
+                    type = DocumentType.valueOf(typeStr.toUpperCase());
+                } catch (IllegalArgumentException | NullPointerException e) {
+                    System.out.println("Invalid document type.");
+                    return;
+                }
+
+                Document document = null;
+                if (type == DocumentType.BOOK) {
+                    System.out.print("Enter number of pages: ");
+                    int pages = scanner.nextInt();
+                    scanner.nextLine();
+                    document = new Book(id, title, author, year, pages);
+                } else if (type == DocumentType.MAGAZINE) {
+                    System.out.print("Enter issue number: ");
+                    int issue = scanner.nextInt();
+                    scanner.nextLine();
+                    document = new Magazine(id, title, author, year, issue);
+                }
 
                 if (documentDAO.insertDocument(document)) {
                     System.out.println("Document added successfully.");

@@ -1,14 +1,11 @@
 package model;
 
 public class Book extends Document {
-    
-    public Book(String id, String title, String author, String publisher, String category, int year, int numbers, boolean isAvailable) {
-        super(id, title, author, publisher, category, year, numbers, isAvailable);
-    }
-    
-    // thêm constructor mới cho chỗ gọi new Book(id, title, author, year, "BOOK")
-    public Book(String id, String title, String author, int year, String category) {
-        super(id, title, author, "", category, year, 1, true);
+    private int numberOfPages;
+
+    public Book(String id, String title, String author, int publication_year, int numberOfPages) {
+        super(id, title, author, publication_year, DocumentType.BOOK);
+        this.numberOfPages = numberOfPages;
     }
 
     @Override
@@ -17,11 +14,17 @@ public class Book extends Document {
         System.out.println("ID: " + id);
         System.out.println("Title: " + title);
         System.out.println("Author: " + author);
-        System.out.println("Publisher: " + publisher);
-        System.out.println("Category: " + category);
-        System.out.println("Year: " + year);
-        System.out.println("Quantity: " + numbers);
+        System.out.println("Publication_year: " + publication_year);
+        System.out.println("Pages: " + numberOfPages);
+        System.out.println("Type: " + documentType);
         System.out.println("Available: " + (isAvailable ? "Yes" : "No"));
         System.out.println("=============================");
+    }
+    public int getNumberOfPages() {
+        return numberOfPages;
+    }
+
+    public void setNumberOfPages(int numberOfPages) {
+        this.numberOfPages = numberOfPages;
     }
 }
