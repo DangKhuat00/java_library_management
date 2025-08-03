@@ -19,10 +19,12 @@ public class DocumentDAO {
             stmt.setInt(4, document.getYear());
             stmt.setString(5, document.getDocumentType().name());
 
-            if (document instanceof Book book) {
+            if (document instanceof Book) {
+                Book book = (Book) document;
                 stmt.setInt(6, book.getNumberOfPages());
                 stmt.setNull(7, Types.INTEGER);
-            } else if (document instanceof Magazine magazine) {
+            } else if (document instanceof Magazine) {
+                Magazine magazine = (Magazine) document;
                 stmt.setNull(6, Types.INTEGER);
                 stmt.setInt(7, magazine.getIssueNumber());
             } else {
@@ -90,10 +92,12 @@ public class DocumentDAO {
             stmt.setString(2, document.getAuthor());
             stmt.setInt(3, document.getYear());
 
-            if (document instanceof Book book) {
+            if (document instanceof Book) {
+                Book book = (Book) document;
                 stmt.setInt(4, book.getNumberOfPages());
                 stmt.setNull(5, Types.INTEGER);
-            } else if (document instanceof Magazine magazine) {
+            } else if (document instanceof Magazine) {
+                Magazine magazine = (Magazine) document;
                 stmt.setNull(4, Types.INTEGER);
                 stmt.setInt(5, magazine.getIssueNumber());
             } else {
@@ -163,10 +167,12 @@ public class DocumentDAO {
         String typeStr = rs.getString("document_type");
         DocumentType type = DocumentType.valueOf(typeStr);
 
-        return switch (type) {
-            case BOOK -> new Book( title, author, year, rs.getInt("number_of_pages"));
-            case MAGAZINE -> new Magazine( title, author, year, rs.getInt("issue_number"));
-            default -> throw new IllegalArgumentException("Unknown document type: " + type);
-        };
+        if (type == DocumentType.BOOK) {
+            return new Book(title, author, year, rs.getInt("number_of_pages"));
+        } else if (type == DocumentType.MAGAZINE) {
+            return new Magazine(title, author, year, rs.getInt("issue_number"));
+        } else {
+            throw new IllegalArgumentException("Unknown document type: " + type);
+        }
     }
 }
