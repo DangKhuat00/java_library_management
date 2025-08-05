@@ -20,17 +20,16 @@ public class DocumentDAO {
         stmt.setInt(3, document.getYear());
         stmt.setString(4, document.getDocumentType().name());
 
-        // Gán thuộc tính đặc trưng của từng loại tài liệu
-        if (document instanceof Book book) {
-            stmt.setInt(5, book.getNumberOfPages());
-            stmt.setNull(6, Types.INTEGER);
-        } else if (document instanceof Magazine magazine) {
-            stmt.setNull(5, Types.INTEGER);
-            stmt.setInt(6, magazine.getIssueNumber());
-        } else {
-            stmt.setNull(5, Types.INTEGER);
-            stmt.setNull(6, Types.INTEGER);
-        }
+            if (document instanceof Book book) {
+                stmt.setInt(6, book.getNumberOfPages());
+                stmt.setNull(7, Types.INTEGER);
+            } else if (document instanceof Magazine magazine) {
+                stmt.setNull(6, Types.INTEGER);
+                stmt.setInt(7, magazine.getIssueNumber());
+            } else {
+                stmt.setNull(6, Types.INTEGER);
+                stmt.setNull(7, Types.INTEGER);
+            }
 
         int rowsAffected = stmt.executeUpdate();
         return rowsAffected > 0;
@@ -73,10 +72,12 @@ public class DocumentDAO {
             stmt.setString(2, document.getAuthor());
             stmt.setInt(3, document.getYear());
 
-            if (document instanceof Book book) {
+            if (document instanceof Book) {
+                Book book = (Book) document;
                 stmt.setInt(4, book.getNumberOfPages());
                 stmt.setNull(5, Types.INTEGER);
-            } else if (document instanceof Magazine magazine) {
+            } else if (document instanceof Magazine) {
+                Magazine magazine = (Magazine) document;
                 stmt.setNull(4, Types.INTEGER);
                 stmt.setInt(5, magazine.getIssueNumber());
             } else {
@@ -146,10 +147,12 @@ public class DocumentDAO {
         String typeStr = rs.getString("document_type");
         DocumentType type = DocumentType.valueOf(typeStr);
 
-        return switch (type) {
-            case BOOK -> new Book( title, author, year, rs.getInt("number_of_pages"));
-            case MAGAZINE -> new Magazine( title, author, year, rs.getInt("issue_number"));
-            default -> throw new IllegalArgumentException("Unknown document type: " + type);
-        };
+        if (type == DocumentType.BOOK) {
+            return new Book(title, author, year, rs.getInt("number_of_pages"));
+        } else if (type == DocumentType.MAGAZINE) {
+            return new Magazine(title, author, year, rs.getInt("issue_number"));
+        } else {
+            throw new IllegalArgumentException("Unknown document type: " + type);
+        }
     }
 }

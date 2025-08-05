@@ -46,10 +46,5 @@ public class User {
     public void setBorrowLimit(int borrowLimit) { this.borrowLimit = borrowLimit; }
     
     public List<Document> getBorrowedDocuments() { return new ArrayList<>(borrowedDocuments); }
-
-    @Override
-    public String toString() {
-        return "User{id=" + id + ", name=" + name + ", email=" + email + "}";
-    }
 }
 
