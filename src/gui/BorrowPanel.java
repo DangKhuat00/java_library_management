@@ -10,7 +10,7 @@ import java.util.List;
 
 public class BorrowPanel extends JPanel {
 
-  private JTextArea borrowTextArea;java -version
+  private JTextArea borrowTextArea;
 
 
   public BorrowPanel() {

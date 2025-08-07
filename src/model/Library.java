@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Scanner;
 
 /**
- * Represents the Library
+ * Represents the Library with 9 core functions
  */
 public class Library {
 
@@ -22,6 +22,100 @@ public class Library {
         this.borrowDAO = new BorrowDAO();
     }
 
+    // ========== GUI-COMPATIBLE METHODS (for MainFrame) ==========
+    
+    /**
+     * 1. Add Document (GUI version)
+     */
+    public boolean addDocument(String title, String author, int year, String type, int pages, int issue) {
+        Document document = null;
+        
+        if (type.equals("BOOK")) {
+            document = new Book(title, author, year, pages);
+        } else if (type.equals("MAGAZINE")) {
+            document = new Magazine(title, author, year, issue);
+        } else {
+            return false;
+        }
+        
+        return documentDAO.insertDocument(document);
+    }
+    
+    /**
+     * 2. Remove Document (GUI version)
+     */
+    public boolean removeDocument(String documentId) {
+        return documentDAO.deleteDocument(documentId);
+    }
+    
+    /**
+     * 3. Find Documents (GUI version)
+     */
+    public List<Document> findDocuments(String keyword) {
+        return documentDAO.findDocument(keyword);
+    }
+    
+    /**
+     * 4. Get All Documents (GUI version)
+     */
+    public List<Document> getAllDocuments() {
+        return documentDAO.getAllDocuments();
+    }
+    
+    /**
+     * 5. Add User (GUI version)
+     */
+    public boolean addUser(String name, String email, String phone, int maxBorrowLimit) {
+        User user = new User(name, email, phone);
+        user.setBorrowLimit(maxBorrowLimit);
+        return userDAO.insertUser(user);
+    }
+    
+    /**
+     * 6. Get All Users (GUI version)
+     */
+    public List<User> getAllUsers() {
+        return userDAO.getAllUsers();
+    }
+    
+    /**
+     * 7. Borrow Document (GUI version)
+     */
+    public boolean borrowDocument(String userId, String documentId) {
+        return borrowDAO.borrowDocument(userId, documentId);
+    }
+    
+    /**
+     * 8. Return Document (GUI version)
+     */
+    public boolean returnDocument(String userId, String documentId) {
+        return borrowDAO.returnDocument(userId, documentId);
+    }
+    
+    /**
+     * 9. Update Document (GUI version)
+     */
+    public boolean updateDocument(String documentId, String title, String author, int year, String type, int pages, int issue) {
+        Document document = null;
+        
+        try {
+            int id = Integer.parseInt(documentId);
+            if (type.equals("BOOK")) {
+                document = new Book(id, title, author, year, pages);
+            } else if (type.equals("MAGAZINE")) {
+                document = new Magazine(id, title, author, year, issue);
+            } else {
+                return false;
+            }
+            
+            return documentDAO.updateDocument(document);
+        } catch (NumberFormatException e) {
+            return false;
+        }
+    }
+
+    // ========== CONSOLE-BASED METHODS (for backward compatibility) ==========
+    
     public void addDocument(Scanner scanner) {
         System.out.print("Enter title: ");
         String title = scanner.nextLine();
@@ -37,11 +131,11 @@ public class Library {
         if (type.equals("BOOK")) {
             System.out.print("Enter number of pages: ");
             int pages = Integer.parseInt(scanner.nextLine());
-            document = new Book( title, author, year, pages);
+            document = new Book(title, author, year, pages);
         } else if (type.equals("MAGAZINE")) {
             System.out.print("Enter issue number: ");
             int issue = Integer.parseInt(scanner.nextLine());
-            document = new Magazine( title, author, year, issue);
+            document = new Magazine(title, author, year, issue);
         } else {
             System.out.println("Invalid document type.");
             return;
@@ -66,7 +160,7 @@ public class Library {
 
     public void updateDocument(Scanner scanner) {
         System.out.print("Enter ID of document to update: ");
-        int id = Integer.parseInt(scanner.nextLine());;;
+        int id = Integer.parseInt(scanner.nextLine());
         System.out.print("Enter new title: ");
         String title = scanner.nextLine();
         System.out.print("Enter new author: ");
@@ -81,11 +175,11 @@ public class Library {
         if (type.equals("BOOK")) {
             System.out.print("Enter number of pages: ");
             int pages = Integer.parseInt(scanner.nextLine());
-            updatedDocument = new Book( id, title, author, year, pages);
+            updatedDocument = new Book(id, title, author, year, pages);
         } else if (type.equals("MAGAZINE")) {
             System.out.print("Enter issue number: ");
             int issue = Integer.parseInt(scanner.nextLine());
-            updatedDocument = new Magazine( id, title, author, year, issue);
+            updatedDocument = new Magazine(id, title, author, year, issue);
         } else {
             System.out.println("Invalid document type.");
             return;
@@ -98,20 +192,20 @@ public class Library {
         }
     }
 
-   public void findDocument(Scanner scanner) {
-    System.out.print("Enter document keyword(title or author) to find: ");
-    String keyword = scanner.nextLine();
-    List<Document> documents = documentDAO.findDocument(keyword);
+    public void findDocument(Scanner scanner) {
+        System.out.print("Enter document keyword(title or author) to find: ");
+        String keyword = scanner.nextLine();
+        List<Document> documents = documentDAO.findDocument(keyword);
 
-    if (documents.isEmpty()) {
-        System.out.println("Document not found.");
-    } else {
-        // Hiển thị toàn bộ tài liệu tìm thấy
-        for (Document doc : documents) {
-            System.out.println(doc);
+        if (documents.isEmpty()) {
+            System.out.println("Document not found.");
+        } else {
+            // Hiển thị toàn bộ tài liệu tìm thấy
+            for (Document doc : documents) {
+                System.out.println(doc);
+            }
         }
     }
-}
 
     public void displayAllDocuments() {
         documentDAO.getAllDocuments().forEach(System.out::println);
@@ -122,7 +216,7 @@ public class Library {
         String name = scanner.nextLine();
         System.out.print("Enter email: ");
         String email = scanner.nextLine();
-         System.out.print("Enter phoneNumber: ");
+        System.out.print("Enter phoneNumber: ");
         String phoneNumber = scanner.nextLine();
 
         User user = new User(name, email, phoneNumber);
@@ -135,7 +229,7 @@ public class Library {
 
     public void displayUserInfo(Scanner scanner) {
         System.out.print("Enter user ID to display: ");
-        int id = Integer.parseInt(scanner.nextLine());;
+        int id = Integer.parseInt(scanner.nextLine());
         User user = userDAO.getUserById(id);
         if (user != null) {
             System.out.println(user);
