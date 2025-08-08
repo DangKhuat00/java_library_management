@@ -18,11 +18,11 @@ CREATE TABLE users (
 CREATE TABLE documents (
     id INT AUTO_INCREMENT PRIMARY KEY,
     title VARCHAR(255) NOT NULL,
+    language VARCHAR(100),
+    pages INT,
     author VARCHAR(255) NOT NULL,
     publication_year INT NOT NULL,
-    document_type ENUM('BOOK', 'MAGAZINE') NOT NULL,
-    number_of_pages INT, -- Thuộc tính riêng cho Book
-    issue_number INT     -- Thuộc tính riêng cho Magazine
+    remain_docs INT DEFAULT 0
 );
 
 -- Create borrows table

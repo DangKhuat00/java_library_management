@@ -7,9 +7,6 @@ import dao.BorrowDAO;
 import java.util.List;
 import java.util.Scanner;
 
-/**
- * Represents the Library with 9 core functions
- */
 public class Library {
 
     private DocumentDAO documentDAO;
@@ -23,45 +20,46 @@ public class Library {
     }
 
     // ========== GUI-COMPATIBLE METHODS (for MainFrame) ==========
-    
-    /**
-     * 1. Add Document (GUI version)
-     */
-    public boolean addDocument(String title, String author, int year, String type, int pages, int issue) {
-        Document document = null;
-        
-        if (type.equals("BOOK")) {
-            document = new Book(title, author, year, pages);
-        } else if (type.equals("MAGAZINE")) {
-            document = new Magazine(title, author, year, issue);
-        } else {
-            return false;
-        }
-        
+
+    // Thêm tài liệu mới
+    public boolean addDocument(Document document) {
         return documentDAO.insertDocument(document);
     }
-    
-    /**
-     * 2. Remove Document (GUI version)
-     */
+
+    // Xóa tài liệu theo id
     public boolean removeDocument(String documentId) {
-        return documentDAO.deleteDocument(documentId);
+        try {
+            int id = Integer.parseInt(documentId);
+            return documentDAO.deleteDocument(id);
+        } catch (NumberFormatException e) {
+            return false;
+        }
     }
-    
-    /**
-     * 3. Find Documents (GUI version)
-     */
+
+    // Tìm tài liệu theo keyword (title hoặc author)
     public List<Document> findDocuments(String keyword) {
         return documentDAO.findDocument(keyword);
     }
-    
-    /**
-     * 4. Get All Documents (GUI version)
-     */
+
+    // Lấy tất cả tài liệu
     public List<Document> getAllDocuments() {
         return documentDAO.getAllDocuments();
     }
-    
+
+    // Cập nhật tài liệu
+    public boolean updateDocument(Document document) {
+        return documentDAO.updateDocument(document);
+    }
+
+    // Lấy tài liệu theo id
+    public Document getDocumentById(int id) {
+        List<Document> docs = documentDAO.getAllDocuments();
+        for (Document d : docs) {
+            if (d.getId() == id) return d;
+        }
+        return null;
+    }
+
     /**
      * 5. Add User (GUI version)
      */
@@ -92,30 +90,14 @@ public class Library {
         return borrowDAO.returnDocument(userId, documentId);
     }
     
-    /**
-     * 9. Update Document (GUI version)
-     */
-    public boolean updateDocument(String documentId, String title, String author, int year, String type, int pages, int issue) {
-        Document document = null;
-        
-        try {
-            int id = Integer.parseInt(documentId);
-            if (type.equals("BOOK")) {
-                document = new Book(id, title, author, year, pages);
-            } else if (type.equals("MAGAZINE")) {
-                document = new Magazine(id, title, author, year, issue);
-            } else {
-                return false;
-            }
-            
-            return documentDAO.updateDocument(document);
-        } catch (NumberFormatException e) {
-            return false;
-        }
-    }
+    // ========== GUI methods tương tự các hàm console có thể gọi thêm ==========
 
-    // ========== CONSOLE-BASED METHODS (for backward compatibility) ==========
-    
+    // Còn các hàm về User, Borrow giữ nguyên, không liên quan Document
+
+    // Các hàm Console bạn có thể tự chỉnh sửa tương tự:
+    // - Thay vì phân biệt BOOK/MAGAZINE, dùng trực tiếp Document
+    // - Ví dụ:
+
     public void addDocument(Scanner scanner) {
         System.out.print("Enter title: ");
         String title = scanner.nextLine();
@@ -123,23 +105,19 @@ public class Library {
         String author = scanner.nextLine();
         System.out.print("Enter publication year: ");
         int year = Integer.parseInt(scanner.nextLine());
-        System.out.print("Enter type (BOOK/MAGAZINE): ");
-        String type = scanner.nextLine().trim().toUpperCase();
+        System.out.print("Enter language: ");
+        String language = scanner.nextLine();
+        System.out.print("Enter number of pages: ");
+        int pages = Integer.parseInt(scanner.nextLine());
+        System.out.print("Enter remaining documents: ");
+        int remainDocs = Integer.parseInt(scanner.nextLine());
 
-        Document document = null;
-
-        if (type.equals("BOOK")) {
-            System.out.print("Enter number of pages: ");
-            int pages = Integer.parseInt(scanner.nextLine());
-            document = new Book(title, author, year, pages);
-        } else if (type.equals("MAGAZINE")) {
-            System.out.print("Enter issue number: ");
-            int issue = Integer.parseInt(scanner.nextLine());
-            document = new Magazine(title, author, year, issue);
-        } else {
-            System.out.println("Invalid document type.");
-            return;
-        }
+        Document document = new Document(title, language, pages, author, year, remainDocs) {
+            @Override
+            public void displayInfo() {
+                // Có thể implement hoặc để trống
+            }
+        };
 
         if (documentDAO.insertDocument(document)) {
             System.out.println("Document added successfully.");
@@ -148,9 +126,52 @@ public class Library {
         }
     }
 
-    public void removeDocument(Scanner scanner) {
+    public boolean removeDocument(int id) {
+        return documentDAO.deleteDocument(id);
+    }
+
+    public void updateDocument(Scanner scanner) {
+        try {
+            System.out.print("Enter ID of document to update: ");
+            int id = Integer.parseInt(scanner.nextLine());
+
+            Document oldDoc = getDocumentById(id);
+            if (oldDoc == null) {
+                System.out.println("Document not found.");
+                return;
+            }
+
+            System.out.print("Enter new title: ");
+            String title = scanner.nextLine();
+            System.out.print("Enter new author: ");
+            String author = scanner.nextLine();
+            System.out.print("Enter new publication year: ");
+            int year = Integer.parseInt(scanner.nextLine());
+            System.out.print("Enter new language: ");
+            String language = scanner.nextLine();
+            System.out.print("Enter number of pages: ");
+            int pages = Integer.parseInt(scanner.nextLine());
+            System.out.print("Enter remaining documents: ");
+            int remainDocs = Integer.parseInt(scanner.nextLine());
+
+            Document updatedDocument = new Document(id, title, language, pages, author, year, remainDocs) {
+                @Override
+                public void displayInfo() { }
+            };
+
+            if (documentDAO.updateDocument(updatedDocument)) {
+                System.out.println("Document updated successfully.");
+            } else {
+                System.out.println("Failed to update document.");
+            }
+        } catch (NumberFormatException e) {
+            System.out.println("Invalid input format.");
+        }
+    }
+
+     public void removeDocument(Scanner scanner) {
         System.out.print("Enter document ID to remove: ");
-        String id = scanner.nextLine();
+        int id = Integer.parseInt(scanner.nextLine());
         if (documentDAO.deleteDocument(id)) {
             System.out.println("Document removed successfully.");
         } else {
@@ -158,49 +179,14 @@ public class Library {
         }
     }
 
-    public void updateDocument(Scanner scanner) {
-        System.out.print("Enter ID of document to update: ");
-        int id = Integer.parseInt(scanner.nextLine());
-        System.out.print("Enter new title: ");
-        String title = scanner.nextLine();
-        System.out.print("Enter new author: ");
-        String author = scanner.nextLine();
-        System.out.print("Enter new publication year: ");
-        int year = Integer.parseInt(scanner.nextLine());
-        System.out.print("Enter new type (BOOK/MAGAZINE): ");
-        String type = scanner.nextLine().trim().toUpperCase();
-
-        Document updatedDocument = null;
-
-        if (type.equals("BOOK")) {
-            System.out.print("Enter number of pages: ");
-            int pages = Integer.parseInt(scanner.nextLine());
-            updatedDocument = new Book(id, title, author, year, pages);
-        } else if (type.equals("MAGAZINE")) {
-            System.out.print("Enter issue number: ");
-            int issue = Integer.parseInt(scanner.nextLine());
-            updatedDocument = new Magazine(id, title, author, year, issue);
-        } else {
-            System.out.println("Invalid document type.");
-            return;
-        }
-
-        if (documentDAO.updateDocument(updatedDocument)) {
-            System.out.println("Document updated successfully.");
-        } else {
-            System.out.println("Failed to update document.");
-        }
-    }
-
     public void findDocument(Scanner scanner) {
-        System.out.print("Enter document keyword(title or author) to find: ");
+        System.out.print("Enter document keyword (title or author) to find: ");
         String keyword = scanner.nextLine();
         List<Document> documents = documentDAO.findDocument(keyword);
 
         if (documents.isEmpty()) {
             System.out.println("Document not found.");
         } else {
-            // Hiển thị toàn bộ tài liệu tìm thấy
             for (Document doc : documents) {
                 System.out.println(doc);
             }
@@ -208,9 +194,12 @@ public class Library {
     }
 
     public void displayAllDocuments() {
-        documentDAO.getAllDocuments().forEach(System.out::println);
+        List<Document> docs = documentDAO.getAllDocuments();
+        for (Document d : docs) {
+            System.out.println(d);
+        }
     }
-
+    
     public void addUser(Scanner scanner) {
         System.out.print("Enter name: ");
         String name = scanner.nextLine();
@@ -268,3 +257,4 @@ public class Library {
         }
     }
 }
+

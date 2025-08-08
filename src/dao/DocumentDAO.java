@@ -1,45 +1,33 @@
 package dao;
 
-import model.*;
+import model.Document;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
 public class DocumentDAO {
 
-   public boolean insertDocument(Document document) {
-    String sql = "INSERT INTO documents (title, author, publication_year, document_type, number_of_pages, issue_number) " +
-                 "VALUES (?, ?, ?, ?, ?, ?)";
+    public boolean insertDocument(Document document) {
+        String sql = "INSERT INTO documents (title, language, pages, author, publication_year, remain_docs) VALUES (?, ?, ?, ?, ?, ?)";
 
-    try (Connection conn = DatabaseConnection.getConnection();
-         PreparedStatement stmt = conn.prepareStatement(sql)) {
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
 
-        // Không cần set ID nếu để AUTO_INCREMENT trong SQL
-        stmt.setString(1, document.getTitle());
-        stmt.setString(2, document.getAuthor());
-        stmt.setInt(3, document.getYear());
-        stmt.setString(4, document.getDocumentType().name());
+            stmt.setString(1, document.getTitle());
+            stmt.setString(2, document.getLanguage());
+            stmt.setInt(3, document.getPages());
+            stmt.setString(4, document.getAuthor());
+            stmt.setInt(5, document.getPublicationYear());
+            stmt.setInt(6, document.getRemainDocs());
 
-        if (document instanceof Book book) {
-            stmt.setInt(5, book.getNumberOfPages());    // tham số 5: pages
-            stmt.setNull(6, Types.INTEGER);             // tham số 6: issue = NULL
-        } else if (document instanceof Magazine magazine) {
-            stmt.setNull(5, Types.INTEGER);             // tham số 5: pages = NULL
-            stmt.setInt(6, magazine.getIssueNumber());  // tham số 6: issue
-        } else {
-            stmt.setNull(5, Types.INTEGER);
-            stmt.setNull(6, Types.INTEGER);
-        }
+            int rowsAffected = stmt.executeUpdate();
+            return rowsAffected > 0;
 
-
-        int rowsAffected = stmt.executeUpdate();
-        return rowsAffected > 0;
         } catch (SQLException e) {
-        System.err.println(" Error inserting document: " + e.getMessage());
-        return false;
+            System.err.println("Error inserting document: " + e.getMessage());
+            return false;
         }
     }
-
 
     public List<Document> getAllDocuments() {
         List<Document> documents = new ArrayList<>();
@@ -50,10 +38,16 @@ public class DocumentDAO {
              ResultSet rs = stmt.executeQuery(sql)) {
 
             while (rs.next()) {
-                Document doc = createDocumentFromResultSet(rs);
-                if (doc != null) {
-                    documents.add(doc);
-                }
+                Document doc = new Document(
+                    rs.getInt("id"),
+                    rs.getString("title"),
+                    rs.getString("language"),
+                    rs.getInt("pages"),
+                    rs.getString("author"),
+                    rs.getInt("publication_year"),
+                    rs.getInt("remain_docs")
+                );
+                documents.add(doc);
             }
 
         } catch (SQLException e) {
@@ -64,29 +58,18 @@ public class DocumentDAO {
     }
 
     public boolean updateDocument(Document document) {
-        String sql = "UPDATE documents SET title = ?, author = ?, publication_year = ?, number_of_pages = ?, issue_number = ? WHERE id = ?";
+        String sql = "UPDATE documents SET title = ?, language = ?, pages = ?, author = ?, publication_year = ?, remain_docs = ? WHERE id = ?";
 
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setString(1, document.getTitle());
-            stmt.setString(2, document.getAuthor());
-            stmt.setInt(3, document.getYear());
-
-            if (document instanceof Book) {
-                Book book = (Book) document;
-                stmt.setInt(4, book.getNumberOfPages());
-                stmt.setNull(5, Types.INTEGER);
-            } else if (document instanceof Magazine) {
-                Magazine magazine = (Magazine) document;
-                stmt.setNull(4, Types.INTEGER);
-                stmt.setInt(5, magazine.getIssueNumber());
-            } else {
-                stmt.setNull(4, Types.INTEGER);
-                stmt.setNull(5, Types.INTEGER);
-            }
-
-            stmt.setInt(6, document.getId());
+            stmt.setString(2, document.getLanguage());
+            stmt.setInt(3, document.getPages());
+            stmt.setString(4, document.getAuthor());
+            stmt.setInt(5, document.getPublicationYear());
+            stmt.setInt(6, document.getRemainDocs());
+            stmt.setInt(7, document.getId());
 
             return stmt.executeUpdate() > 0;
 
@@ -96,13 +79,13 @@ public class DocumentDAO {
         }
     }
 
-    public boolean deleteDocument(String id) {
+    public boolean deleteDocument(int id) {
         String sql = "DELETE FROM documents WHERE id = ?";
 
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
-            stmt.setString(1, id);
+            stmt.setInt(1, id);
             return stmt.executeUpdate() > 0;
 
         } catch (SQLException e) {
@@ -124,10 +107,16 @@ public class DocumentDAO {
 
             ResultSet rs = stmt.executeQuery();
             while (rs.next()) {
-                Document doc = createDocumentFromResultSet(rs);
-                if (doc != null) {
-                    documents.add(doc);
-                }
+                Document doc = new Document(
+                    rs.getInt("id"),
+                    rs.getString("title"),
+                    rs.getString("language"),
+                    rs.getInt("pages"),
+                    rs.getString("author"),
+                    rs.getInt("publication_year"),
+                    rs.getInt("remain_docs")
+                );
+                documents.add(doc);
             }
 
         } catch (SQLException e) {
@@ -135,29 +124,5 @@ public class DocumentDAO {
         }
 
         return documents;
-    }
-
-    /*
-     * Chuyen 1 dong trong bang thanh 1 doi tuong
-     */
-    private Document createDocumentFromResultSet(ResultSet rs) throws SQLException {
-        // Lấy id là int (hoặc String nếu bạn để String), tùy kiểu id
-        int id = rs.getInt("id");
-        String title = rs.getString("title");
-        String author = rs.getString("author");
-        int year = rs.getInt("publication_year");
-        String typeStr = rs.getString("document_type");
-        DocumentType type = DocumentType.valueOf(typeStr);
-
-        if (type == DocumentType.BOOK) {
-            // Truyền id vào constructor hoặc setId sau khi tạo
-            Book book = new Book(id, title, author, year, rs.getInt("number_of_pages"));
-            return book;
-        } else if (type == DocumentType.MAGAZINE) {
-            Magazine magazine = new Magazine(id, title, author, year, rs.getInt("issue_number"));
-            return magazine;
-        } else {
-            throw new IllegalArgumentException("Unknown document type: " + type);
-        }
     }
 }

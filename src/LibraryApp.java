@@ -1,11 +1,8 @@
 import config.DatabaseConfig;
 import dao.DocumentDAO;
 import dao.UserDAO;
-import model.Book;
 import model.Document;
-import model.DocumentType;
 import model.Library;
-import model.Magazine;
 import model.User;
 import java.util.Scanner;
 
