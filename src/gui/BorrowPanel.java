@@ -1,56 +1,75 @@
 package gui;
 
-import model.User;
-import model.Document;
-import dao.UserDAO;
-
 import javax.swing.*;
 import java.awt.*;
-import java.util.List;
+import java.awt.event.ActionEvent;
+import model.Library;
+
 
 public class BorrowPanel extends JPanel {
+    private JTextArea display;
+    private Library library;
 
-  private JTextArea borrowTextArea;
+    public BorrowPanel() {
+        library = new Library();
+        setupGUI();
+    }
 
+    private void setupGUI() {
+        setLayout(new BorderLayout());
 
-  public BorrowPanel() {
-    setLayout(new BorderLayout());
+        display = new JTextArea("Welcome to Borrow/Return Management!\n");
+        display.setEditable(false);
+        display.setFont(new Font("Monospaced", Font.PLAIN, 12));
+        JScrollPane scroll = new JScrollPane(display);
 
-    JLabel titleLabel = new JLabel("Danh sách mượn tài liệu");
-    titleLabel.setHorizontalAlignment(JLabel.CENTER);
-    titleLabel.setFont(new Font("Arial", Font.BOLD, 16));
+        JPanel buttons = new JPanel(new GridLayout(1, 3, 5, 5));
+        buttons.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
-    borrowTextArea = new JTextArea();
-    borrowTextArea.setEditable(false);
-    borrowTextArea.setFont(new Font("Monospaced", Font.PLAIN, 14));
-    JScrollPane scrollPane = new JScrollPane(borrowTextArea);
+        buttons.add(createButton("📤 Borrow", this::borrowDocument));
+        buttons.add(createButton("📥 Return", this::returnDocument));
+        buttons.add(createButton("📋 View All", this::viewAll));
 
-    add(titleLabel, BorderLayout.NORTH);
-    add(scrollPane, BorderLayout.CENTER);
+        add(scroll, BorderLayout.CENTER);
+        add(buttons, BorderLayout.SOUTH);
+    }
 
-    loadBorrowedData();
-  }
+    private JButton createButton(String text, java.awt.event.ActionListener action) {
+        JButton btn = new JButton(text);
+        btn.addActionListener(action);
+        return btn;
+    }
 
-  private void loadBorrowedData() {
-    UserDAO userDAO = new UserDAO();
-    List<User> users = userDAO.getAllUsers(); // gọi non-static method đúng cách
-    StringBuilder sb = new StringBuilder();
+    private void borrowDocument(ActionEvent e) {
+        String userId = JOptionPane.showInputDialog("Enter User ID:");
+        if (userId == null || userId.trim().isEmpty()) return;
 
-    for (User user : users) {
-      List<Document> borrowedDocs = user.getBorrowedDocuments();
-      if (!borrowedDocs.isEmpty()) {
-        sb.append("Người dùng: ").append(user.getName()).append(" (ID: ").append(user.getId()).append(")\n");
-        for (Document doc : borrowedDocs) {
-          sb.append("   - ").append(doc.getTitle()).append(" (ID: ").append(doc.getId()).append(")\n");
+        String docId = JOptionPane.showInputDialog("Enter Document ID:");
+        if (docId == null || docId.trim().isEmpty()) return;
+
+        if (library.borrowDocument(userId.trim(), docId.trim())) {
+            display.append("✅ Document borrowed successfully\n");
+        } else {
+            display.append("❌ Failed to borrow document\n");
         }
-        sb.append("\n");
-      }
     }
 
-    if (sb.length() == 0) {
-      sb.append("Không có tài liệu nào được mượn.");
+    private void returnDocument(ActionEvent e) {
+        String userId = JOptionPane.showInputDialog("Enter User ID:");
+        if (userId == null || userId.trim().isEmpty()) return;
+
+        String docId = JOptionPane.showInputDialog("Enter Document ID:");
+        if (docId == null || docId.trim().isEmpty()) return;
+
+        if (library.returnDocument(userId.trim(), docId.trim())) {
+            display.append("✅ Document returned successfully\n");
+        } else {
+            display.append("❌ Failed to return document\n");
+        }
     }
 
-    borrowTextArea.setText(sb.toString());
-  }
+    private void viewAll(ActionEvent e) {
+        display.setText("📋 All borrow/return records feature not implemented yet\n");
+        // Bạn có thể triển khai thêm tính năng xem lịch sử mượn trả ở đây
+    }
 }

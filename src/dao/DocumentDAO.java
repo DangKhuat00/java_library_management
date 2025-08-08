@@ -20,16 +20,17 @@ public class DocumentDAO {
         stmt.setInt(3, document.getYear());
         stmt.setString(4, document.getDocumentType().name());
 
-            if (document instanceof Book book) {
-                stmt.setInt(6, book.getNumberOfPages());
-                stmt.setNull(7, Types.INTEGER);
-            } else if (document instanceof Magazine magazine) {
-                stmt.setNull(6, Types.INTEGER);
-                stmt.setInt(7, magazine.getIssueNumber());
-            } else {
-                stmt.setNull(6, Types.INTEGER);
-                stmt.setNull(7, Types.INTEGER);
-            }
+        if (document instanceof Book book) {
+            stmt.setInt(5, book.getNumberOfPages());    // tham số 5: pages
+            stmt.setNull(6, Types.INTEGER);             // tham số 6: issue = NULL
+        } else if (document instanceof Magazine magazine) {
+            stmt.setNull(5, Types.INTEGER);             // tham số 5: pages = NULL
+            stmt.setInt(6, magazine.getIssueNumber());  // tham số 6: issue
+        } else {
+            stmt.setNull(5, Types.INTEGER);
+            stmt.setNull(6, Types.INTEGER);
+        }
+
 
         int rowsAffected = stmt.executeUpdate();
         return rowsAffected > 0;
@@ -140,7 +141,8 @@ public class DocumentDAO {
      * Chuyen 1 dong trong bang thanh 1 doi tuong
      */
     private Document createDocumentFromResultSet(ResultSet rs) throws SQLException {
-        String id = rs.getString("id");
+        // Lấy id là int (hoặc String nếu bạn để String), tùy kiểu id
+        int id = rs.getInt("id");
         String title = rs.getString("title");
         String author = rs.getString("author");
         int year = rs.getInt("publication_year");
@@ -148,9 +150,12 @@ public class DocumentDAO {
         DocumentType type = DocumentType.valueOf(typeStr);
 
         if (type == DocumentType.BOOK) {
-            return new Book(title, author, year, rs.getInt("number_of_pages"));
+            // Truyền id vào constructor hoặc setId sau khi tạo
+            Book book = new Book(id, title, author, year, rs.getInt("number_of_pages"));
+            return book;
         } else if (type == DocumentType.MAGAZINE) {
-            return new Magazine(title, author, year, rs.getInt("issue_number"));
+            Magazine magazine = new Magazine(id, title, author, year, rs.getInt("issue_number"));
+            return magazine;
         } else {
             throw new IllegalArgumentException("Unknown document type: " + type);
         }

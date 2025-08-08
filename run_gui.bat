@@ -1,6 +1,6 @@
 @echo off
 echo ========================================
-echo    🚀 LAUNCHING LIBRARY MANAGEMENT GUI
+echo     LAUNCHING LIBRARY MANAGEMENT GUI
 echo ========================================
 
 cd src

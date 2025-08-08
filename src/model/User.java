@@ -16,7 +16,6 @@ public class User {
     this.name = name;
     this.email = email;
     this.phoneNumber = phoneNumber;
-    this.borrowLimit = borrowLimit;
     this.borrowedDocuments = new ArrayList<>();
 }
 
