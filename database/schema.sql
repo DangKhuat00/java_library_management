@@ -31,8 +31,8 @@ CREATE TABLE borrowed_documents (
     id INT AUTO_INCREMENT PRIMARY KEY,
     user_id INT NOT NULL,
     document_id INT NOT NULL,
-    borrow_date DATE NOT NULL,
-    return_date DATE,
+    MODIFY borrow_date DATETIME NOT NULL,
+    MODIFY return_date DATETIME;
     FOREIGN KEY (user_id) REFERENCES users(id),
     FOREIGN KEY (document_id) REFERENCES documents(id)
 );

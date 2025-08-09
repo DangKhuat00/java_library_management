@@ -57,6 +57,7 @@ public class UserPanel extends JPanel {
         tfEmail = createField("Email:", formPanel, 250);
         tfPhone = createField("Phone:", formPanel, 250);
         tfBorrowLimit = createField("Borrow Limit:", formPanel, 250);
+        tfBorrowLimit.setText("10"); 
         tfBorrowedCount = createField("Borrowed Count:", formPanel, 250);
 
         // === Panel chứa form + nút ===

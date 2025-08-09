@@ -9,7 +9,7 @@ import java.awt.*;
 import java.util.List;
 
 public class DocumentPanel extends JPanel {
-    private Library library;
+    private final Library library;
     private JTable table;
     private DefaultTableModel tableModel;
 
@@ -17,23 +17,31 @@ public class DocumentPanel extends JPanel {
     private JTextField tfSearch;
     private JComboBox<String> cbFilter;
 
-    private JButton btnAdd, btnUpdate, btnRemove, btnSearch, btnReset;
+    private JButton btnAdd, btnUpdate, btnRemove, btnSearch, btnReset, btnClear;
 
     private int selectedId = -1;
 
     public DocumentPanel() {
         library = new Library();
-        setupGUI();
+        initUI();
         loadAllDocuments();
-        setupEvents(); // Thêm sự kiện
+        initEvents();
     }
 
-    private void setupGUI() {
+    /** ===================== UI SETUP ===================== */
+    private void initUI() {
         setLayout(new BorderLayout(5, 5));
         setBorder(BorderFactory.createEmptyBorder(8, 8, 8, 8));
 
-        // === Panel Search + Filter ===
+        add(createSearchPanel(), BorderLayout.NORTH);
+        add(createFormPanel(), BorderLayout.CENTER);
+        add(createTablePanel(), BorderLayout.SOUTH);
+    }
+
+    /** Panel tìm kiếm + filter */
+    private JPanel createSearchPanel() {
         JPanel searchPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 5, 5));
+
         cbFilter = new JComboBox<>(new String[]{
                 "All Fields", "Title", "Author", "Language", "Year", "Pages", "Remain Docs"
         });
@@ -48,10 +56,13 @@ public class DocumentPanel extends JPanel {
         searchPanel.add(btnReset);
         searchPanel.setBorder(BorderFactory.createEmptyBorder(0, 0, 10, 0));
 
-        add(searchPanel, BorderLayout.NORTH);
+        return searchPanel;
+    }
 
-        // === Panel nhập dữ liệu ===
-        JPanel formPanel = new JPanel(new GridLayout(3, 2, 15, 10));
+    /** Panel nhập dữ liệu + nút thêm/sửa/xóa */
+    private JPanel createFormPanel() {
+        // Giảm khoảng cách dọc (vgap) giữa các hàng trong lưới
+        JPanel formPanel = new JPanel(new GridLayout(3, 2, 5, 2));
 
         tfTitle = createField("Title:", formPanel, 250);
         tfAuthor = createField("Author:", formPanel, 250);
@@ -60,7 +71,6 @@ public class DocumentPanel extends JPanel {
         tfPages = createField("Pages:", formPanel, 250);
         tfRemain = createField("Remain Docs:", formPanel, 250);
 
-        // === Panel chứa form + nút ===
         JPanel formAndButtonPanel = new JPanel(new BorderLayout(5, 5));
         formAndButtonPanel.add(formPanel, BorderLayout.CENTER);
 
@@ -68,7 +78,7 @@ public class DocumentPanel extends JPanel {
         btnAdd = new JButton("➕ Add");
         btnUpdate = new JButton("✏️ Update");
         btnRemove = new JButton("🗑️ Remove");
-        JButton btnClear = new JButton("Clear Form");
+        btnClear = new JButton("Clear Form");
 
         btnPanel.add(btnAdd);
         btnPanel.add(btnUpdate);
@@ -76,43 +86,50 @@ public class DocumentPanel extends JPanel {
         btnPanel.add(btnClear);
 
         formAndButtonPanel.add(btnPanel, BorderLayout.SOUTH);
-        formAndButtonPanel.setBorder(BorderFactory.createEmptyBorder(0, 0, 20, 0));
+        // Giảm khoảng trống dưới cùng để tiết kiệm không gian
+        formAndButtonPanel.setBorder(BorderFactory.createEmptyBorder(0, 0, 10, 0));
 
-        add(formAndButtonPanel, BorderLayout.CENTER);
+        return formAndButtonPanel;
+    }
 
-        // === Bảng dữ liệu ===
+    /** Tạo một trường nhập có label - Đã tối ưu hóa chiều cao */
+    private JTextField createField(String label, JPanel parent, int width) {
+        // Giảm khoảng cách dọc (vgap) về 0
+        JPanel fieldPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 5, 0));
+
+        JLabel lb = new JLabel(label);
+        // Giảm chiều cao label
+        lb.setPreferredSize(new Dimension(90, 28));
+
+        JTextField tf = new JTextField();
+        // Giảm chiều cao text field
+        tf.setPreferredSize(new Dimension(width, 28));
+
+        fieldPanel.add(lb);
+        fieldPanel.add(tf);
+        parent.add(fieldPanel);
+
+        return tf;
+    }
+
+    /** Panel chứa bảng dữ liệu */
+    private JScrollPane createTablePanel() {
         String[] columns = {"ID", "Title", "Author", "Year", "Language", "Pages", "Remain Docs"};
         tableModel = new DefaultTableModel(columns, 0) {
             @Override
             public boolean isCellEditable(int row, int col) {
-                return false;
+                return false; // Không cho chỉnh sửa trực tiếp
             }
         };
         table = new JTable(tableModel);
         table.setRowHeight(22);
 
         JScrollPane scrollPane = new JScrollPane(table);
-        scrollPane.setPreferredSize(new Dimension(900, 200));
-        add(scrollPane, BorderLayout.SOUTH);
-
-        // Sự kiện clear form
-        btnClear.addActionListener(e -> clearForm());
+        scrollPane.setPreferredSize(new Dimension(900, 250)); // Tăng chiều cao cho bảng
+        return scrollPane;
     }
 
-    private JTextField createField(String label, JPanel parent, int width) {
-        JPanel fieldPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 5, 0));
-
-        JLabel lb = new JLabel(label);
-        lb.setPreferredSize(new Dimension(90, 36));
-        JTextField tf = new JTextField();
-        tf.setPreferredSize(new Dimension(width, 28));
-
-        fieldPanel.add(lb);
-        fieldPanel.add(tf);
-        parent.add(fieldPanel);
-        return tf;
-    }
-
+    /** ===================== DATA LOADING ===================== */
     private void loadAllDocuments() {
         tableModel.setRowCount(0);
         List<Document> docs = library.getAllDocuments();
@@ -129,6 +146,22 @@ public class DocumentPanel extends JPanel {
         }
     }
 
+    private void loadDocuments(List<Document> docs) {
+        tableModel.setRowCount(0);
+        for (Document doc : docs) {
+            tableModel.addRow(new Object[]{
+                    doc.getId(),
+                    doc.getTitle(),
+                    doc.getAuthor(),
+                    doc.getPublicationYear(),
+                    doc.getLanguage(),
+                    doc.getPages(),
+                    doc.getRemainDocs()
+            });
+        }
+    }
+
+    /** ===================== VALIDATION ===================== */
     private boolean validateInput() {
         if (tfTitle.getText().trim().isEmpty() ||
                 tfAuthor.getText().trim().isEmpty() ||
@@ -161,7 +194,8 @@ public class DocumentPanel extends JPanel {
         table.clearSelection();
     }
 
-    private void setupEvents() {
+    /** ===================== EVENT HANDLING ===================== */
+    private void initEvents() {
         // Thêm tài liệu
         btnAdd.addActionListener(e -> {
             if (validateInput()) {
@@ -236,28 +270,28 @@ public class DocumentPanel extends JPanel {
                 JOptionPane.showMessageDialog(this, "Please enter a search keyword.");
                 return;
             }
-            List<Document> docs = library.findDocuments(keyword);
-            tableModel.setRowCount(0);
-            for (Document doc : docs) {
-                tableModel.addRow(new Object[]{
-                        doc.getId(),
-                        doc.getTitle(),
-                        doc.getAuthor(),
-                        doc.getPublicationYear(),
-                        doc.getLanguage(),
-                        doc.getPages(),
-                        doc.getRemainDocs()
-                });
+
+            String filter = cbFilter.getSelectedItem().toString();
+            List<Document> docs;
+            if (filter.equals("All Fields")) {
+                docs = library.findDocuments(keyword);
+            } else {
+                docs = library.findDocumentsByField(filter, keyword);
             }
+            loadDocuments(docs);
         });
 
-        // Reset về toàn bộ dữ liệu
+        // Reset
         btnReset.addActionListener(e -> {
             tfSearch.setText("");
+            cbFilter.setSelectedIndex(0);
             loadAllDocuments();
         });
 
-        // Click vào bảng để load dữ liệu lên form
+        // Clear form
+        btnClear.addActionListener(e -> clearForm());
+
+        // Chọn bảng -> load form
         table.getSelectionModel().addListSelectionListener(e -> {
             if (!e.getValueIsAdjusting() && table.getSelectedRow() != -1) {
                 selectedId = (int) table.getValueAt(table.getSelectedRow(), 0);

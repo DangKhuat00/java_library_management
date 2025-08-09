@@ -4,174 +4,95 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Data Access Object for Borrow operations
- * Handles database operations for borrowed documents
- */
 public class BorrowDAO {
-    
-    /**
-     * Record a document borrowing
-     */
+
+    // Mượn tài liệu
     public boolean borrowDocument(String userId, String documentId) {
-    String sql = "INSERT INTO borrowed_documents (user_id, document_id, borrow_date) VALUES (?, ?, ?)";
-    
-    try (Connection conn = DatabaseConnection.getConnection();
-         PreparedStatement stmt = conn.prepareStatement(sql)) {
-        
-        stmt.setString(1, userId);
-        stmt.setString(2, documentId);
-        stmt.setDate(3, new java.sql.Date(System.currentTimeMillis())); // Ngày mượn hiện tại
-        
-        int result = stmt.executeUpdate();
-        return result > 0;
-        
-    } catch (SQLException e) {
-        System.err.println("Error recording borrow: " + e.getMessage());
-        return false;
-    }
-}
-    
-    /**
-     * Return a borrowed document
-     */
-    public boolean returnDocument(String userId, String documentId) {
-        String sql = "DELETE FROM borrowed_documents WHERE user_id = ? AND document_id = ?";
-        
+        String sql = "INSERT INTO borrowed_documents (user_id, document_id, borrow_date) VALUES (?, ?, ?)";
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
-            
             stmt.setString(1, userId);
             stmt.setString(2, documentId);
-            
-            int result = stmt.executeUpdate();
-            return result > 0;
-            
+            stmt.setTimestamp(3, new Timestamp(System.currentTimeMillis()));
+            return stmt.executeUpdate() > 0;
+        } catch (SQLException e) {
+            System.err.println("Error recording borrow: " + e.getMessage());
+            return false;
+        }
+    }
+
+    // Trả tài liệu
+    public boolean returnDocument(String userId, String documentId) {
+        String sql = "UPDATE borrowed_documents SET return_date = ? " +
+                     "WHERE user_id = ? AND document_id = ? AND return_date IS NULL";
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setTimestamp(1, new Timestamp(System.currentTimeMillis()));
+            stmt.setString(2, userId);
+            stmt.setString(3, documentId);
+            return stmt.executeUpdate() > 0;
         } catch (SQLException e) {
             System.err.println("Error recording return: " + e.getMessage());
             return false;
         }
     }
-    
-    /**
-     * Get borrowed documents for a user
-     */
-    public List<String> getBorrowedDocuments(String userId) {
-        List<String> documentIds = new ArrayList<>();
-        String sql = "SELECT document_id FROM borrowed_documents WHERE user_id = ?";
-        
-        try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-            
-            stmt.setString(1, userId);
-            ResultSet rs = stmt.executeQuery();
-            
-            while (rs.next()) {
-                documentIds.add(rs.getString("document_id"));
-            }
-            
-        } catch (SQLException e) {
-            System.err.println("Error getting borrowed documents: " + e.getMessage());
-        }
-        
-        return documentIds;
-    }
-    
-    /**
-     * Check if a document is currently borrowed
-     */
-    public boolean isDocumentBorrowed(String documentId) {
-        String sql = "SELECT COUNT(*) FROM borrowed_documents WHERE document_id = ?";
-        
-        try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-            
-            stmt.setString(1, documentId);
-            ResultSet rs = stmt.executeQuery();
-            
-            if (rs.next()) {
-                return rs.getInt(1) > 0;
-            }
-            
-        } catch (SQLException e) {
-            System.err.println("Error checking document availability: " + e.getMessage());
-        }
-        
-        return false;
-    }
-    
-    /**
-     * Get borrow count for a user
-     */
-    public int getUserBorrowCount(String userId) {
-        String sql = "SELECT COUNT(*) FROM borrowed_documents WHERE user_id = ?";
-        
-        try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-            
-            stmt.setString(1, userId);
-            ResultSet rs = stmt.executeQuery();
-            
-            if (rs.next()) {
-                return rs.getInt(1);
-            }
-            
-        } catch (SQLException e) {
-            System.err.println("Error getting user borrow count: " + e.getMessage());
-        }
-        
-        return 0;
-    }
-    
-    /**
-     * Get complete borrow history for a user
-     */
+
+    // Lịch sử mượn của 1 user
     public List<BorrowRecord> getUserBorrowHistory(String userId) {
         List<BorrowRecord> records = new ArrayList<>();
-        String sql = "SELECT bd.*, d.title FROM borrowed_documents bd " +
-                    "JOIN documents d ON bd.document_id = d.id " +
-                    "WHERE bd.user_id = ? ORDER BY bd.borrowed_date DESC";
-        
+        String sql = "SELECT bd.id, bd.user_id, bd.document_id, d.title, bd.borrow_date, bd.return_date " +
+                     "FROM borrowed_documents bd " +
+                     "JOIN documents d ON bd.document_id = d.id " +
+                     "WHERE bd.user_id = ? ORDER BY bd.borrow_date DESC";
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
-            
             stmt.setString(1, userId);
             ResultSet rs = stmt.executeQuery();
-            
             while (rs.next()) {
-                BorrowRecord record = new BorrowRecord();
-                record.documentId = rs.getString("document_id");
-                record.documentTitle = rs.getString("title");
-                record.borrowedDate = rs.getTimestamp("borrowed_date");
-                record.returnDate = rs.getTimestamp("return_date");
-                record.isReturned = rs.getBoolean("is_returned");
-                records.add(record);
+                records.add(extractBorrowRecord(rs));
             }
-            
         } catch (SQLException e) {
             System.err.println("Error getting borrow history: " + e.getMessage());
         }
-        
         return records;
     }
-    
-    /**
-     * Inner class to represent borrow record
-     */
+
+    // Lấy tất cả lịch sử mượn
+    public List<BorrowRecord> getAllBorrowRecords() {
+        List<BorrowRecord> records = new ArrayList<>();
+        String sql = "SELECT bd.id, bd.user_id, bd.document_id, d.title, bd.borrow_date, bd.return_date " +
+                     "FROM borrowed_documents bd " +
+                     "JOIN documents d ON bd.document_id = d.id " +
+                     "ORDER BY bd.borrow_date DESC";
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            ResultSet rs = stmt.executeQuery();
+            while (rs.next()) {
+                records.add(extractBorrowRecord(rs));
+            }
+        } catch (SQLException e) {
+            System.err.println("Error getting all borrow records: " + e.getMessage());
+        }
+        return records;
+    }
+
+    private BorrowRecord extractBorrowRecord(ResultSet rs) throws SQLException {
+        BorrowRecord record = new BorrowRecord();
+        record.borrowId = rs.getString("id");
+        record.userId = rs.getString("user_id");
+        record.documentId = rs.getString("document_id");
+        record.documentTitle = rs.getString("title");
+        record.borrowedDate = rs.getTimestamp("borrow_date");
+        record.returnDate = rs.getTimestamp("return_date");
+        return record;
+    }
+
     public static class BorrowRecord {
+        public String borrowId;
+        public String userId;
         public String documentId;
         public String documentTitle;
         public Timestamp borrowedDate;
         public Timestamp returnDate;
-        public boolean isReturned;
-        
-        @Override
-        public String toString() {
-            return String.format("%s (Borrowed: %s, Returned: %s)", 
-                documentTitle, 
-                borrowedDate.toString(),
-                isReturned ? returnDate.toString() : "Not returned"
-            );
-        }
     }
 }

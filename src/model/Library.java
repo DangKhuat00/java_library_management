@@ -3,6 +3,7 @@ package model;
 import dao.DocumentDAO;
 import dao.UserDAO;
 import dao.BorrowDAO;
+import dao.BorrowDAO.BorrowRecord;
 
 import java.util.List;
 import java.util.Scanner;
@@ -41,6 +42,22 @@ public class Library {
         return documentDAO.findDocument(keyword);
     }
 
+    public List<Document> findDocumentsByField(String filter, String keyword) {
+        String field;
+
+        switch (filter) {
+            case "Title": field = "title"; break;
+            case "Author": field = "author"; break;
+            case "Language": field = "language"; break;
+            case "Year": field = "year"; break;
+            case "Pages": field = "pages"; break;
+            case "Remain Docs": field = "remain_docs"; break;
+            default: // All Fields
+                return findDocuments(keyword);
+        }
+
+        return documentDAO.findDocumentsByField(field, keyword);
+    }
     // Lấy tất cả tài liệu
     public List<Document> getAllDocuments() {
         return documentDAO.getAllDocuments();
@@ -93,6 +110,13 @@ public class Library {
         return borrowDAO.returnDocument(userId, documentId);
     }
     
+    public List<BorrowRecord> getAllBorrowRecords() {
+        return borrowDAO.getAllBorrowRecords();
+    }
+
+    public List<BorrowRecord> getUserBorrowHistory(String userId) {
+        return borrowDAO.getUserBorrowHistory(userId);
+    }
 
 
     // ========== GUI methods tương tự các hàm console có thể gọi thêm ==========

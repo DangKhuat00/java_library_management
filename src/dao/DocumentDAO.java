@@ -125,4 +125,31 @@ public class DocumentDAO {
 
         return documents;
     }
+
+    public List<Document> findDocumentsByField(String field, String keyword) {
+        List<Document> list = new ArrayList<>();
+        String sql = "SELECT * FROM documents WHERE " + field + " LIKE ?";
+
+        try (Connection conn = DatabaseConnection.getConnection();
+            PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, "%" + keyword + "%");
+            ResultSet rs = stmt.executeQuery();
+
+            while (rs.next()) {
+                Document doc = new Document(
+                        rs.getInt("id"),
+                        rs.getString("title"),
+                        rs.getString("language"),
+                        rs.getInt("pages"),
+                        rs.getString("author"),
+                        rs.getInt("year"),
+                        rs.getInt("remain_docs")
+                );
+                list.add(doc);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return list;
+    }
 }
