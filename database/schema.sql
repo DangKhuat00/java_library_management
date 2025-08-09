@@ -10,7 +10,8 @@ CREATE TABLE users (
     name VARCHAR(255) NOT NULL,
     email VARCHAR(255) NOT NULL UNIQUE,
     phoneNumber VARCHAR(20) NOT NULL,
-    borrowLimit INT NOT NULL 
+    borrowLimit INT NOT NULL,
+    borrowedBooksCount INT NOT NULL
 );
 
 -- Create documents table

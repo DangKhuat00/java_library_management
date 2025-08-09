@@ -59,30 +59,33 @@ public class Library {
         }
         return null;
     }
-
-    /**
-     * 5. Add User (GUI version)
-     */
-    public boolean addUser(String name, String email, String phone, int maxBorrowLimit) {
-        User user = new User(name, email, phone);
-        user.setBorrowLimit(maxBorrowLimit);
+    
+    public boolean addUser(User user) {
         return userDAO.insertUser(user);
     }
+
     
-    /**
-     * 6. Get All Users (GUI version)
-     */
     public List<User> getAllUsers() {
         return userDAO.getAllUsers();
     }
-    
-    /**
-     * 7. Borrow Document (GUI version)
-     */
+
+    public boolean deleteUser(int id) {
+        return userDAO.deleteUser(id);
+    }
+
+    // Cập nhật user
+    public boolean updateUser(User user) {
+        return userDAO.updateUser(user);
+    }
+
     public boolean borrowDocument(String userId, String documentId) {
         return borrowDAO.borrowDocument(userId, documentId);
     }
     
+    public List<User> findUsers(String keyword) {
+        return userDAO.searchUsers(keyword);
+    }
+
     /**
      * 8. Return Document (GUI version)
      */
@@ -90,6 +93,8 @@ public class Library {
         return borrowDAO.returnDocument(userId, documentId);
     }
     
+
+
     // ========== GUI methods tương tự các hàm console có thể gọi thêm ==========
 
     // Còn các hàm về User, Borrow giữ nguyên, không liên quan Document
@@ -208,7 +213,10 @@ public class Library {
         System.out.print("Enter phoneNumber: ");
         String phoneNumber = scanner.nextLine();
 
-        User user = new User(name, email, phoneNumber);
+        System.out.print("Enter borrowedBooksCount: ");
+        int borrowedBooksCount = Integer.parseInt(scanner.nextLine());
+
+        User user = new User(name, email, phoneNumber, borrowedBooksCount);
         if (userDAO.insertUser(user)) {
             System.out.println("User added successfully.");
         } else {
