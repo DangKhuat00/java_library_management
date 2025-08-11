@@ -8,6 +8,10 @@ import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.util.List;
 
+/**
+ * Quan ly giao dien tai lieu
+ * Xu ly cac chuc nang them, sua, xoa, tim kiem va hien thi danh sach tai lieu
+ */
 public class DocumentPanel extends JPanel {
     private final Library library;
     private JTable table;
@@ -23,6 +27,9 @@ public class DocumentPanel extends JPanel {
 
     private int selectedId = -1;
 
+    /**
+     * Khoi tao giao dien quan ly tai lieu
+     */
     public DocumentPanel() {
         library = new Library();
         setupGUI();
@@ -30,6 +37,9 @@ public class DocumentPanel extends JPanel {
         setupEvents();
     }
 
+    /**
+     * Thiet lap giao dien nguoi dung
+     */
     private void setupGUI() {
         setLayout(new BorderLayout(5, 5));
         setBorder(BorderFactory.createEmptyBorder(8, 8, 8, 8));
@@ -63,9 +73,10 @@ public class DocumentPanel extends JPanel {
         tfSearch.setPreferredSize(new Dimension(250, 28));
         btnSearch = new JButton("🔍 Search");
         btnReset = new JButton("Reset");
-        cbFilter = new JComboBox<>(new String[]{"All Fields", "Title", "Author", "Language", "publication_year"});
+        cbFilter = new JComboBox<>(
+                new String[] { "All Fields", "Title", "Author", "Language", "Year", "Pages", "Available" });
         JLabel lblFilter = new JLabel("Filter by:");
-        
+
         searchAndFilterPanel.add(lblFilter);
         searchAndFilterPanel.add(cbFilter);
         searchAndFilterPanel.add(Box.createRigidArea(new Dimension(10, 0)));
@@ -82,7 +93,7 @@ public class DocumentPanel extends JPanel {
         actionButtonPanel.add(btnUpdate);
         actionButtonPanel.add(btnRemove);
         actionButtonPanel.add(btnClear);
-        
+
         JPanel buttonWrapperPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
         buttonWrapperPanel.add(actionButtonPanel);
 
@@ -99,16 +110,18 @@ public class DocumentPanel extends JPanel {
         add(northPanel, BorderLayout.NORTH);
 
         // Cập nhật tên cột
-        String[] columns = {"ID", "Title", "Author", "Year", "Language", "Pages", "Available"};
+        String[] columns = { "ID", "Title", "Author", "Year", "Language", "Pages", "Available" };
         tableModel = new DefaultTableModel(columns, 0) {
             @Override
             public boolean isCellEditable(int row, int col) {
                 return false;
             }
+
             // Hiển thị kiểu Boolean dưới dạng checkbox trong bảng
             @Override
             public Class<?> getColumnClass(int columnIndex) {
-                if (columnIndex == 6) return Boolean.class;
+                if (columnIndex == 6)
+                    return Boolean.class;
                 return super.getColumnClass(columnIndex);
             }
         };
@@ -119,6 +132,9 @@ public class DocumentPanel extends JPanel {
         add(scrollPane, BorderLayout.CENTER);
     }
 
+    /**
+     * Tao mot truong nhap lieu voi label va do rong tuy chinh
+     */
     private JTextField createField(String label, JPanel parent, int width) {
         JPanel fieldPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 5, 0));
         JLabel lb = new JLabel(label);
@@ -131,16 +147,22 @@ public class DocumentPanel extends JPanel {
         return tf;
     }
 
+    /**
+     * Tai va hien thi tat ca tai lieu len bang
+     */
     private void loadAllDocuments() {
         tableModel.setRowCount(0);
         List<Document> docs = library.getAllDocuments();
         loadDocumentsToTable(docs);
     }
 
+    /**
+     * Dua danh sach tai lieu vao bang
+     */
     private void loadDocumentsToTable(List<Document> docs) {
         tableModel.setRowCount(0);
         for (Document doc : docs) {
-            tableModel.addRow(new Object[]{
+            tableModel.addRow(new Object[] {
                     doc.getId(),
                     doc.getTitle(),
                     doc.getAuthor(),
@@ -152,6 +174,9 @@ public class DocumentPanel extends JPanel {
         }
     }
 
+    /**
+     * Kiem tra du lieu nhap vao hop le
+     */
     private boolean validateInput() {
         // Bỏ kiểm tra cho trường "remain docs" cũ
         if (tfTitle.getText().trim().isEmpty() ||
@@ -172,6 +197,9 @@ public class DocumentPanel extends JPanel {
         return true;
     }
 
+    /**
+     * Xoa trang cac truong nhap lieu va bo chon tren bang
+     */
     private void clearForm() {
         tfTitle.setText("");
         tfAuthor.setText("");
@@ -183,6 +211,9 @@ public class DocumentPanel extends JPanel {
         table.clearSelection();
     }
 
+    /**
+     * Thiet lap cac su kien cho cac nut va bang
+     */
     private void setupEvents() {
         btnAdd.addActionListener(e -> {
             if (validateInput()) {
@@ -192,8 +223,7 @@ public class DocumentPanel extends JPanel {
                         tfLanguage.getText().trim(),
                         Integer.parseInt(tfPages.getText().trim()),
                         tfAuthor.getText().trim(),
-                        Integer.parseInt(tfYear.getText().trim())
-                );
+                        Integer.parseInt(tfYear.getText().trim()));
                 if (library.addDocument(doc)) {
                     JOptionPane.showMessageDialog(this, "Document added successfully.");
                     loadAllDocuments();
@@ -236,8 +266,7 @@ public class DocumentPanel extends JPanel {
                 return;
             }
             int confirm = JOptionPane.showConfirmDialog(
-                    this, "Are you sure to delete this document?", "Confirm", JOptionPane.YES_NO_OPTION
-            );
+                    this, "Are you sure to delete this document?", "Confirm", JOptionPane.YES_NO_OPTION);
             if (confirm == JOptionPane.YES_OPTION) {
                 if (library.removeDocument(String.valueOf(selectedId))) {
                     JOptionPane.showMessageDialog(this, "Document removed successfully.");
@@ -261,7 +290,7 @@ public class DocumentPanel extends JPanel {
             }
             List<Document> docs;
             if (filter.equals("All Fields")) {
-                docs = library.findDocuments(keyword); 
+                docs = library.findDocuments(keyword);
             } else {
                 docs = library.findDocumentsByField(filter, keyword);
             }
