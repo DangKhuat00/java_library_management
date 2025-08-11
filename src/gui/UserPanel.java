@@ -43,10 +43,10 @@ public class UserPanel extends JPanel {
         tfBorrowLimit = createField("Borrow Limit:", formPanel, 250);
         tfBorrowLimit.setText("10"); // Mặc định giới hạn mượn
         tfBorrowedCount = createField("Borrowed Count:", formPanel, 250);
-        
+
         // THAY ĐỔI: Khởi tạo giá trị và làm cho không thể sửa
         tfBorrowedCount.setText("0");
-        tfBorrowedCount.setEditable(false); 
+        tfBorrowedCount.setEditable(false);
 
         northPanel.add(formPanel, BorderLayout.WEST);
 
@@ -62,9 +62,9 @@ public class UserPanel extends JPanel {
         tfSearch.setPreferredSize(new Dimension(250, 28)); // Giảm chiều rộng để cân đối
         btnSearch = new JButton("🔍 Search");
         btnReset = new JButton("Reset");
-        cbFilter = new JComboBox<>(new String[]{"All Fields", "Name", "Email", "Phone"});
+        cbFilter = new JComboBox<>(new String[] { "All Fields", "Name", "Email", "Phone" });
         JLabel lblFilter = new JLabel("Filter by:");
-        
+
         // Thêm các thành phần theo thứ tự mới: Filter -> Search
         searchAndFilterPanel.add(lblFilter);
         searchAndFilterPanel.add(cbFilter);
@@ -72,7 +72,6 @@ public class UserPanel extends JPanel {
         searchAndFilterPanel.add(tfSearch);
         searchAndFilterPanel.add(btnSearch);
         searchAndFilterPanel.add(btnReset);
-
 
         // --- Panel Nút chức năng ---
         JPanel actionButtonPanel = new JPanel(new GridLayout(1, 4, 10, 5));
@@ -84,7 +83,7 @@ public class UserPanel extends JPanel {
         actionButtonPanel.add(btnUpdate);
         actionButtonPanel.add(btnRemove);
         actionButtonPanel.add(btnClear);
-        
+
         JPanel buttonWrapperPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
         buttonWrapperPanel.add(actionButtonPanel);
 
@@ -105,7 +104,7 @@ public class UserPanel extends JPanel {
         add(northPanel, BorderLayout.NORTH);
 
         // ===== Bảng dữ liệu =====
-        String[] columns = {"ID", "Name", "Email", "Phone", "Borrow Limit", "Borrowed Count"};
+        String[] columns = { "ID", "Name", "Email", "Phone", "Borrow Limit", "Borrowed Count" };
         tableModel = new DefaultTableModel(columns, 0) {
             @Override
             public boolean isCellEditable(int row, int col) {
@@ -118,7 +117,7 @@ public class UserPanel extends JPanel {
         JScrollPane scrollPane = new JScrollPane(table);
         add(scrollPane, BorderLayout.CENTER);
     }
-    
+
     private JTextField createField(String label, JPanel parent, int width) {
         JPanel fieldPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 5, 0));
         JLabel lb = new JLabel(label);
@@ -135,7 +134,7 @@ public class UserPanel extends JPanel {
         tableModel.setRowCount(0);
         List<User> users = library.getAllUsers();
         for (User user : users) {
-            tableModel.addRow(new Object[]{
+            tableModel.addRow(new Object[] {
                     user.getId(),
                     user.getName(),
                     user.getEmail(),
@@ -210,8 +209,7 @@ public class UserPanel extends JPanel {
                         tfPhone.getText().trim(),
                         Integer.parseInt(tfBorrowLimit.getText().trim()),
                         // Giữ nguyên số sách đã mượn khi cập nhật thông tin khác
-                        Integer.parseInt(tfBorrowedCount.getText().trim())
-                );
+                        Integer.parseInt(tfBorrowedCount.getText().trim()));
                 if (library.updateUser(user)) {
                     JOptionPane.showMessageDialog(this, "User updated successfully.");
                     loadAllUsers();
@@ -228,8 +226,7 @@ public class UserPanel extends JPanel {
                 return;
             }
             int confirm = JOptionPane.showConfirmDialog(
-                    this, "Are you sure to delete this user?", "Confirm", JOptionPane.YES_NO_OPTION
-            );
+                    this, "Are you sure to delete this user?", "Confirm", JOptionPane.YES_NO_OPTION);
             if (confirm == JOptionPane.YES_OPTION) {
                 if (library.deleteUser(selectedId)) {
                     JOptionPane.showMessageDialog(this, "User removed successfully.");
@@ -240,7 +237,7 @@ public class UserPanel extends JPanel {
                 }
             }
         });
-        
+
         btnSearch.addActionListener(e -> {
             String keyword = tfSearch.getText().trim();
             if (keyword.isEmpty()) {
@@ -249,10 +246,10 @@ public class UserPanel extends JPanel {
             }
             String filter = cbFilter.getSelectedItem().toString();
             List<User> users = library.findUsers(keyword, filter);
-            
+
             tableModel.setRowCount(0);
             for (User user : users) {
-                tableModel.addRow(new Object[]{
+                tableModel.addRow(new Object[] {
                         user.getId(),
                         user.getName(),
                         user.getEmail(),

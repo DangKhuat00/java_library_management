@@ -36,12 +36,12 @@ public class LibraryAppGUI {
                 // Xu ly loi khi khoi dong giao dien
                 System.err.println("Loi khoi dong giao dien quan ly thu vien:");
                 e.printStackTrace();
-                JOptionPane.showMessageDialog(null, 
-                    "Loi khoi dong ung dung quan ly thu vien!\n" +
-                    "Error: " + e.getMessage() + "\n\n" +
-                    "Vui long kiem tra ket noi co so du lieu va thu lai.",
-                    "Loi khoi dong", 
-                    JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(null,
+                        "Loi khoi dong ung dung quan ly thu vien!\n" +
+                                "Error: " + e.getMessage() + "\n\n" +
+                                "Vui long kiem tra ket noi co so du lieu va thu lai.",
+                        "Loi khoi dong",
+                        JOptionPane.ERROR_MESSAGE);
                 System.exit(1);
             }
         });

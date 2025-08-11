@@ -38,7 +38,7 @@ public class BorrowPanel extends JPanel {
         JPanel formPanel = new JPanel(new GridLayout(5, 1, 0, 8));
         tfUserId = createField("User ID:", formPanel, 200, true);
         tfDocId = createField("Document ID:", formPanel, 200, true);
-        
+
         // THAY ĐỔI: Các trường này sẽ không thể chỉnh sửa
         tfDocTitle = createField("Document Title:", formPanel, 200, false);
         tfBorrowDate = createField("Borrow Date:", formPanel, 200, false);
@@ -54,9 +54,9 @@ public class BorrowPanel extends JPanel {
         tfSearch.setPreferredSize(new Dimension(250, 28));
         btnSearch = new JButton("🔍 Search");
         btnReset = new JButton("Reset");
-        cbFilter = new JComboBox<>(new String[]{"All Fields", "User ID", "Document ID", "Document Title"});
+        cbFilter = new JComboBox<>(new String[] { "All Fields", "User ID", "Document ID", "Document Title" });
         JLabel lblFilter = new JLabel("Filter by:");
-        
+
         searchAndFilterPanel.add(lblFilter);
         searchAndFilterPanel.add(cbFilter);
         searchAndFilterPanel.add(Box.createRigidArea(new Dimension(10, 0)));
@@ -72,14 +72,14 @@ public class BorrowPanel extends JPanel {
         actionButtonPanel.add(btnBorrow);
         actionButtonPanel.add(btnReturn);
         actionButtonPanel.add(btnClear);
-        
+
         JPanel buttonWrapperPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
         buttonWrapperPanel.add(actionButtonPanel);
 
         // Căn giữa các khối điều khiển
         searchAndFilterPanel.setAlignmentX(Component.CENTER_ALIGNMENT);
         buttonWrapperPanel.setAlignmentX(Component.CENTER_ALIGNMENT);
-        
+
         rightPanel.add(Box.createVerticalGlue());
         rightPanel.add(searchAndFilterPanel);
         rightPanel.add(Box.createRigidArea(new Dimension(0, 15)));
@@ -92,8 +92,7 @@ public class BorrowPanel extends JPanel {
         add(northPanel, BorderLayout.NORTH);
 
         tableModel = new DefaultTableModel(
-                new String[]{"User ID", "Doc ID", "Document Title", "Borrow Date", "Return Date"}, 0
-        ) {
+                new String[] { "User ID", "Doc ID", "Document Title", "Borrow Date", "Return Date" }, 0) {
             @Override
             public boolean isCellEditable(int row, int column) {
                 return false; // Toàn bộ bảng không thể sửa
@@ -104,7 +103,7 @@ public class BorrowPanel extends JPanel {
         JScrollPane scrollPane = new JScrollPane(table);
         add(scrollPane, BorderLayout.CENTER);
     }
-    
+
     private void setupEvents() {
         // --- Sự kiện cho các nút ---
         btnBorrow.addActionListener(e -> borrowDocument());
@@ -141,7 +140,8 @@ public class BorrowPanel extends JPanel {
         String userId = tfUserId.getText().trim();
         String docId = tfDocId.getText().trim();
         if (userId.isEmpty() || docId.isEmpty()) {
-            JOptionPane.showMessageDialog(this, "User ID and Document ID cannot be empty.", "Input Error", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this, "User ID and Document ID cannot be empty.", "Input Error",
+                    JOptionPane.ERROR_MESSAGE);
             return;
         }
         // Ngày mượn sẽ được xử lý tự động trong DAO
@@ -149,7 +149,7 @@ public class BorrowPanel extends JPanel {
             // Thông báo thành công đã có trong lớp Library, không cần lặp lại
             loadBorrowData();
             clearForm();
-        } 
+        }
         // Thông báo lỗi cũng đã có trong lớp Library
     }
 
@@ -157,7 +157,8 @@ public class BorrowPanel extends JPanel {
         String userId = tfUserId.getText().trim();
         String docId = tfDocId.getText().trim();
         if (userId.isEmpty() || docId.isEmpty()) {
-            JOptionPane.showMessageDialog(this, "Please select a record from the table to return.", "Input Error", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Please select a record from the table to return.", "Input Error",
+                    JOptionPane.ERROR_MESSAGE);
             return;
         }
         // Ngày trả sẽ được xử lý tự động trong DAO
@@ -195,11 +196,11 @@ public class BorrowPanel extends JPanel {
         // For now, let's assume a client-side search
         List<BorrowRecord> allRecords = library.getAllBorrowRecords();
         String filter = cbFilter.getSelectedItem().toString();
-        
+
         tableModel.setRowCount(0); // Clear table
         allRecords.stream()
-            .filter(record -> matchesFilter(record, keyword, filter))
-            .forEach(this::addBorrowRecordToTable);
+                .filter(record -> matchesFilter(record, keyword, filter))
+                .forEach(this::addBorrowRecordToTable);
     }
 
     private void resetSearch() {
@@ -207,7 +208,7 @@ public class BorrowPanel extends JPanel {
         cbFilter.setSelectedIndex(0);
         loadBorrowData();
     }
-    
+
     // --- Các hàm tiện ích ---
 
     private JTextField createField(String label, JPanel parent, int width, boolean editable) {
@@ -231,9 +232,9 @@ public class BorrowPanel extends JPanel {
         List<BorrowRecord> borrows = library.getAllBorrowRecords();
         borrows.forEach(this::addBorrowRecordToTable);
     }
-    
+
     private void addBorrowRecordToTable(BorrowRecord b) {
-        tableModel.addRow(new Object[]{
+        tableModel.addRow(new Object[] {
                 b.userId,
                 b.documentId,
                 b.documentTitle,
@@ -245,13 +246,16 @@ public class BorrowPanel extends JPanel {
     private boolean matchesFilter(BorrowRecord record, String keyword, String filter) {
         String lowerKeyword = keyword.toLowerCase();
         switch (filter) {
-            case "User ID": return record.userId.toLowerCase().contains(lowerKeyword);
-            case "Document ID": return record.documentId.toLowerCase().contains(lowerKeyword);
-            case "Document Title": return record.documentTitle.toLowerCase().contains(lowerKeyword);
+            case "User ID":
+                return record.userId.toLowerCase().contains(lowerKeyword);
+            case "Document ID":
+                return record.documentId.toLowerCase().contains(lowerKeyword);
+            case "Document Title":
+                return record.documentTitle.toLowerCase().contains(lowerKeyword);
             default: // All Fields
                 return record.userId.toLowerCase().contains(lowerKeyword) ||
-                       record.documentId.toLowerCase().contains(lowerKeyword) ||
-                       record.documentTitle.toLowerCase().contains(lowerKeyword);
+                        record.documentId.toLowerCase().contains(lowerKeyword) ||
+                        record.documentTitle.toLowerCase().contains(lowerKeyword);
         }
     }
 

@@ -9,29 +9,29 @@ public class Document {
     protected int publicationYear;
     protected boolean isAvailable;
 
-
     public Document(String title, String language, int pages, String author, int publicationYear) {
         this.title = title;
         this.language = language;
         this.pages = pages;
         this.author = author;
         this.publicationYear = publicationYear;
-        this.isAvailable = true; 
+        this.isAvailable = true;
     }
 
-     public Document(int id, String title, String language, int pages, String author, int publicationYear, boolean isAvailable) {
+    public Document(int id, String title, String language, int pages, String author, int publicationYear,
+            boolean isAvailable) {
         this.id = id;
         this.title = title;
         this.language = language;
         this.pages = pages;
         this.author = author;
         this.publicationYear = publicationYear;
-        this.isAvailable = isAvailable; 
+        this.isAvailable = isAvailable;
     }
 
     // Getters
-    public int getId() { 
-        return id; 
+    public int getId() {
+        return id;
     }
 
     public String getTitle() {
@@ -39,11 +39,11 @@ public class Document {
     }
 
     public String getLanguage() {
-        return language; 
+        return language;
     }
 
     public int getPages() {
-        return pages; 
+        return pages;
     }
 
     public String getAuthor() {
@@ -56,19 +56,20 @@ public class Document {
 
     /**
      * Getter cho trạng thái có sẵn của sách.
+     * 
      * @return true nếu sách có sẵn, false nếu đã được mượn.
      */
     public boolean isAvailable() {
         return isAvailable;
     }
-    
+
     // Setters
     public void setId(int id) {
         this.id = id;
     }
-    
+
     public void setTitle(String title) {
-        this.title = title; 
+        this.title = title;
     }
 
     public void setLanguage(String language) {
@@ -89,6 +90,7 @@ public class Document {
 
     /**
      * Setter cho trạng thái có sẵn của sách.
+     * 
      * @param available true để đặt sách là có sẵn, false để đặt là đã được mượn.
      */
     public void setAvailable(boolean available) {
