@@ -3,6 +3,7 @@ package config;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.sql.Statement;
 
 /**
  * Cung cap cau hinh ket noi toi co so du lieu MySQL su dung trong he thong quan ly thu vien.
