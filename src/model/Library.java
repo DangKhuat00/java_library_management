@@ -1,18 +1,22 @@
 package model;
 
-import dao.DocumentDAO;
-import dao.UserDAO;
 import dao.BorrowDAO;
 import dao.BorrowDAO.BorrowRecord;
+import dao.DocumentDAO;
+import dao.UserDAO;
 
+import javax.swing.JOptionPane;
 import java.util.List;
-import java.util.Scanner;
 
+/**
+ * Lớp trung tâm điều phối logic nghiệp vụ của thư viện.
+ * Nó hoạt động như một cầu nối giữa Giao diện người dùng (GUI) và các lớp Truy cập Dữ liệu (DAO).
+ */
 public class Library {
 
-    private DocumentDAO documentDAO;
-    private UserDAO userDAO;
-    private BorrowDAO borrowDAO;
+    private final DocumentDAO documentDAO;
+    private final UserDAO userDAO;
+    private final BorrowDAO borrowDAO;
 
     public Library() {
         this.documentDAO = new DocumentDAO();
@@ -20,273 +24,190 @@ public class Library {
         this.borrowDAO = new BorrowDAO();
     }
 
-    // ========== GUI-COMPATIBLE METHODS (for MainFrame) ==========
+    // ========== DOCUMENT METHODS ==========
 
-    // Thêm tài liệu mới
     public boolean addDocument(Document document) {
         return documentDAO.insertDocument(document);
     }
 
-    // Xóa tài liệu theo id
     public boolean removeDocument(String documentId) {
         try {
             int id = Integer.parseInt(documentId);
             return documentDAO.deleteDocument(id);
         } catch (NumberFormatException e) {
+            System.err.println("Error parsing document ID for deletion: " + e.getMessage());
             return false;
         }
     }
 
-    // Tìm tài liệu theo keyword (title hoặc author)
+    public boolean updateDocument(Document document) {
+        return documentDAO.updateDocument(document);
+    }
+
+    public List<Document> getAllDocuments() {
+        return documentDAO.getAllDocuments();
+    }
+
+    public Document getDocumentById(int id) {
+        // Tối ưu hơn là tạo hàm getById trong DAO, nhưng cách này vẫn hoạt động
+        return documentDAO.getAllDocuments().stream()
+                .filter(doc -> doc.getId() == id)
+                .findFirst()
+                .orElse(null);
+    }
+
     public List<Document> findDocuments(String keyword) {
         return documentDAO.findDocument(keyword);
     }
 
     public List<Document> findDocumentsByField(String filter, String keyword) {
-        String field;
-
+        String dbField;
         switch (filter) {
-            case "Title": field = "title"; break;
-            case "Author": field = "author"; break;
-            case "Language": field = "language"; break;
-            case "Year": field = "year"; break;
-            case "Pages": field = "pages"; break;
-            case "Remain Docs": field = "remain_docs"; break;
-            default: // All Fields
+            case "Title":
+                dbField = "title";
+                break;
+            case "Author":
+                dbField = "author";
+                break;
+            case "Language":
+                dbField = "language";
+                break;
+            case "Year":
+                dbField = "publication_year"; // Tên cột trong DB
+                break;
+            default: // "All Fields"
                 return findDocuments(keyword);
         }
-
-        return documentDAO.findDocumentsByField(field, keyword);
-    }
-    // Lấy tất cả tài liệu
-    public List<Document> getAllDocuments() {
-        return documentDAO.getAllDocuments();
+        return documentDAO.findDocumentsByField(dbField, keyword);
     }
 
-    // Cập nhật tài liệu
-    public boolean updateDocument(Document document) {
-        return documentDAO.updateDocument(document);
-    }
+    // ========== USER METHODS ==========
 
-    // Lấy tài liệu theo id
-    public Document getDocumentById(int id) {
-        List<Document> docs = documentDAO.getAllDocuments();
-        for (Document d : docs) {
-            if (d.getId() == id) return d;
-        }
-        return null;
-    }
-    
     public boolean addUser(User user) {
         return userDAO.insertUser(user);
-    }
-
-    
-    public List<User> getAllUsers() {
-        return userDAO.getAllUsers();
     }
 
     public boolean deleteUser(int id) {
         return userDAO.deleteUser(id);
     }
 
-    // Cập nhật user
     public boolean updateUser(User user) {
         return userDAO.updateUser(user);
     }
 
-    public boolean borrowDocument(String userId, String documentId) {
-        return borrowDAO.borrowDocument(userId, documentId);
+    public List<User> getAllUsers() {
+        return userDAO.getAllUsers();
     }
-    
-    public List<User> findUsers(String keyword) {
-        return userDAO.searchUsers(keyword);
+
+    public User getUserById(int id) {
+        return userDAO.getUserById(id);
+    }
+
+    public List<User> findUsers(String keyword, String filter) {
+        return userDAO.searchUsers(keyword, filter);
+    }
+
+    // ========== BORROW/RETURN METHODS (LOGIC HOÀN CHỈNH) ==========
+
+    /**
+     * Xử lý logic mượn một tài liệu.
+     * Cập nhật trạng thái của tài liệu và số sách đã mượn của người dùng.
+     * @param userIdStr ID của người dùng
+     * @param documentIdStr ID của tài liệu
+     * @return true nếu mượn thành công, false nếu thất bại.
+     */
+    public boolean borrowDocument(String userIdStr, String documentIdStr) {
+        try {
+            int userId = Integer.parseInt(userIdStr);
+            int documentId = Integer.parseInt(documentIdStr);
+
+            User user = getUserById(userId);
+            Document doc = getDocumentById(documentId);
+
+            // --- 1. Kiểm tra các điều kiện tiên quyết ---
+            if (user == null) {
+                JOptionPane.showMessageDialog(null, "User with ID " + userId + " not found.", "Borrow Error", JOptionPane.ERROR_MESSAGE);
+                return false;
+            }
+            if (doc == null) {
+                JOptionPane.showMessageDialog(null, "Document with ID " + documentId + " not found.", "Borrow Error", JOptionPane.ERROR_MESSAGE);
+                return false;
+            }
+            if (!doc.isAvailable()) {
+                JOptionPane.showMessageDialog(null, "This document is currently unavailable.", "Borrow Error", JOptionPane.ERROR_MESSAGE);
+                return false;
+            }
+            if (user.getBorrowedBooksCount() >= user.getBorrowLimit()) {
+                JOptionPane.showMessageDialog(null, "User has reached the borrow limit of " + user.getBorrowLimit() + " items.", "Borrow Error", JOptionPane.ERROR_MESSAGE);
+                return false;
+            }
+
+            // --- 2. Thực hiện các hành động ---
+            if (borrowDAO.borrowDocument(userIdStr, documentIdStr)) {
+                // Cập nhật trạng thái sách thành "đã mượn"
+                doc.setAvailable(false);
+                documentDAO.updateDocument(doc);
+
+                // Tăng số lượng sách đã mượn của người dùng
+                user.setBorrowedBooksCount(user.getBorrowedBooksCount() + 1);
+                userDAO.updateUser(user);
+                
+                return true; // Mượn thành công
+            }
+            return false; // Lỗi từ borrowDAO
+        } catch (NumberFormatException e) {
+            JOptionPane.showMessageDialog(null, "Invalid User ID or Document ID format.", "Input Error", JOptionPane.ERROR_MESSAGE);
+            return false;
+        }
     }
 
     /**
-     * 8. Return Document (GUI version)
+     * Xử lý logic trả một tài liệu.
+     * Cập nhật trạng thái của tài liệu và số sách đã mượn của người dùng.
+     * @param userIdStr ID của người dùng
+     * @param documentIdStr ID của tài liệu
+     * @return true nếu trả thành công, false nếu thất bại.
      */
-    public boolean returnDocument(String userId, String documentId) {
-        return borrowDAO.returnDocument(userId, documentId);
+    public boolean returnDocument(String userIdStr, String documentIdStr) {
+        try {
+            int userId = Integer.parseInt(userIdStr);
+            int documentId = Integer.parseInt(documentIdStr);
+
+            User user = getUserById(userId);
+            Document doc = getDocumentById(documentId);
+
+            // --- 1. Kiểm tra điều kiện ---
+            if (user == null || doc == null) {
+                JOptionPane.showMessageDialog(null, "User or Document not found.", "Return Error", JOptionPane.ERROR_MESSAGE);
+                return false;
+            }
+
+            // --- 2. Thực hiện hành động trả sách ---
+            if (borrowDAO.returnDocument(userIdStr, documentIdStr)) {
+                // Cập nhật trạng thái sách thành "có sẵn"
+                doc.setAvailable(true);
+                documentDAO.updateDocument(doc);
+
+                // Giảm số lượng sách đã mượn của người dùng (đảm bảo không âm)
+                int currentBorrowedCount = user.getBorrowedBooksCount();
+                if (currentBorrowedCount > 0) {
+                    user.setBorrowedBooksCount(currentBorrowedCount - 1);
+                    userDAO.updateUser(user);
+                }
+                
+                return true; // Trả thành công
+            } else {
+                // Lỗi này thường xảy ra khi bản ghi mượn không tồn tại hoặc đã được trả.
+                JOptionPane.showMessageDialog(null, "Failed to return. The borrow record might not exist or was already updated.", "Return Error", JOptionPane.ERROR_MESSAGE);
+                return false;
+            }
+        } catch (NumberFormatException e) {
+            JOptionPane.showMessageDialog(null, "Invalid User ID or Document ID format.", "Input Error", JOptionPane.ERROR_MESSAGE);
+            return false;
+        }
     }
-    
+
     public List<BorrowRecord> getAllBorrowRecords() {
         return borrowDAO.getAllBorrowRecords();
     }
-
-    public List<BorrowRecord> getUserBorrowHistory(String userId) {
-        return borrowDAO.getUserBorrowHistory(userId);
-    }
-
-
-    // ========== GUI methods tương tự các hàm console có thể gọi thêm ==========
-
-    // Còn các hàm về User, Borrow giữ nguyên, không liên quan Document
-
-    // Các hàm Console bạn có thể tự chỉnh sửa tương tự:
-    // - Thay vì phân biệt BOOK/MAGAZINE, dùng trực tiếp Document
-    // - Ví dụ:
-
-    public void addDocument(Scanner scanner) {
-        System.out.print("Enter title: ");
-        String title = scanner.nextLine();
-        System.out.print("Enter author: ");
-        String author = scanner.nextLine();
-        System.out.print("Enter publication year: ");
-        int year = Integer.parseInt(scanner.nextLine());
-        System.out.print("Enter language: ");
-        String language = scanner.nextLine();
-        System.out.print("Enter number of pages: ");
-        int pages = Integer.parseInt(scanner.nextLine());
-        System.out.print("Enter remaining documents: ");
-        int remainDocs = Integer.parseInt(scanner.nextLine());
-
-        Document document = new Document(title, language, pages, author, year, remainDocs) {
-            @Override
-            public void displayInfo() {
-                // Có thể implement hoặc để trống
-            }
-        };
-
-        if (documentDAO.insertDocument(document)) {
-            System.out.println("Document added successfully.");
-        } else {
-            System.out.println("Failed to add document.");
-        }
-    }
-
-    public boolean removeDocument(int id) {
-        return documentDAO.deleteDocument(id);
-    }
-
-    public void updateDocument(Scanner scanner) {
-        try {
-            System.out.print("Enter ID of document to update: ");
-            int id = Integer.parseInt(scanner.nextLine());
-
-            Document oldDoc = getDocumentById(id);
-            if (oldDoc == null) {
-                System.out.println("Document not found.");
-                return;
-            }
-
-            System.out.print("Enter new title: ");
-            String title = scanner.nextLine();
-            System.out.print("Enter new author: ");
-            String author = scanner.nextLine();
-            System.out.print("Enter new publication year: ");
-            int year = Integer.parseInt(scanner.nextLine());
-            System.out.print("Enter new language: ");
-            String language = scanner.nextLine();
-            System.out.print("Enter number of pages: ");
-            int pages = Integer.parseInt(scanner.nextLine());
-            System.out.print("Enter remaining documents: ");
-            int remainDocs = Integer.parseInt(scanner.nextLine());
-
-            Document updatedDocument = new Document(id, title, language, pages, author, year, remainDocs) {
-                @Override
-                public void displayInfo() { }
-            };
-
-            if (documentDAO.updateDocument(updatedDocument)) {
-                System.out.println("Document updated successfully.");
-            } else {
-                System.out.println("Failed to update document.");
-            }
-        } catch (NumberFormatException e) {
-            System.out.println("Invalid input format.");
-        }
-    }
-
-     public void removeDocument(Scanner scanner) {
-        System.out.print("Enter document ID to remove: ");
-        int id = Integer.parseInt(scanner.nextLine());
-        if (documentDAO.deleteDocument(id)) {
-            System.out.println("Document removed successfully.");
-        } else {
-            System.out.println("Failed to remove document.");
-        }
-    }
-
-    public void findDocument(Scanner scanner) {
-        System.out.print("Enter document keyword (title or author) to find: ");
-        String keyword = scanner.nextLine();
-        List<Document> documents = documentDAO.findDocument(keyword);
-
-        if (documents.isEmpty()) {
-            System.out.println("Document not found.");
-        } else {
-            for (Document doc : documents) {
-                System.out.println(doc);
-            }
-        }
-    }
-
-    public void displayAllDocuments() {
-        List<Document> docs = documentDAO.getAllDocuments();
-        for (Document d : docs) {
-            System.out.println(d);
-        }
-    }
-    
-    public void addUser(Scanner scanner) {
-        System.out.print("Enter name: ");
-        String name = scanner.nextLine();
-        System.out.print("Enter email: ");
-        String email = scanner.nextLine();
-        System.out.print("Enter phoneNumber: ");
-        String phoneNumber = scanner.nextLine();
-
-        System.out.print("Enter borrowedBooksCount: ");
-        int borrowedBooksCount = Integer.parseInt(scanner.nextLine());
-
-        User user = new User(name, email, phoneNumber, borrowedBooksCount);
-        if (userDAO.insertUser(user)) {
-            System.out.println("User added successfully.");
-        } else {
-            System.out.println("Failed to add user.");
-        }
-    }
-
-    public void displayUserInfo(Scanner scanner) {
-        System.out.print("Enter user ID to display: ");
-        int id = Integer.parseInt(scanner.nextLine());
-        User user = userDAO.getUserById(id);
-        if (user != null) {
-            System.out.println(user);
-        } else {
-            System.out.println("User not found.");
-        }
-    }
-
-    public void displayAllUsers() {
-        userDAO.getAllUsers().forEach(System.out::println);
-    }
-
-    public void borrowDocument(Scanner scanner) {
-        System.out.print("Enter user ID: ");
-        String userId = scanner.nextLine();
-        System.out.print("Enter document ID: ");
-        String documentId = scanner.nextLine();
-
-        if (borrowDAO.borrowDocument(userId, documentId)) {
-            System.out.println("Document borrowed successfully.");
-        } else {
-            System.out.println("Failed to borrow document.");
-        }
-    }
-
-    public void returnDocument(Scanner scanner) {
-        System.out.print("Enter user ID: ");
-        String userId = scanner.nextLine();
-        System.out.print("Enter document ID: ");
-        String documentId = scanner.nextLine();
-
-        if (borrowDAO.returnDocument(userId, documentId)) {
-            System.out.println("Document returned successfully.");
-        } else {
-            System.out.println("Failed to return document.");
-        }
-    }
 }
-

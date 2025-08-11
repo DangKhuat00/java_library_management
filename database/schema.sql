@@ -23,7 +23,7 @@ CREATE TABLE documents (
     pages INT,
     author VARCHAR(255) NOT NULL,
     publication_year INT NOT NULL,
-    remain_docs INT DEFAULT 0
+    is_available BOOLEAN DEFAULT TRUE
 );
 
 -- Create borrows table
@@ -31,8 +31,8 @@ CREATE TABLE borrowed_documents (
     id INT AUTO_INCREMENT PRIMARY KEY,
     user_id INT NOT NULL,
     document_id INT NOT NULL,
-    MODIFY borrow_date DATETIME NOT NULL,
-    MODIFY return_date DATETIME;
+    borrow_date DATETIME NOT NULL,
+    return_date DATETIME,
     FOREIGN KEY (user_id) REFERENCES users(id),
     FOREIGN KEY (document_id) REFERENCES documents(id)
 );

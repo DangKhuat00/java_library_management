@@ -13,7 +13,9 @@ public class DocumentPanel extends JPanel {
     private JTable table;
     private DefaultTableModel tableModel;
 
-    private JTextField tfTitle, tfAuthor, tfLanguage, tfYear, tfPages, tfRemain;
+    // Thay thế JTextField bằng JCheckBox
+    private JTextField tfTitle, tfAuthor, tfLanguage, tfYear, tfPages;
+    private JCheckBox chkIsAvailable;
     private JTextField tfSearch;
     private JComboBox<String> cbFilter;
 
@@ -23,130 +25,119 @@ public class DocumentPanel extends JPanel {
 
     public DocumentPanel() {
         library = new Library();
-        initUI();
+        setupGUI();
         loadAllDocuments();
-        initEvents();
+        setupEvents();
     }
 
-    /** ===================== UI SETUP ===================== */
-    private void initUI() {
+    private void setupGUI() {
         setLayout(new BorderLayout(5, 5));
         setBorder(BorderFactory.createEmptyBorder(8, 8, 8, 8));
 
-        add(createSearchPanel(), BorderLayout.NORTH);
-        add(createFormPanel(), BorderLayout.CENTER);
-        add(createTablePanel(), BorderLayout.SOUTH);
-    }
+        JPanel northPanel = new JPanel(new BorderLayout(5, 5));
 
-    /** Panel tìm kiếm + filter */
-    private JPanel createSearchPanel() {
-        JPanel searchPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 5, 5));
-
-        cbFilter = new JComboBox<>(new String[]{
-                "All Fields", "Title", "Author", "Language", "Year", "Pages", "Remain Docs"
-        });
-        tfSearch = new JTextField(35);
-        btnSearch = new JButton("🔍 Search");
-        btnReset = new JButton("Reset");
-
-        searchPanel.add(new JLabel("Filter by:"));
-        searchPanel.add(cbFilter);
-        searchPanel.add(tfSearch);
-        searchPanel.add(btnSearch);
-        searchPanel.add(btnReset);
-        searchPanel.setBorder(BorderFactory.createEmptyBorder(0, 0, 10, 0));
-
-        return searchPanel;
-    }
-
-    /** Panel nhập dữ liệu + nút thêm/sửa/xóa */
-    private JPanel createFormPanel() {
-        // Giảm khoảng cách dọc (vgap) giữa các hàng trong lưới
-        JPanel formPanel = new JPanel(new GridLayout(3, 2, 5, 2));
-
+        JPanel formPanel = new JPanel(new GridLayout(6, 1, 0, 8));
         tfTitle = createField("Title:", formPanel, 250);
         tfAuthor = createField("Author:", formPanel, 250);
         tfLanguage = createField("Language:", formPanel, 250);
         tfYear = createField("Year:", formPanel, 250);
         tfPages = createField("Pages:", formPanel, 250);
-        tfRemain = createField("Remain Docs:", formPanel, 250);
 
-        JPanel formAndButtonPanel = new JPanel(new BorderLayout(5, 5));
-        formAndButtonPanel.add(formPanel, BorderLayout.CENTER);
+        // Tạo JCheckBox cho trạng thái 'Available'
+        chkIsAvailable = new JCheckBox("Is Available");
+        chkIsAvailable.setSelected(true); // Mặc định là có sẵn
+        JPanel chkPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 5, 0));
+        JLabel lblAvailable = new JLabel("Status:");
+        lblAvailable.setPreferredSize(new Dimension(110, 28));
+        chkPanel.add(lblAvailable);
+        chkPanel.add(chkIsAvailable);
+        formPanel.add(chkPanel);
 
-        JPanel btnPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 5));
+        northPanel.add(formPanel, BorderLayout.WEST);
+
+        JPanel rightPanel = new JPanel();
+        rightPanel.setLayout(new BoxLayout(rightPanel, BoxLayout.Y_AXIS));
+
+        JPanel searchAndFilterPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 5, 0));
+        tfSearch = new JTextField();
+        tfSearch.setPreferredSize(new Dimension(250, 28));
+        btnSearch = new JButton("🔍 Search");
+        btnReset = new JButton("Reset");
+        cbFilter = new JComboBox<>(new String[]{"All Fields", "Title", "Author", "Language", "publication_year"});
+        JLabel lblFilter = new JLabel("Filter by:");
+        
+        searchAndFilterPanel.add(lblFilter);
+        searchAndFilterPanel.add(cbFilter);
+        searchAndFilterPanel.add(Box.createRigidArea(new Dimension(10, 0)));
+        searchAndFilterPanel.add(tfSearch);
+        searchAndFilterPanel.add(btnSearch);
+        searchAndFilterPanel.add(btnReset);
+
+        JPanel actionButtonPanel = new JPanel(new GridLayout(1, 4, 10, 5));
         btnAdd = new JButton("➕ Add");
         btnUpdate = new JButton("✏️ Update");
         btnRemove = new JButton("🗑️ Remove");
         btnClear = new JButton("Clear Form");
+        actionButtonPanel.add(btnAdd);
+        actionButtonPanel.add(btnUpdate);
+        actionButtonPanel.add(btnRemove);
+        actionButtonPanel.add(btnClear);
+        
+        JPanel buttonWrapperPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        buttonWrapperPanel.add(actionButtonPanel);
 
-        btnPanel.add(btnAdd);
-        btnPanel.add(btnUpdate);
-        btnPanel.add(btnRemove);
-        btnPanel.add(btnClear);
+        searchAndFilterPanel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        buttonWrapperPanel.setAlignmentX(Component.CENTER_ALIGNMENT);
 
-        formAndButtonPanel.add(btnPanel, BorderLayout.SOUTH);
-        // Giảm khoảng trống dưới cùng để tiết kiệm không gian
-        formAndButtonPanel.setBorder(BorderFactory.createEmptyBorder(0, 0, 10, 0));
+        rightPanel.add(Box.createVerticalGlue());
+        rightPanel.add(searchAndFilterPanel);
+        rightPanel.add(Box.createRigidArea(new Dimension(0, 15)));
+        rightPanel.add(buttonWrapperPanel);
+        rightPanel.add(Box.createVerticalGlue());
 
-        return formAndButtonPanel;
-    }
+        northPanel.add(rightPanel, BorderLayout.CENTER);
+        add(northPanel, BorderLayout.NORTH);
 
-    /** Tạo một trường nhập có label - Đã tối ưu hóa chiều cao */
-    private JTextField createField(String label, JPanel parent, int width) {
-        // Giảm khoảng cách dọc (vgap) về 0
-        JPanel fieldPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 5, 0));
-
-        JLabel lb = new JLabel(label);
-        // Giảm chiều cao label
-        lb.setPreferredSize(new Dimension(90, 28));
-
-        JTextField tf = new JTextField();
-        // Giảm chiều cao text field
-        tf.setPreferredSize(new Dimension(width, 28));
-
-        fieldPanel.add(lb);
-        fieldPanel.add(tf);
-        parent.add(fieldPanel);
-
-        return tf;
-    }
-
-    /** Panel chứa bảng dữ liệu */
-    private JScrollPane createTablePanel() {
-        String[] columns = {"ID", "Title", "Author", "Year", "Language", "Pages", "Remain Docs"};
+        // Cập nhật tên cột
+        String[] columns = {"ID", "Title", "Author", "Year", "Language", "Pages", "Available"};
         tableModel = new DefaultTableModel(columns, 0) {
             @Override
             public boolean isCellEditable(int row, int col) {
-                return false; // Không cho chỉnh sửa trực tiếp
+                return false;
+            }
+            // Hiển thị kiểu Boolean dưới dạng checkbox trong bảng
+            @Override
+            public Class<?> getColumnClass(int columnIndex) {
+                if (columnIndex == 6) return Boolean.class;
+                return super.getColumnClass(columnIndex);
             }
         };
         table = new JTable(tableModel);
         table.setRowHeight(22);
 
         JScrollPane scrollPane = new JScrollPane(table);
-        scrollPane.setPreferredSize(new Dimension(900, 250)); // Tăng chiều cao cho bảng
-        return scrollPane;
+        add(scrollPane, BorderLayout.CENTER);
     }
 
-    /** ===================== DATA LOADING ===================== */
+    private JTextField createField(String label, JPanel parent, int width) {
+        JPanel fieldPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 5, 0));
+        JLabel lb = new JLabel(label);
+        lb.setPreferredSize(new Dimension(110, 28));
+        JTextField tf = new JTextField();
+        tf.setPreferredSize(new Dimension(width, 28));
+        fieldPanel.add(lb);
+        fieldPanel.add(tf);
+        parent.add(fieldPanel);
+        return tf;
+    }
+
     private void loadAllDocuments() {
         tableModel.setRowCount(0);
         List<Document> docs = library.getAllDocuments();
-        for (Document doc : docs) {
-            tableModel.addRow(new Object[]{
-                    doc.getId(),
-                    doc.getTitle(),
-                    doc.getAuthor(),
-                    doc.getPublicationYear(),
-                    doc.getLanguage(),
-                    doc.getPages(),
-                    doc.getRemainDocs()
-            });
-        }
+        loadDocumentsToTable(docs);
     }
 
-    private void loadDocuments(List<Document> docs) {
+    private void loadDocumentsToTable(List<Document> docs) {
         tableModel.setRowCount(0);
         for (Document doc : docs) {
             tableModel.addRow(new Object[]{
@@ -156,28 +147,26 @@ public class DocumentPanel extends JPanel {
                     doc.getPublicationYear(),
                     doc.getLanguage(),
                     doc.getPages(),
-                    doc.getRemainDocs()
+                    doc.isAvailable() // Cập nhật ở đây
             });
         }
     }
 
-    /** ===================== VALIDATION ===================== */
     private boolean validateInput() {
+        // Bỏ kiểm tra cho trường "remain docs" cũ
         if (tfTitle.getText().trim().isEmpty() ||
                 tfAuthor.getText().trim().isEmpty() ||
                 tfLanguage.getText().trim().isEmpty() ||
                 tfYear.getText().trim().isEmpty() ||
-                tfPages.getText().trim().isEmpty() ||
-                tfRemain.getText().trim().isEmpty()) {
+                tfPages.getText().trim().isEmpty()) {
             JOptionPane.showMessageDialog(this, "Please fill all fields.");
             return false;
         }
         try {
             Integer.parseInt(tfYear.getText().trim());
             Integer.parseInt(tfPages.getText().trim());
-            Integer.parseInt(tfRemain.getText().trim());
         } catch (NumberFormatException e) {
-            JOptionPane.showMessageDialog(this, "Year, Pages, and Remain Docs must be numbers.");
+            JOptionPane.showMessageDialog(this, "Year and Pages must be numbers.");
             return false;
         }
         return true;
@@ -189,23 +178,21 @@ public class DocumentPanel extends JPanel {
         tfLanguage.setText("");
         tfYear.setText("");
         tfPages.setText("");
-        tfRemain.setText("");
+        chkIsAvailable.setSelected(true); // Đặt lại checkbox
         selectedId = -1;
         table.clearSelection();
     }
 
-    /** ===================== EVENT HANDLING ===================== */
-    private void initEvents() {
-        // Thêm tài liệu
+    private void setupEvents() {
         btnAdd.addActionListener(e -> {
             if (validateInput()) {
+                // Sử dụng constructor mới, không cần isAvailable vì nó mặc định là true
                 Document doc = new Document(
                         tfTitle.getText().trim(),
                         tfLanguage.getText().trim(),
                         Integer.parseInt(tfPages.getText().trim()),
                         tfAuthor.getText().trim(),
-                        Integer.parseInt(tfYear.getText().trim()),
-                        Integer.parseInt(tfRemain.getText().trim())
+                        Integer.parseInt(tfYear.getText().trim())
                 );
                 if (library.addDocument(doc)) {
                     JOptionPane.showMessageDialog(this, "Document added successfully.");
@@ -217,13 +204,13 @@ public class DocumentPanel extends JPanel {
             }
         });
 
-        // Cập nhật tài liệu
         btnUpdate.addActionListener(e -> {
             if (selectedId == -1) {
                 JOptionPane.showMessageDialog(this, "Please select a document to update.");
                 return;
             }
             if (validateInput()) {
+                // Sử dụng constructor mới với isAvailable
                 Document doc = new Document(
                         selectedId,
                         tfTitle.getText().trim(),
@@ -231,7 +218,7 @@ public class DocumentPanel extends JPanel {
                         Integer.parseInt(tfPages.getText().trim()),
                         tfAuthor.getText().trim(),
                         Integer.parseInt(tfYear.getText().trim()),
-                        Integer.parseInt(tfRemain.getText().trim())
+                        chkIsAvailable.isSelected() // Lấy giá trị từ checkbox
                 );
                 if (library.updateDocument(doc)) {
                     JOptionPane.showMessageDialog(this, "Document updated successfully.");
@@ -243,7 +230,6 @@ public class DocumentPanel extends JPanel {
             }
         });
 
-        // Xóa tài liệu
         btnRemove.addActionListener(e -> {
             if (selectedId == -1) {
                 JOptionPane.showMessageDialog(this, "Please select a document to remove.");
@@ -263,44 +249,44 @@ public class DocumentPanel extends JPanel {
             }
         });
 
-        // Tìm kiếm
         btnSearch.addActionListener(e -> {
             String keyword = tfSearch.getText().trim();
             if (keyword.isEmpty()) {
                 JOptionPane.showMessageDialog(this, "Please enter a search keyword.");
                 return;
             }
-
             String filter = cbFilter.getSelectedItem().toString();
+            if (filter.equals("Year")) { // Đảm bảo tên cột đúng với DB
+                filter = "publication_year";
+            }
             List<Document> docs;
             if (filter.equals("All Fields")) {
-                docs = library.findDocuments(keyword);
+                docs = library.findDocuments(keyword); 
             } else {
                 docs = library.findDocumentsByField(filter, keyword);
             }
-            loadDocuments(docs);
+            loadDocumentsToTable(docs);
         });
 
-        // Reset
         btnReset.addActionListener(e -> {
             tfSearch.setText("");
             cbFilter.setSelectedIndex(0);
             loadAllDocuments();
         });
 
-        // Clear form
         btnClear.addActionListener(e -> clearForm());
 
-        // Chọn bảng -> load form
         table.getSelectionModel().addListSelectionListener(e -> {
             if (!e.getValueIsAdjusting() && table.getSelectedRow() != -1) {
-                selectedId = (int) table.getValueAt(table.getSelectedRow(), 0);
-                tfTitle.setText((String) table.getValueAt(table.getSelectedRow(), 1));
-                tfAuthor.setText((String) table.getValueAt(table.getSelectedRow(), 2));
-                tfYear.setText(String.valueOf(table.getValueAt(table.getSelectedRow(), 3)));
-                tfLanguage.setText((String) table.getValueAt(table.getSelectedRow(), 4));
-                tfPages.setText(String.valueOf(table.getValueAt(table.getSelectedRow(), 5)));
-                tfRemain.setText(String.valueOf(table.getValueAt(table.getSelectedRow(), 6)));
+                int selectedRow = table.getSelectedRow();
+                selectedId = (int) table.getValueAt(selectedRow, 0);
+                tfTitle.setText((String) table.getValueAt(selectedRow, 1));
+                tfAuthor.setText((String) table.getValueAt(selectedRow, 2));
+                tfYear.setText(String.valueOf(table.getValueAt(selectedRow, 3)));
+                tfLanguage.setText((String) table.getValueAt(selectedRow, 4));
+                tfPages.setText(String.valueOf(table.getValueAt(selectedRow, 5)));
+                // Cập nhật checkbox
+                chkIsAvailable.setSelected((Boolean) table.getValueAt(selectedRow, 6));
             }
         });
     }

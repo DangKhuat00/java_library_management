@@ -17,7 +17,7 @@ public class UserPanel extends JPanel {
     private JTextField tfSearch;
     private JComboBox<String> cbFilter;
 
-    private JButton btnAdd, btnUpdate, btnRemove, btnSearch, btnReset;
+    private JButton btnAdd, btnUpdate, btnRemove, btnSearch, btnReset, btnClear;
 
     private int selectedId = -1;
 
@@ -32,55 +32,79 @@ public class UserPanel extends JPanel {
         setLayout(new BorderLayout(5, 5));
         setBorder(BorderFactory.createEmptyBorder(8, 8, 8, 8));
 
-        // === Panel Search + Filter ===
-        JPanel searchPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 5, 5));
-        cbFilter = new JComboBox<>(new String[]{
-                "All Fields", "Name", "Email", "Phone", "Borrow Limit", "Borrowed Count"
-        });
-        tfSearch = new JTextField(35);
-        btnSearch = new JButton("🔍 Search");
-        btnReset = new JButton("Reset");
+        // ===== Panel phía trên (chứa Form và Điều khiển) =====
+        JPanel northPanel = new JPanel(new BorderLayout(5, 5));
 
-        searchPanel.add(new JLabel("Filter by:"));
-        searchPanel.add(cbFilter);
-        searchPanel.add(tfSearch);
-        searchPanel.add(btnSearch);
-        searchPanel.add(btnReset);
-        searchPanel.setBorder(BorderFactory.createEmptyBorder(0, 0, 10, 0));
-
-        add(searchPanel, BorderLayout.NORTH);
-
-        // === Form nhập dữ liệu ===
-        JPanel formPanel = new JPanel(new GridLayout(3, 2, 15, 10));
-
+        // ===== Form nhập (bên trái) =====
+        JPanel formPanel = new JPanel(new GridLayout(5, 1, 0, 8));
         tfName = createField("Name:", formPanel, 250);
         tfEmail = createField("Email:", formPanel, 250);
         tfPhone = createField("Phone:", formPanel, 250);
         tfBorrowLimit = createField("Borrow Limit:", formPanel, 250);
-        tfBorrowLimit.setText("10"); 
+        tfBorrowLimit.setText("10"); // Mặc định giới hạn mượn
         tfBorrowedCount = createField("Borrowed Count:", formPanel, 250);
+        
+        // THAY ĐỔI: Khởi tạo giá trị và làm cho không thể sửa
+        tfBorrowedCount.setText("0");
+        tfBorrowedCount.setEditable(false); 
 
-        // === Panel chứa form + nút ===
-        JPanel formAndButtonPanel = new JPanel(new BorderLayout(5, 5));
-        formAndButtonPanel.add(formPanel, BorderLayout.CENTER);
+        northPanel.add(formPanel, BorderLayout.WEST);
 
-        JPanel btnPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 5));
+        // ===== Khu vực điều khiển (bên phải) =====
+        JPanel rightPanel = new JPanel();
+        rightPanel.setLayout(new BoxLayout(rightPanel, BoxLayout.Y_AXIS));
+
+        // --- Panel Lọc và Tìm kiếm ---
+        JPanel searchAndFilterPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 5, 0));
+
+        // Khai báo các thành phần
+        tfSearch = new JTextField();
+        tfSearch.setPreferredSize(new Dimension(250, 28)); // Giảm chiều rộng để cân đối
+        btnSearch = new JButton("🔍 Search");
+        btnReset = new JButton("Reset");
+        cbFilter = new JComboBox<>(new String[]{"All Fields", "Name", "Email", "Phone"});
+        JLabel lblFilter = new JLabel("Filter by:");
+        
+        // Thêm các thành phần theo thứ tự mới: Filter -> Search
+        searchAndFilterPanel.add(lblFilter);
+        searchAndFilterPanel.add(cbFilter);
+        searchAndFilterPanel.add(Box.createRigidArea(new Dimension(10, 0))); // Thêm khoảng cách
+        searchAndFilterPanel.add(tfSearch);
+        searchAndFilterPanel.add(btnSearch);
+        searchAndFilterPanel.add(btnReset);
+
+
+        // --- Panel Nút chức năng ---
+        JPanel actionButtonPanel = new JPanel(new GridLayout(1, 4, 10, 5));
         btnAdd = new JButton("➕ Add");
         btnUpdate = new JButton("✏️ Update");
         btnRemove = new JButton("🗑️ Remove");
-        JButton btnClear = new JButton("Clear Form");
+        btnClear = new JButton("Clear Form");
+        actionButtonPanel.add(btnAdd);
+        actionButtonPanel.add(btnUpdate);
+        actionButtonPanel.add(btnRemove);
+        actionButtonPanel.add(btnClear);
+        
+        JPanel buttonWrapperPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        buttonWrapperPanel.add(actionButtonPanel);
 
-        btnPanel.add(btnAdd);
-        btnPanel.add(btnUpdate);
-        btnPanel.add(btnRemove);
-        btnPanel.add(btnClear);
+        // Căn giữa các khối điều khiển
+        searchAndFilterPanel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        buttonWrapperPanel.setAlignmentX(Component.CENTER_ALIGNMENT);
 
-        formAndButtonPanel.add(btnPanel, BorderLayout.SOUTH);
-        formAndButtonPanel.setBorder(BorderFactory.createEmptyBorder(0, 0, 20, 0));
+        // Thêm các khối vào rightPanel với "keo" để căn giữa theo chiều dọc
+        rightPanel.add(Box.createVerticalGlue());
+        rightPanel.add(searchAndFilterPanel);
+        rightPanel.add(Box.createRigidArea(new Dimension(0, 15)));
+        rightPanel.add(buttonWrapperPanel);
+        rightPanel.add(Box.createVerticalGlue());
 
-        add(formAndButtonPanel, BorderLayout.CENTER);
+        northPanel.add(rightPanel, BorderLayout.CENTER);
 
-        // === Bảng dữ liệu ===
+        // Thêm northPanel vào panel chính
+        add(northPanel, BorderLayout.NORTH);
+
+        // ===== Bảng dữ liệu =====
         String[] columns = {"ID", "Name", "Email", "Phone", "Borrow Limit", "Borrowed Count"};
         tableModel = new DefaultTableModel(columns, 0) {
             @Override
@@ -92,21 +116,15 @@ public class UserPanel extends JPanel {
         table.setRowHeight(22);
 
         JScrollPane scrollPane = new JScrollPane(table);
-        scrollPane.setPreferredSize(new Dimension(900, 200));
-        add(scrollPane, BorderLayout.SOUTH);
-
-        // Clear form event
-        btnClear.addActionListener(e -> clearForm());
+        add(scrollPane, BorderLayout.CENTER);
     }
-
+    
     private JTextField createField(String label, JPanel parent, int width) {
         JPanel fieldPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 5, 0));
-
         JLabel lb = new JLabel(label);
-        lb.setPreferredSize(new Dimension(110, 36));
+        lb.setPreferredSize(new Dimension(110, 28));
         JTextField tf = new JTextField();
         tf.setPreferredSize(new Dimension(width, 28));
-
         fieldPanel.add(lb);
         fieldPanel.add(tf);
         parent.add(fieldPanel);
@@ -129,19 +147,19 @@ public class UserPanel extends JPanel {
     }
 
     private boolean validateInput() {
+        // THAY ĐỔI: Bỏ kiểm tra trường tfBorrowedCount vì nó không thể rỗng
         if (tfName.getText().trim().isEmpty() ||
                 tfEmail.getText().trim().isEmpty() ||
                 tfPhone.getText().trim().isEmpty() ||
-                tfBorrowLimit.getText().trim().isEmpty() ||
-                tfBorrowedCount.getText().trim().isEmpty()) {
-            JOptionPane.showMessageDialog(this, "Please fill all fields.");
+                tfBorrowLimit.getText().trim().isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Please fill all fields except Borrowed Count.");
             return false;
         }
         try {
             Integer.parseInt(tfBorrowLimit.getText().trim());
-            Integer.parseInt(tfBorrowedCount.getText().trim());
+            // Không cần parse tfBorrowedCount ở đây nữa vì nó do hệ thống quản lý
         } catch (NumberFormatException e) {
-            JOptionPane.showMessageDialog(this, "Borrow Limit and Borrowed Count must be numbers.");
+            JOptionPane.showMessageDialog(this, "Borrow Limit must be a number.");
             return false;
         }
         return true;
@@ -151,22 +169,23 @@ public class UserPanel extends JPanel {
         tfName.setText("");
         tfEmail.setText("");
         tfPhone.setText("");
-        tfBorrowLimit.setText("");
-        tfBorrowedCount.setText("");
+        tfBorrowLimit.setText("10");
+        tfBorrowedCount.setText("0"); // THAY ĐỔI: Đặt lại là "0"
         selectedId = -1;
         table.clearSelection();
     }
 
     private void setupEvents() {
-        // Add user
+        btnClear.addActionListener(e -> clearForm());
+
         btnAdd.addActionListener(e -> {
             if (validateInput()) {
-                User user = new User(   
+                User user = new User(
                         tfName.getText().trim(),
                         tfEmail.getText().trim(),
                         tfPhone.getText().trim(),
                         Integer.parseInt(tfBorrowLimit.getText().trim()),
-                        Integer.parseInt(tfBorrowedCount.getText().trim())
+                        0 // THAY ĐỔI: Người dùng mới luôn có 0 sách đã mượn
                 );
                 if (library.addUser(user)) {
                     JOptionPane.showMessageDialog(this, "User added successfully.");
@@ -178,7 +197,6 @@ public class UserPanel extends JPanel {
             }
         });
 
-        // Update user
         btnUpdate.addActionListener(e -> {
             if (selectedId == -1) {
                 JOptionPane.showMessageDialog(this, "Please select a user to update.");
@@ -191,6 +209,7 @@ public class UserPanel extends JPanel {
                         tfEmail.getText().trim(),
                         tfPhone.getText().trim(),
                         Integer.parseInt(tfBorrowLimit.getText().trim()),
+                        // Giữ nguyên số sách đã mượn khi cập nhật thông tin khác
                         Integer.parseInt(tfBorrowedCount.getText().trim())
                 );
                 if (library.updateUser(user)) {
@@ -203,7 +222,6 @@ public class UserPanel extends JPanel {
             }
         });
 
-        // Remove user
         btnRemove.addActionListener(e -> {
             if (selectedId == -1) {
                 JOptionPane.showMessageDialog(this, "Please select a user to remove.");
@@ -222,15 +240,16 @@ public class UserPanel extends JPanel {
                 }
             }
         });
-
-        // Search user
+        
         btnSearch.addActionListener(e -> {
             String keyword = tfSearch.getText().trim();
             if (keyword.isEmpty()) {
                 JOptionPane.showMessageDialog(this, "Please enter a search keyword.");
                 return;
             }
-            List<User> users = library.findUsers(keyword); // cần viết findUsers trong Library
+            String filter = cbFilter.getSelectedItem().toString();
+            List<User> users = library.findUsers(keyword, filter);
+            
             tableModel.setRowCount(0);
             for (User user : users) {
                 tableModel.addRow(new Object[]{
@@ -244,21 +263,21 @@ public class UserPanel extends JPanel {
             }
         });
 
-        // Reset
         btnReset.addActionListener(e -> {
             tfSearch.setText("");
+            cbFilter.setSelectedIndex(0);
             loadAllUsers();
         });
 
-        // Click vào bảng load form
         table.getSelectionModel().addListSelectionListener(e -> {
             if (!e.getValueIsAdjusting() && table.getSelectedRow() != -1) {
-                selectedId = Integer.parseInt(table.getValueAt(table.getSelectedRow(), 0).toString());
-                tfName.setText(table.getValueAt(table.getSelectedRow(), 1).toString());
-                tfEmail.setText(table.getValueAt(table.getSelectedRow(), 2).toString());
-                tfPhone.setText(table.getValueAt(table.getSelectedRow(), 3).toString());
-                tfBorrowLimit.setText(table.getValueAt(table.getSelectedRow(), 4).toString());
-                tfBorrowedCount.setText(table.getValueAt(table.getSelectedRow(), 5).toString());
+                int row = table.getSelectedRow();
+                selectedId = (int) table.getValueAt(row, 0);
+                tfName.setText((String) table.getValueAt(row, 1));
+                tfEmail.setText((String) table.getValueAt(row, 2));
+                tfPhone.setText((String) table.getValueAt(row, 3));
+                tfBorrowLimit.setText(String.valueOf(table.getValueAt(row, 4)));
+                tfBorrowedCount.setText(String.valueOf(table.getValueAt(row, 5)));
             }
         });
     }

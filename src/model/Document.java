@@ -7,25 +7,26 @@ public class Document {
     protected int pages;
     protected String author;
     protected int publicationYear;
-    protected int remainDocs;
+    protected boolean isAvailable;
 
-    public Document(String title, String language, int pages, String author, int publicationYear, int remainDocs ) {
+
+    public Document(String title, String language, int pages, String author, int publicationYear) {
         this.title = title;
         this.language = language;
         this.pages = pages;
         this.author = author;
         this.publicationYear = publicationYear;
-        this.remainDocs = remainDocs;
+        this.isAvailable = true; 
     }
 
-     public Document(int id, String title, String language, int pages, String author, int publicationYear, int remainDocs ) {
+     public Document(int id, String title, String language, int pages, String author, int publicationYear, boolean isAvailable) {
         this.id = id;
         this.title = title;
         this.language = language;
         this.pages = pages;
         this.author = author;
         this.publicationYear = publicationYear;
-        this.remainDocs = remainDocs;
+        this.isAvailable = isAvailable; 
     }
 
     // Getters
@@ -36,10 +37,11 @@ public class Document {
     public String getTitle() {
         return title;
     }
+
     public String getLanguage() {
         return language; 
-    
     }
+
     public int getPages() {
         return pages; 
     }
@@ -52,11 +54,14 @@ public class Document {
         return publicationYear;
     }
 
-    public int getRemainDocs() {
-        return remainDocs;
+    /**
+     * Getter cho trạng thái có sẵn của sách.
+     * @return true nếu sách có sẵn, false nếu đã được mượn.
+     */
+    public boolean isAvailable() {
+        return isAvailable;
     }
     
-
     // Setters
     public void setId(int id) {
         this.id = id;
@@ -82,17 +87,11 @@ public class Document {
         this.publicationYear = publicationYear;
     }
 
-    public void setRemainDocs(int remainDocs) {
-        this.remainDocs = remainDocs;
-    }
-
-     public void displayInfo() {
-        System.out.println("ID: " + id);
-        System.out.println("Title: " + title);
-        System.out.println("Language: " + language);
-        System.out.println("Pages: " + pages);
-        System.out.println("Author: " + author);
-        System.out.println("Publication Year: " + publicationYear);
-        System.out.println("Remain Docs: " + remainDocs);
+    /**
+     * Setter cho trạng thái có sẵn của sách.
+     * @param available true để đặt sách là có sẵn, false để đặt là đã được mượn.
+     */
+    public void setAvailable(boolean available) {
+        isAvailable = available;
     }
 }

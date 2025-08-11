@@ -135,32 +135,81 @@ public class UserDAO {
     }
 
     public List<User> searchUsers(String keyword) {
-    List<User> users = new ArrayList<>();
-    String sql = "SELECT * FROM users WHERE name LIKE ? OR email LIKE ? OR phone LIKE ?";
-    
-    try (Connection conn = DatabaseConnection.getConnection();
-         PreparedStatement stmt = conn.prepareStatement(sql)) {
+        List<User> users = new ArrayList<>();
+        String sql = "SELECT * FROM users WHERE name LIKE ? OR email LIKE ? OR phone LIKE ?";
         
-        String searchPattern = "%" + keyword + "%";
-        stmt.setString(1, searchPattern);
-        stmt.setString(2, searchPattern);
-        stmt.setString(3, searchPattern);
-        
-        ResultSet rs = stmt.executeQuery();
-        while (rs.next()) {
-            User user = new User(
-                rs.getString("name"),
-                rs.getString("email"),
-                rs.getString("phone"),
-                rs.getInt("borrowedBooksCount")
-            );
-            user.setBorrowLimit(rs.getInt("maxBorrowLimit"));
-            users.add(user);
+        try (Connection conn = DatabaseConnection.getConnection();
+            PreparedStatement stmt = conn.prepareStatement(sql)) {
+            
+            String searchPattern = "%" + keyword + "%";
+            stmt.setString(1, searchPattern);
+            stmt.setString(2, searchPattern);
+            stmt.setString(3, searchPattern);
+            
+            ResultSet rs = stmt.executeQuery();
+            while (rs.next()) {
+                User user = new User(
+                    rs.getString("name"),
+                    rs.getString("email"),
+                    rs.getString("phone"),
+                    rs.getInt("borrowedBooksCount")
+                );
+                user.setBorrowLimit(rs.getInt("maxBorrowLimit"));
+                users.add(user);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
-    } catch (SQLException e) {
-        e.printStackTrace();
+        return users;
     }
-    return users;
-}
 
+    public List<User> searchUsers(String keyword, String filter) {
+        List<User> users = new ArrayList<>();
+        String sql;
+        
+        switch (filter) {
+            case "Name":
+                sql = "SELECT * FROM users WHERE LOWER(name) LIKE ?";
+                break;
+            case "Email":
+                sql = "SELECT * FROM users WHERE LOWER(email) LIKE ?";
+                break;
+            case "Phone":
+                sql = "SELECT * FROM users WHERE LOWER(phone_number) LIKE ?";
+                break;
+            case "All Fields":
+            default:
+                sql = "SELECT * FROM users WHERE LOWER(name) LIKE ? OR LOWER(email) LIKE ? OR LOWER(phone_number) LIKE ?";
+                break;
+        }
+
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            
+            String searchKeyword = "%" + keyword.toLowerCase() + "%";
+            
+            if ("All Fields".equals(filter)) {
+                pstmt.setString(1, searchKeyword);
+                pstmt.setString(2, searchKeyword);
+                pstmt.setString(3, searchKeyword);
+            } else {
+                pstmt.setString(1, searchKeyword);
+            }
+
+            ResultSet rs = pstmt.executeQuery();
+            while (rs.next()) {
+                users.add(new User(
+                        rs.getInt("id"),
+                        rs.getString("name"),
+                        rs.getString("email"),
+                        rs.getString("phone_number"),
+                        rs.getInt("borrow_limit"),
+                        rs.getInt("borrowed_books_count")
+                ));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return users;
+    }
 }
