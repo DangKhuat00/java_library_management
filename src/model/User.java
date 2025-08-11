@@ -3,127 +3,155 @@ package model;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Lớp {@code User} đại diện cho người dùng trong hệ thống thư viện.
+ *
+ * <p>Mỗi người dùng có ID duy nhất, thông tin cá nhân và danh sách tài liệu đã mượn.
+ */
 public class User {
-    private String id;
-    private String name;
-    private String email;
-    private String phoneNumber;
-    private int borrowLimit;
-    private List<Document> borrowedDocuments;
-    private static int userCounter = 1;
 
-    /*  Constructor - Add initialized member
-    public User(String id, String name, String email, String phoneNumber, int borrowLimit){
-        this.id = id;
-        this.name = name;
-        this.email = email;
-        this.phoneNumber = phoneNumber;
-        this.borrowLimit = borrowLimit;
-        this.borrowedDocuments = new ArrayList<>();
-    }
-    */
-    // Constructor to match parameters used in UserDAO
-    public User(String name, String email, String phoneNumber) {
+  /** Mã định danh duy nhất của người dùng. */
+  private String id;
+
+  /** Tên người dùng. */
+  private String name;
+
+  /** Địa chỉ email của người dùng. */
+  private String email;
+
+  /** Số điện thoại của người dùng. */
+  private String phoneNumber;
+
+  /** Giới hạn số lượng tài liệu có thể mượn. */
+  private int borrowLimit;
+
+  /** Danh sách tài liệu người dùng đang mượn. */
+  private List<Document> borrowedDocuments;
+
+  /** Biến đếm để tự động tạo ID cho người dùng. */
+  private static int userCounter = 1;
+
+  /**
+   * Khởi tạo {@code User} mới với thông tin cơ bản.
+   *
+   * <p>Giới hạn mượn mặc định là 10 tài liệu.
+   *
+   * @param name tên người dùng
+   * @param email địa chỉ email
+   * @param phoneNumber số điện thoại
+   */
+  public User(String name, String email, String phoneNumber) {
     this.id = "USER" + String.format("%04d", userCounter++);
     this.name = name;
     this.email = email;
     this.phoneNumber = phoneNumber;
     this.borrowLimit = 10;
     this.borrowedDocuments = new ArrayList<>();
-}
+  }
 
-    /* 
-    // ========== DOCUMENT BORROWING FUNCTIONS ==========
-    
-    public boolean borrowDocument(Document document) {
-        // Check borrowing limit
-        if (borrowedDocuments.size() >= borrowLimit) {
-            return false;
-        }
-        
-        // Check if document is available
-        if (!document.isAvailable()) {
-            return false;
-        }
-        
-        // Check if already borrowed this document
-        if (borrowedDocuments.contains(document)) {
-            return false;
-        }
-        
-        // Execute borrowing
-        borrowedDocuments.add(document);
-        document.setAvailable(false);
-        return true;
-    }
-    
-    // ========== DOCUMENT RETURN FUNCTIONS ==========
-    
-    public boolean returnDocument(Document document) {
-        // Check if borrowed this document
-        if (!borrowedDocuments.contains(document)) {
-            return false;
-        }
-        
-        // Execute return
-        borrowedDocuments.remove(document);
-        document.setAvailable(true);
-        return true;
-    }
-    
-    // ========== MEMBER INFORMATION MANAGEMENT FUNCTIONS ==========
-    
-    public void updatePersonalInfo(String name, String email, String phoneNumber) {
-        if (name != null && !name.trim().isEmpty()) {
-            this.name = name;
-        }
-        if (email != null && !email.trim().isEmpty()) {
-            this.email = email;
-        }
-        if (phoneNumber != null && !phoneNumber.trim().isEmpty()) {
-            this.phoneNumber = phoneNumber;
-        }
-    }
-    
-    // ========== UTILITY METHODS ==========
-    
-    public boolean canBorrowMore() {
-        return borrowedDocuments.size() < borrowLimit;
-    }
-    
-    public int getBorrowedCount() {
-        return borrowedDocuments.size();
-    }
-    
-    public boolean isValidUser() {
-        return id != null && !id.trim().isEmpty() &&
-               name != null && !name.trim().isEmpty() &&
-               email != null && email.contains("@") &&
-               phoneNumber != null && !phoneNumber.trim().isEmpty() &&
-               borrowLimit > 0;
-    }
-    */
-    
-    // ========== GETTERS AND SETTERS ==========
-    
-    public String getId() { return id; }
-    
-    public String getName() { return name; }
-    public void setName(String name) { this.name = name; }
-    
-    public String getEmail() { return email; }
-    public void setEmail(String email) { this.email = email; }
-    
-    public String getPhoneNumber() { return phoneNumber; }
-    public void setPhoneNumber(String phoneNumber) { this.phoneNumber = phoneNumber; }
-    
-    public int getBorrowLimit() { return borrowLimit; }
-    public void setBorrowLimit(int borrowLimit) { this.borrowLimit = borrowLimit; }
-    
-    public List<Document> getBorrowedDocuments() { return new ArrayList<>(borrowedDocuments); }
-    @Override
-    public String toString() {
-        return String.format("ID: %s | Tên: %s | Email: %s | SĐT: %s | Số tài liệu tối đa: %d",
-            id, name, email, phoneNumber, borrowLimit);
-    }
+  // ===== GETTERS & SETTERS =====
+
+  /**
+   * Lấy mã định danh người dùng.
+   *
+   * @return ID của người dùng
+   */
+  public String getId() {
+    return id;
+  }
+
+  /**
+   * Lấy tên người dùng.
+   *
+   * @return tên người dùng
+   */
+  public String getName() {
+    return name;
+  }
+
+  /**
+   * Cập nhật tên người dùng.
+   *
+   * @param name tên mới
+   */
+  public void setName(String name) {
+    this.name = name;
+  }
+
+  /**
+   * Lấy email người dùng.
+   *
+   * @return email
+   */
+  public String getEmail() {
+    return email;
+  }
+
+  /**
+   * Cập nhật email người dùng.
+   *
+   * @param email email mới
+   */
+  public void setEmail(String email) {
+    this.email = email;
+  }
+
+  /**
+   * Lấy số điện thoại.
+   *
+   * @return số điện thoại
+   */
+  public String getPhoneNumber() {
+    return phoneNumber;
+  }
+
+  /**
+   * Cập nhật số điện thoại.
+   *
+   * @param phoneNumber số điện thoại mới
+   */
+  public void setPhoneNumber(String phoneNumber) {
+    this.phoneNumber = phoneNumber;
+  }
+
+  /**
+   * Lấy giới hạn số lượng tài liệu được mượn.
+   *
+   * @return giới hạn mượn
+   */
+  public int getBorrowLimit() {
+    return borrowLimit;
+  }
+
+  /**
+   * Cập nhật giới hạn mượn tài liệu.
+   *
+   * @param borrowLimit giới hạn mới
+   */
+  public void setBorrowLimit(int borrowLimit) {
+    this.borrowLimit = borrowLimit;
+  }
+
+  /**
+   * Lấy danh sách tài liệu đang mượn.
+   *
+   * <p>Trả về bản sao để tránh thay đổi trực tiếp từ bên ngoài.
+   *
+   * @return danh sách tài liệu đã mượn
+   */
+  public List<Document> getBorrowedDocuments() {
+    return new ArrayList<>(borrowedDocuments);
+  }
+
+  /**
+   * Trả về chuỗi mô tả thông tin người dùng.
+   *
+   * @return thông tin định dạng chuỗi
+   */
+  @Override
+  public String toString() {
+    return String.format(
+        "ID: %s | Tên: %s | Email: %s | SĐT: %s | Số tài liệu tối đa: %d",
+        id, name, email, phoneNumber, borrowLimit);
+  }
 }

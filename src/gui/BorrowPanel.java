@@ -8,14 +8,22 @@ import javax.swing.*;
 import java.awt.*;
 import java.util.List;
 
+/**
+ * JPanel hien thi danh sach nguoi dung va cac tai lieu ho dang muon. Su dung JTextArea de hien thi
+ * thong tin o dang text cuon duoc.
+ */
 public class BorrowPanel extends JPanel {
 
   private JTextArea borrowTextArea;
 
+  /**
+   * Khoi tao panel hien thi danh sach muon tai lieu. Thiet lap layout, tieu de va goi ham
+   * loadBorrowedData() de tai du lieu.
+   */
   public BorrowPanel() {
     setLayout(new BorderLayout());
 
-    JLabel titleLabel = new JLabel("Danh sách mượn tài liệu");
+    JLabel titleLabel = new JLabel("Danh sach muon tai lieu");
     titleLabel.setHorizontalAlignment(JLabel.CENTER);
     titleLabel.setFont(new Font("Arial", Font.BOLD, 16));
 
@@ -30,24 +38,36 @@ public class BorrowPanel extends JPanel {
     loadBorrowedData();
   }
 
+  /**
+   * Tai du lieu nguoi dung va tai lieu ho muon tu co so du lieu. Su dung UserDAO de lay danh sach
+   * nguoi dung va in ra thong tin neu nguoi dung co tai lieu dang muon.
+   */
   private void loadBorrowedData() {
     UserDAO userDAO = new UserDAO();
-    List<User> users = userDAO.getAllUsers(); // gọi non-static method đúng cách
+    List<User> users = userDAO.getAllUsers(); // Goi phuong thuc lay danh sach nguoi dung
     StringBuilder sb = new StringBuilder();
 
     for (User user : users) {
       List<Document> borrowedDocs = user.getBorrowedDocuments();
       if (!borrowedDocs.isEmpty()) {
-        sb.append("Người dùng: ").append(user.getName()).append(" (ID: ").append(user.getId()).append(")\n");
+        sb.append("Nguoi dung: ")
+            .append(user.getName())
+            .append(" (ID: ")
+            .append(user.getId())
+            .append(")\n");
         for (Document doc : borrowedDocs) {
-          sb.append("   - ").append(doc.getTitle()).append(" (ID: ").append(doc.getId()).append(")\n");
+          sb.append("   - ")
+              .append(doc.getTitle())
+              .append(" (ID: ")
+              .append(doc.getId())
+              .append(")\n");
         }
         sb.append("\n");
       }
     }
 
     if (sb.length() == 0) {
-      sb.append("Không có tài liệu nào được mượn.");
+      sb.append("Khong co tai lieu nao duoc muon.");
     }
 
     borrowTextArea.setText(sb.toString());

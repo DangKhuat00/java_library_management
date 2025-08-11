@@ -7,10 +7,21 @@ import javax.swing.*;
 import java.awt.*;
 import java.util.List;
 
+/**
+ * UserPanel la JPanel hien thi danh sach nguoi dung tu co so du lieu. Su dung {@link UserDAO} de
+ * lay thong tin va hien thi len giao dien.
+ */
 public class UserPanel extends JPanel {
+  /** Vung hien thi thong tin nguoi dung */
   private JTextArea displayArea;
+
+  /** Doi tuong truy cap du lieu nguoi dung */
   private UserDAO userDAO;
 
+  /**
+   * Khoi tao UserPanel va hien thi danh sach nguoi dung. Mac dinh se goi {@link #updateDisplay()}
+   * de nap du lieu tu co so du lieu.
+   */
   public UserPanel() {
     setLayout(new BorderLayout());
 
@@ -25,12 +36,16 @@ public class UserPanel extends JPanel {
     updateDisplay();
   }
 
+  /**
+   * Cap nhat vung hien thi voi danh sach nguoi dung hien co. Neu khong co nguoi dung nao, se hien
+   * thi thong bao tuong ung.
+   */
   private void updateDisplay() {
     List<User> users = userDAO.getAllUsers();
     displayArea.setText("");
 
     if (users.isEmpty()) {
-      displayArea.setText("Không có người dùng nào trong hệ thống.");
+      displayArea.setText("Khong co nguoi dung nao trong he thong.");
     } else {
       for (User user : users) {
         displayArea.append(user.toString() + "\n");
