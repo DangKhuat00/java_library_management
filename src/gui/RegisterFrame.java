@@ -10,21 +10,19 @@ public class RegisterFrame extends JFrame {
   private JTextField txtUsername;
   private JPasswordField txtPassword;
   private JTextField txtPhone;
+  private JTextField txtEmail;
   private JComboBox<String> cbRole;
 
   public RegisterFrame() {
     setTitle("Đăng ký tài khoản");
-    setSize(800, 500);
+    setSize(800, 600); // tăng chiều cao để không mất nút
     setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     setLocationRelativeTo(null);
     setResizable(false);
 
     // Nền ảnh
     JPanel backgroundPanel = new JPanel() {
-      ImageIcon backgroundImage = new ImageIcon(
-          getClass().getResource("/images/background.jpg")
-      );
-
+      ImageIcon backgroundImage = new ImageIcon(getClass().getResource("/images/background.jpg"));
       @Override
       protected void paintComponent(Graphics g) {
         super.paintComponent(g);
@@ -48,7 +46,7 @@ public class RegisterFrame extends JFrame {
       }
     };
     formPanel.setOpaque(false);
-    formPanel.setPreferredSize(new Dimension(450, 380));
+    formPanel.setPreferredSize(new Dimension(450, 540)); // tăng chiều cao form
 
     GridBagConstraints gbc = new GridBagConstraints();
     gbc.insets = new Insets(10, 20, 10, 20);
@@ -78,8 +76,7 @@ public class RegisterFrame extends JFrame {
 
     txtUsername = new JTextField();
     txtUsername.setFont(new Font("Arial", Font.PLAIN, 14));
-    txtUsername.setBackground(Color.WHITE);
-    txtUsername.setPreferredSize(new Dimension(220, 30));
+    txtUsername.setPreferredSize(new Dimension(240, 30)); // rộng hơn
     txtUsername.setBorder(roundedBorder);
     gbc.gridx = 1;
     formPanel.add(txtUsername, gbc);
@@ -93,8 +90,7 @@ public class RegisterFrame extends JFrame {
 
     txtPassword = new JPasswordField();
     txtPassword.setFont(new Font("Arial", Font.PLAIN, 14));
-    txtPassword.setBackground(Color.WHITE);
-    txtPassword.setPreferredSize(new Dimension(220, 30));
+    txtPassword.setPreferredSize(new Dimension(240, 30)); // rộng hơn
     txtPassword.setBorder(roundedBorder);
     gbc.gridx = 1;
     formPanel.add(txtPassword, gbc);
@@ -108,49 +104,57 @@ public class RegisterFrame extends JFrame {
 
     txtPhone = new JTextField();
     txtPhone.setFont(new Font("Arial", Font.PLAIN, 14));
-    txtPhone.setBackground(Color.WHITE);
-    txtPhone.setPreferredSize(new Dimension(220, 30));
+    txtPhone.setPreferredSize(new Dimension(240, 30));
     txtPhone.setBorder(roundedBorder);
     gbc.gridx = 1;
     formPanel.add(txtPhone, gbc);
 
+    // Email
+    JLabel lblEmail = new JLabel("Email:");
+    lblEmail.setFont(new Font("Arial", Font.PLAIN, 14));
+    gbc.gridy = 4;
+    gbc.gridx = 0;
+    formPanel.add(lblEmail, gbc);
+
+    txtEmail = new JTextField();
+    txtEmail.setFont(new Font("Arial", Font.PLAIN, 14));
+    txtEmail.setPreferredSize(new Dimension(240, 30));
+    txtEmail.setBorder(roundedBorder);
+    gbc.gridx = 1;
+    formPanel.add(txtEmail, gbc);
+
     // Role
     JLabel lblRole = new JLabel("Role:");
     lblRole.setFont(new Font("Arial", Font.PLAIN, 14));
-    gbc.gridy = 4;
+    gbc.gridy = 5;
     gbc.gridx = 0;
     formPanel.add(lblRole, gbc);
 
     cbRole = new JComboBox<>(new String[]{"user", "admin"});
     cbRole.setFont(new Font("Arial", Font.PLAIN, 14));
-    cbRole.setBackground(Color.WHITE);
+    cbRole.setPreferredSize(new Dimension(240, 30));
     cbRole.setBorder(roundedBorder);
     gbc.gridx = 1;
     formPanel.add(cbRole, gbc);
 
     // Nút Đăng ký
     JButton btnRegister = new JButton("Đăng ký");
-    btnRegister.setBackground(Color.WHITE);
     btnRegister.setForeground(new Color(0, 102, 255));
     btnRegister.setFont(new Font("Arial", Font.BOLD, 14));
-    btnRegister.setFocusPainted(false);
-    btnRegister.setPreferredSize(new Dimension(120, 35));
+    btnRegister.setPreferredSize(new Dimension(140, 35));
     btnRegister.setBorder(roundedBorder);
     gbc.gridx = 0;
-    gbc.gridy = 5;
+    gbc.gridy = 6;
     gbc.gridwidth = 2;
-    gbc.anchor = GridBagConstraints.CENTER;
     formPanel.add(btnRegister, gbc);
 
     // Nút Quay lại
     JButton btnBack = new JButton("Quay lại");
-    btnBack.setBackground(Color.WHITE);
     btnBack.setForeground(new Color(0, 102, 255));
     btnBack.setFont(new Font("Arial", Font.BOLD, 14));
-    btnBack.setFocusPainted(false);
-    btnBack.setPreferredSize(new Dimension(120, 35));
+    btnBack.setPreferredSize(new Dimension(140, 35));
     btnBack.setBorder(roundedBorder);
-    gbc.gridy = 6;
+    gbc.gridy = 7;
     formPanel.add(btnBack, gbc);
 
     // Thêm form vào nền
@@ -162,15 +166,16 @@ public class RegisterFrame extends JFrame {
       String username = txtUsername.getText().trim();
       String password = new String(txtPassword.getPassword()).trim();
       String phone = txtPhone.getText().trim();
+      String email = txtEmail.getText().trim();
       String role = cbRole.getSelectedItem().toString();
 
-      if (username.isEmpty() || password.isEmpty() || phone.isEmpty()) {
+      if (username.isEmpty() || password.isEmpty() || phone.isEmpty() || email.isEmpty()) {
         JOptionPane.showMessageDialog(this, "Vui lòng nhập đầy đủ thông tin!");
         return;
       }
 
       AccountDAO dao = new AccountDAO();
-      boolean success = dao.register(new Account(username, password, phone, role));
+      boolean success = dao.register(new Account(username, password, phone, email, role));
 
       if (success) {
         JOptionPane.showMessageDialog(this, "Đăng ký thành công!");
@@ -180,7 +185,7 @@ public class RegisterFrame extends JFrame {
         JOptionPane.showMessageDialog(this, "Đăng ký thất bại! Tài khoản có thể đã tồn tại.");
       }
     });
-
+  
     // Sự kiện nút Quay lại
     btnBack.addActionListener(e -> {
       new LoginFrame().setVisible(true);

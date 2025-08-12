@@ -6,14 +6,16 @@ public class Account {
   private String password;
   private String role;
   private String phone;
+  private String email;
 
   public Account() {}
 
   // Constructor đầy đủ
-  public Account(String username, String password, String phone, String role) {
+  public Account(String username, String password, String phone, String email, String role) {
     this.username = username;
     this.password = password;
     this.phone = phone;
+    this.email = email;
     this.role = role;
   }
 
@@ -38,6 +40,14 @@ public class Account {
 
   public void setPhone(String phone) {
     this.phone = phone;
+  }
+
+  public String getEmail() {
+    return email;
+  }
+
+  public void setEmail(String email) {
+    this.email = email;
   }
 
   public String getUsername() {

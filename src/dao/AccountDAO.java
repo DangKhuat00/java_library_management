@@ -9,14 +9,15 @@ import model.Account;
 public class AccountDAO {
 
   public boolean register(Account account) {
-    String sql = "INSERT INTO accounts (username, password, phone, role) VALUES (?, ?, ?, ?)";
+    String sql = "INSERT INTO accounts (username, password, phone, email, role) VALUES (?, ?, ?, ?, ?)";
     try (Connection conn = DatabaseConnection.getConnection();
         PreparedStatement stmt = conn.prepareStatement(sql)) {
 
       stmt.setString(1, account.getUsername());
       stmt.setString(2, account.getPassword()); // Có thể mã hóa password ở đây
-      stmt.setString(3, account.getPhone());    // thêm phone
-      stmt.setString(4, account.getRole());
+      stmt.setString(3, account.getPhone());
+      stmt.setString(4, account.getEmail());
+      stmt.setString(5, account.getRole());
 
       return stmt.executeUpdate() > 0;
     } catch (SQLException e) {
@@ -39,6 +40,8 @@ public class AccountDAO {
         acc.setId(rs.getInt("id"));
         acc.setUsername(rs.getString("username"));
         acc.setPassword(rs.getString("password"));
+        acc.setPhone(rs.getString("phone"));
+        acc.setEmail(rs.getString("email"));
         acc.setRole(rs.getString("role"));
         return acc;
       }
