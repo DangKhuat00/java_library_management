@@ -17,32 +17,33 @@ public class LoginFrame extends JFrame {
     setLocationRelativeTo(null);
     setResizable(false);
 
-    JPanel backgroundPanel = new JPanel() {
-      ImageIcon backgroundImage = new ImageIcon(
-          getClass().getResource("/images/background.jpg")
-      );
+    JPanel backgroundPanel =
+        new JPanel() {
+          ImageIcon backgroundImage =
+              new ImageIcon(getClass().getResource("/images/background.jpg"));
 
-      @Override
-      protected void paintComponent(Graphics g) {
-        super.paintComponent(g);
-        if (backgroundImage != null) {
-          g.drawImage(backgroundImage.getImage(), 0, 0, getWidth(), getHeight(), this);
-        }
-      }
-    };
+          @Override
+          protected void paintComponent(Graphics g) {
+            super.paintComponent(g);
+            if (backgroundImage != null) {
+              g.drawImage(backgroundImage.getImage(), 0, 0, getWidth(), getHeight(), this);
+            }
+          }
+        };
 
     // Panel trắng bo tròn
-    JPanel formPanel = new JPanel(new GridBagLayout()) {
-      @Override
-      protected void paintComponent(Graphics g) {
-        super.paintComponent(g);
-        Graphics2D g2 = (Graphics2D) g.create();
-        g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-        g2.setColor(Color.WHITE);
-        g2.fillRoundRect(0, 0, getWidth(), getHeight(), 30, 30);
-        g2.dispose();
-      }
-    };
+    JPanel formPanel =
+        new JPanel(new GridBagLayout()) {
+          @Override
+          protected void paintComponent(Graphics g) {
+            super.paintComponent(g);
+            Graphics2D g2 = (Graphics2D) g.create();
+            g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+            g2.setColor(Color.WHITE);
+            g2.fillRoundRect(0, 0, getWidth(), getHeight(), 30, 30);
+            g2.dispose();
+          }
+        };
     formPanel.setOpaque(false);
     formPanel.setPreferredSize(new Dimension(450, 300)); // Tăng kích thước form
 
@@ -51,10 +52,11 @@ public class LoginFrame extends JFrame {
     gbc.fill = GridBagConstraints.HORIZONTAL;
 
     // Tạo border bo tròn màu xám nhạt
-    Border roundedBorder = BorderFactory.createCompoundBorder(
-        BorderFactory.createLineBorder(new Color(200, 200, 200), 1, true),
-        BorderFactory.createEmptyBorder(5, 10, 5, 10) // padding trong
-    );
+    Border roundedBorder =
+        BorderFactory.createCompoundBorder(
+            BorderFactory.createLineBorder(new Color(200, 200, 200), 1, true),
+            BorderFactory.createEmptyBorder(5, 10, 5, 10) // padding trong
+            );
 
     // Tiêu đề
     JLabel title = new JLabel("Sign In", SwingConstants.CENTER);
@@ -76,6 +78,7 @@ public class LoginFrame extends JFrame {
     usernameField = new JTextField();
     usernameField.setFont(new Font("Arial", Font.PLAIN, 14));
     usernameField.setBackground(Color.WHITE);
+    usernameField.setPreferredSize(new Dimension(220, 30)); // giống đăng ký
     usernameField.setBorder(roundedBorder);
     gbc.gridx = 1;
     gbc.weightx = 1;
@@ -93,6 +96,7 @@ public class LoginFrame extends JFrame {
     passwordField = new JPasswordField();
     passwordField.setFont(new Font("Arial", Font.PLAIN, 14));
     passwordField.setBackground(Color.WHITE);
+    passwordField.setPreferredSize(new Dimension(220, 30)); // giống đăng ký
     passwordField.setBorder(roundedBorder);
     gbc.gridx = 1;
     gbc.gridy = 2;
@@ -107,17 +111,17 @@ public class LoginFrame extends JFrame {
     loginButton.setFont(new Font("Arial", Font.BOLD, 14));
     loginButton.setFocusPainted(false);
     loginButton.setPreferredSize(new Dimension(120, 35));
-    loginButton.setBorder(BorderFactory.createCompoundBorder(
-        BorderFactory.createLineBorder(new Color(200, 200, 200), 1, true),
-        BorderFactory.createEmptyBorder(5, 10, 5, 10)
-    ));
+    loginButton.setBorder(
+        BorderFactory.createCompoundBorder(
+            BorderFactory.createLineBorder(new Color(200, 200, 200), 1, true),
+            BorderFactory.createEmptyBorder(5, 10, 5, 10)));
     gbc.gridx = 0;
     gbc.gridy = 3;
     gbc.gridwidth = 2;
     gbc.anchor = GridBagConstraints.CENTER;
     formPanel.add(loginButton, gbc);
 
-// Thêm form vào nền, căn giữa nhưng lùi xuống một ít
+    // Thêm form vào nền, căn giữa nhưng lùi xuống một ít
     backgroundPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 0, 60)); // 60px top margin
     backgroundPanel.add(formPanel);
     add(backgroundPanel);
@@ -129,35 +133,38 @@ public class LoginFrame extends JFrame {
     registerButton.setFont(new Font("Arial", Font.BOLD, 14));
     registerButton.setFocusPainted(false);
     registerButton.setPreferredSize(new Dimension(120, 35));
-    registerButton.setBorder(BorderFactory.createCompoundBorder(
-        BorderFactory.createLineBorder(new Color(200, 200, 200), 1, true),
-        BorderFactory.createEmptyBorder(5, 10, 5, 10)
-    ));
+    registerButton.setBorder(
+        BorderFactory.createCompoundBorder(
+            BorderFactory.createLineBorder(new Color(200, 200, 200), 1, true),
+            BorderFactory.createEmptyBorder(5, 10, 5, 10)));
     gbc.gridy = 4;
     formPanel.add(registerButton, gbc);
 
     // Sự kiện bấm Đăng ký
-    registerButton.addActionListener(e -> {
-      new RegisterFrame().setVisible(true);
-      dispose();
-    });
+    registerButton.addActionListener(
+        e -> {
+          new RegisterFrame().setVisible(true);
+          dispose();
+        });
 
     // Xử lý đăng nhập
-    loginButton.addActionListener(e -> {
-      String username = usernameField.getText();
-      String password = new String(passwordField.getPassword());
+    loginButton.addActionListener(
+        e -> {
+          String username = usernameField.getText();
+          String password = new String(passwordField.getPassword());
 
-      AccountDAO dao = new AccountDAO();
-      Account acc = dao.login(username, password);
+          AccountDAO dao = new AccountDAO();
+          Account acc = dao.login(username, password);
 
-      if (acc != null) {
-        JOptionPane.showMessageDialog(this,
-            "Đăng nhập thành công! Xin chào " + acc.getUsername() + " (" + acc.getRole() + ")");
-        new MainFrame().setVisible(true);
-        dispose();
-      } else {
-        JOptionPane.showMessageDialog(this, "Sai tên đăng nhập hoặc mật khẩu!");
-      }
-    });
+          if (acc != null) {
+            JOptionPane.showMessageDialog(
+                this,
+                "Đăng nhập thành công! Xin chào " + acc.getUsername() + " (" + acc.getRole() + ")");
+            new MainFrame().setVisible(true);
+            dispose();
+          } else {
+            JOptionPane.showMessageDialog(this, "Sai tên đăng nhập hoặc mật khẩu!");
+          }
+        });
   }
 }

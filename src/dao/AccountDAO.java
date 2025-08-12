@@ -9,13 +9,14 @@ import model.Account;
 public class AccountDAO {
 
   public boolean register(Account account) {
-    String sql = "INSERT INTO accounts (username, password, role) VALUES (?, ?, ?)";
+    String sql = "INSERT INTO accounts (username, password, phone, role) VALUES (?, ?, ?, ?)";
     try (Connection conn = DatabaseConnection.getConnection();
         PreparedStatement stmt = conn.prepareStatement(sql)) {
 
       stmt.setString(1, account.getUsername());
       stmt.setString(2, account.getPassword()); // Có thể mã hóa password ở đây
-      stmt.setString(3, account.getRole());
+      stmt.setString(3, account.getPhone());    // thêm phone
+      stmt.setString(4, account.getRole());
 
       return stmt.executeUpdate() > 0;
     } catch (SQLException e) {

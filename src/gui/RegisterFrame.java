@@ -9,11 +9,12 @@ import model.Account;
 public class RegisterFrame extends JFrame {
   private JTextField txtUsername;
   private JPasswordField txtPassword;
+  private JTextField txtPhone;
   private JComboBox<String> cbRole;
 
   public RegisterFrame() {
     setTitle("Đăng ký tài khoản");
-    setSize(800, 500); // đồng bộ kích thước với LoginFrame
+    setSize(800, 500);
     setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     setLocationRelativeTo(null);
     setResizable(false);
@@ -32,7 +33,7 @@ public class RegisterFrame extends JFrame {
         }
       }
     };
-    backgroundPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 0, 60)); // Lui form xuống 60px
+    backgroundPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 0, 60));
 
     // Form trắng bo tròn
     JPanel formPanel = new JPanel(new GridBagLayout()) {
@@ -47,7 +48,7 @@ public class RegisterFrame extends JFrame {
       }
     };
     formPanel.setOpaque(false);
-    formPanel.setPreferredSize(new Dimension(450, 320));
+    formPanel.setPreferredSize(new Dimension(450, 380));
 
     GridBagConstraints gbc = new GridBagConstraints();
     gbc.insets = new Insets(10, 20, 10, 20);
@@ -78,7 +79,7 @@ public class RegisterFrame extends JFrame {
     txtUsername = new JTextField();
     txtUsername.setFont(new Font("Arial", Font.PLAIN, 14));
     txtUsername.setBackground(Color.WHITE);
-    txtUsername.setPreferredSize(new Dimension(220, 30)); // dài và cao hơn
+    txtUsername.setPreferredSize(new Dimension(220, 30));
     txtUsername.setBorder(roundedBorder);
     gbc.gridx = 1;
     formPanel.add(txtUsername, gbc);
@@ -93,15 +94,30 @@ public class RegisterFrame extends JFrame {
     txtPassword = new JPasswordField();
     txtPassword.setFont(new Font("Arial", Font.PLAIN, 14));
     txtPassword.setBackground(Color.WHITE);
-    txtPassword.setPreferredSize(new Dimension(220, 30)); // dài và cao hơn
+    txtPassword.setPreferredSize(new Dimension(220, 30));
     txtPassword.setBorder(roundedBorder);
     gbc.gridx = 1;
     formPanel.add(txtPassword, gbc);
 
+    // Phone
+    JLabel lblPhone = new JLabel("Phone:");
+    lblPhone.setFont(new Font("Arial", Font.PLAIN, 14));
+    gbc.gridy = 3;
+    gbc.gridx = 0;
+    formPanel.add(lblPhone, gbc);
+
+    txtPhone = new JTextField();
+    txtPhone.setFont(new Font("Arial", Font.PLAIN, 14));
+    txtPhone.setBackground(Color.WHITE);
+    txtPhone.setPreferredSize(new Dimension(220, 30));
+    txtPhone.setBorder(roundedBorder);
+    gbc.gridx = 1;
+    formPanel.add(txtPhone, gbc);
+
     // Role
     JLabel lblRole = new JLabel("Role:");
     lblRole.setFont(new Font("Arial", Font.PLAIN, 14));
-    gbc.gridy = 3;
+    gbc.gridy = 4;
     gbc.gridx = 0;
     formPanel.add(lblRole, gbc);
 
@@ -121,7 +137,7 @@ public class RegisterFrame extends JFrame {
     btnRegister.setPreferredSize(new Dimension(120, 35));
     btnRegister.setBorder(roundedBorder);
     gbc.gridx = 0;
-    gbc.gridy = 4;
+    gbc.gridy = 5;
     gbc.gridwidth = 2;
     gbc.anchor = GridBagConstraints.CENTER;
     formPanel.add(btnRegister, gbc);
@@ -134,7 +150,7 @@ public class RegisterFrame extends JFrame {
     btnBack.setFocusPainted(false);
     btnBack.setPreferredSize(new Dimension(120, 35));
     btnBack.setBorder(roundedBorder);
-    gbc.gridy = 5;
+    gbc.gridy = 6;
     formPanel.add(btnBack, gbc);
 
     // Thêm form vào nền
@@ -145,15 +161,16 @@ public class RegisterFrame extends JFrame {
     btnRegister.addActionListener(e -> {
       String username = txtUsername.getText().trim();
       String password = new String(txtPassword.getPassword()).trim();
+      String phone = txtPhone.getText().trim();
       String role = cbRole.getSelectedItem().toString();
 
-      if (username.isEmpty() || password.isEmpty()) {
+      if (username.isEmpty() || password.isEmpty() || phone.isEmpty()) {
         JOptionPane.showMessageDialog(this, "Vui lòng nhập đầy đủ thông tin!");
         return;
       }
 
       AccountDAO dao = new AccountDAO();
-      boolean success = dao.register(new Account(username, password, role));
+      boolean success = dao.register(new Account(username, password, phone, role));
 
       if (success) {
         JOptionPane.showMessageDialog(this, "Đăng ký thành công!");

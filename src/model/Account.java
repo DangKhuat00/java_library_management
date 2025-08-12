@@ -5,8 +5,17 @@ public class Account {
   private String username;
   private String password;
   private String role;
+  private String phone;
 
   public Account() {}
+
+  // Constructor đầy đủ
+  public Account(String username, String password, String phone, String role) {
+    this.username = username;
+    this.password = password;
+    this.phone = phone;
+    this.role = role;
+  }
 
   public Account(String username, String password, String role) {
     this.username = username;
@@ -19,8 +28,16 @@ public class Account {
     return id;
   }
 
+  public String getPhone() {
+    return phone;
+  }
+
   public void setId(int id) {
     this.id = id;
+  }
+
+  public void setPhone(String phone) {
+    this.phone = phone;
   }
 
   public String getUsername() {
