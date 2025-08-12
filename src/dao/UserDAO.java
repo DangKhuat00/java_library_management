@@ -4,6 +4,8 @@ package dao;
 
 // Import cac thu vien can thiet
 import model.User;
+import model.UserFilter;
+
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -184,23 +186,38 @@ public class UserDAO {
     }
 
     // Ham tim kiem nguoi dung theo tu khoa va bo loc
-    public List<User> searchUsers(String keyword, String filter) {
+    public List<User> searchUsers(String keyword, UserFilter filter) {
         List<User> users = new ArrayList<>();
         String sql;
 
         switch (filter) {
-            case "Name":
+            case ID:
+                sql = "SELECT * FROM users WHERE CAST(id AS CHAR) LIKE ?";
+                break;
+            case NAME:
                 sql = "SELECT * FROM users WHERE LOWER(name) LIKE ?";
                 break;
-            case "Email":
+            case EMAIL:
                 sql = "SELECT * FROM users WHERE LOWER(email) LIKE ?";
                 break;
-            case "Phone":
-                sql = "SELECT * FROM users WHERE LOWER(phone_number) LIKE ?";
+            case PHONE_NUMBER:
+                sql = "SELECT * FROM users WHERE LOWER(phoneNumber) LIKE ?";
                 break;
-            case "All Fields":
+            case BORROW_LIMIT:
+                sql = "SELECT * FROM users WHERE CAST(borrowLimit AS CHAR) LIKE ?";
+                break;
+            case BORROWED_COUNT:
+                sql = "SELECT * FROM users WHERE CAST(borrowedBooksCount AS CHAR) LIKE ?";
+                break;
+            case ALL_FIELDS:
             default:
-                sql = "SELECT * FROM users WHERE LOWER(name) LIKE ? OR LOWER(email) LIKE ? OR LOWER(phone_number) LIKE ?";
+                sql = "SELECT * FROM users WHERE " +
+                        "CAST(id AS CHAR) LIKE ? OR " +
+                        "LOWER(name) LIKE ? OR " +
+                        "LOWER(email) LIKE ? OR " +
+                        "LOWER(phoneNumber) LIKE ? OR " +
+                        "CAST(borrowLimit AS CHAR) LIKE ? OR " +
+                        "CAST(borrowedBooksCount AS CHAR) LIKE ?";
                 break;
         }
 
@@ -209,28 +226,32 @@ public class UserDAO {
 
             String searchKeyword = "%" + keyword.toLowerCase() + "%";
 
-            if ("All Fields".equals(filter)) {
+            if (filter == UserFilter.ALL_FIELDS) {
                 pstmt.setString(1, searchKeyword);
                 pstmt.setString(2, searchKeyword);
                 pstmt.setString(3, searchKeyword);
+                pstmt.setString(4, searchKeyword);
+                pstmt.setString(5, searchKeyword);
+                pstmt.setString(6, searchKeyword);
             } else {
                 pstmt.setString(1, searchKeyword);
             }
 
-            ResultSet rs = pstmt.executeQuery();
-            while (rs.next()) {
-                users.add(new User(
-                        rs.getInt("id"),
-                        rs.getString("name"),
-                        rs.getString("email"),
-                        rs.getString("phone_number"),
-                        rs.getInt("borrow_limit"),
-                        rs.getInt("borrowed_books_count")));
+            try (ResultSet rs = pstmt.executeQuery()) {
+                while (rs.next()) {
+                    users.add(new User(
+                            rs.getInt("id"),
+                            rs.getString("name"),
+                            rs.getString("email"),
+                            rs.getString("phoneNumber"),
+                            rs.getInt("borrowLimit"),
+                            rs.getInt("borrowedBooksCount")));
+                }
             }
         } catch (SQLException e) {
-            // In ra loi neu co loi khi tim kiem
             e.printStackTrace();
         }
         return users;
     }
+
 }
