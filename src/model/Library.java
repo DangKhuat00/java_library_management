@@ -64,6 +64,10 @@ public class Library {
         return userDAO.insertUser(user);
     }
 
+    public boolean phoneExists(String phone) {
+        return userDAO.phoneExists(phone);
+    }
+
     public boolean deleteUser(int id) {
         return userDAO.deleteUser(id);
     }

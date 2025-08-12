@@ -64,7 +64,7 @@ public class UserPanel extends JPanel {
         btnSearch = new JButton("🔍 Search");
         btnReset = new JButton("Reset");
         cbFilter = new JComboBox<>(new String[] { "All Fields", "Id", "Name", "Email", "PhoneNumber", "BorrowLimit",
-                "BorrowedBooksCount" });
+                "BorrowedCount" });
         JLabel lblFilter = new JLabel("Filter by:");
 
         // Thêm các thành phần theo thứ tự mới: Filter -> Search
@@ -106,7 +106,7 @@ public class UserPanel extends JPanel {
         add(northPanel, BorderLayout.NORTH);
 
         // ===== Bảng dữ liệu =====
-        String[] columns = { "ID", "Name", "Email", "Phone", "Borrow Limit", "Borrowed Count" };
+        String[] columns = { "ID", "Name", "Email", "PhoneNumber", "BorrowLimit", "BorrowedCount" };
         tableModel = new DefaultTableModel(columns, 0) {
             @Override
             public boolean isCellEditable(int row, int col) {
@@ -180,21 +180,22 @@ public class UserPanel extends JPanel {
         btnClear.addActionListener(e -> clearForm());
 
         btnAdd.addActionListener(e -> {
-            if (validateInput()) {
-                User user = new User(
-                        tfName.getText().trim(),
-                        tfEmail.getText().trim(),
-                        tfPhone.getText().trim(),
-                        Integer.parseInt(tfBorrowLimit.getText().trim()),
-                        0 // THAY ĐỔI: Người dùng mới luôn có 0 sách đã mượn
-                );
-                if (library.addUser(user)) {
-                    JOptionPane.showMessageDialog(this, "User added successfully.");
-                    loadAllUsers();
-                    clearForm();
-                } else {
-                    JOptionPane.showMessageDialog(this, "Failed to add user.");
-                }
+            if (!validateInput())
+                return;
+
+            User user = new User(
+                    tfName.getText().trim(),
+                    tfEmail.getText().trim(),
+                    tfPhone.getText().trim(),
+                    Integer.parseInt(tfBorrowLimit.getText().trim()),
+                    0);
+
+            if (library.addUser(user)) {
+                JOptionPane.showMessageDialog(this, "User added successfully.");
+                loadAllUsers();
+                clearForm();
+            } else {
+                JOptionPane.showMessageDialog(this, "Phone number already exists or failed to add user.");
             }
         });
 
@@ -265,7 +266,7 @@ public class UserPanel extends JPanel {
                 case "BorrowLimit":
                     filter = UserFilter.BORROW_LIMIT;
                     break;
-                case "BorrowedBooksCount":
+                case "BorrowedCount":
                     filter = UserFilter.BORROWED_COUNT;
                     break;
                 default:

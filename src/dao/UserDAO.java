@@ -13,11 +13,32 @@ import java.util.List;
 // Lop xu ly cac thao tac voi nguoi dung
 public class UserDAO {
 
+    public boolean phoneExists(String phone) {
+        String sql = "SELECT COUNT(*) FROM users WHERE phoneNumber = ?";
+        try (Connection conn = DatabaseConnection.getConnection();
+                PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, phone);
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1) > 0;
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
     /**
      * Them nguoi dung moi vao co so du lieu
      */
     // Ham them nguoi dung moi
     public boolean insertUser(User user) {
+        if (phoneExists(user.getPhoneNumber())) {
+            System.err.println("Error: Phone number already exists.");
+            return false;
+        }
+
         String sql = "INSERT INTO users (name, email, phoneNumber, borrowLimit, borrowedBooksCount) VALUES (?, ?, ?, ?, ?)";
 
         try (Connection conn = DatabaseConnection.getConnection();

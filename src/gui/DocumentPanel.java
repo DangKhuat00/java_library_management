@@ -310,6 +310,7 @@ public class DocumentPanel extends JPanel {
                     break;
                 case "Available":
                     filter = DocumentFilter.IS_AVAILABLE;
+                    break;
                 default:
                     filter = DocumentFilter.ALL_FIELDS;
                     break;

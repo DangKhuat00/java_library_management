@@ -154,83 +154,91 @@ public class DocumentDAO {
     }
 
     public List<Document> searchDocuments(String keyword, DocumentFilter filter) {
-    List<Document> documents = new ArrayList<>();
-    String sql;
+        List<Document> documents = new ArrayList<>();
+        String sql;
 
-    switch (filter) {
-        case ID:
-            sql = "SELECT * FROM documents WHERE CAST(id AS CHAR) LIKE ?";
-            break;
-        case TITLE:
-            sql = "SELECT * FROM documents WHERE LOWER(title) LIKE ?";
-            break;
-        case AUTHOR:
-            sql = "SELECT * FROM documents WHERE LOWER(author) LIKE ?";
-            break;
-        case LANGUAGE:
-            sql = "SELECT * FROM documents WHERE LOWER(language) LIKE ?";
-            break;
-        case PAGES:
-            sql = "SELECT * FROM documents WHERE CAST(pages AS CHAR) LIKE ?";
-            break;
-        case PUBLICATION_YEAR:
-            sql = "SELECT * FROM documents WHERE CAST(publication_year AS CHAR) LIKE ?";
-            break;
-        case IS_AVAILABLE:
-            sql = "SELECT * FROM documents WHERE is_available = ?";
-            break;
-        case ALL_FIELDS:
-        default:
-            sql = """
-                SELECT * FROM documents
-                WHERE CAST(id AS CHAR) LIKE ?
-                   OR LOWER(title) LIKE ?
-                   OR LOWER(author) LIKE ?
-                   OR LOWER(language) LIKE ?
-                   OR CAST(pages AS CHAR) LIKE ?
-                   OR CAST(publication_year AS CHAR) LIKE ?
-                   OR is_available = ?
-                """;
-            break;
-    }
-
-    try (Connection conn = DatabaseConnection.getConnection();
-         PreparedStatement pstmt = conn.prepareStatement(sql)) {
-
-        String like = "%" + keyword.toLowerCase() + "%";
-
-        if (filter == DocumentFilter.ALL_FIELDS) {
-            boolean availableMatch = "available".equalsIgnoreCase(keyword) || "true".equalsIgnoreCase(keyword);
-            pstmt.setString(1, like); // id
-            pstmt.setString(2, like); // title
-            pstmt.setString(3, like); // author
-            pstmt.setString(4, like); // language
-            pstmt.setString(5, like); // pages
-            pstmt.setString(6, like); // publication_year
-            pstmt.setBoolean(7, availableMatch);
-        } else if (filter == DocumentFilter.IS_AVAILABLE) {
-            boolean availableMatch = "available".equalsIgnoreCase(keyword) || "true".equalsIgnoreCase(keyword);
-            pstmt.setBoolean(1, availableMatch);
-        } else {
-            pstmt.setString(1, like);
+        switch (filter) {
+            case ID:
+                sql = "SELECT * FROM documents WHERE CAST(id AS CHAR) LIKE ?";
+                break;
+            case TITLE:
+                sql = "SELECT * FROM documents WHERE LOWER(title) LIKE ?";
+                break;
+            case AUTHOR:
+                sql = "SELECT * FROM documents WHERE LOWER(author) LIKE ?";
+                break;
+            case LANGUAGE:
+                sql = "SELECT * FROM documents WHERE LOWER(language) LIKE ?";
+                break;
+            case PAGES:
+                sql = "SELECT * FROM documents WHERE CAST(pages AS CHAR) LIKE ?";
+                break;
+            case PUBLICATION_YEAR:
+                sql = "SELECT * FROM documents WHERE CAST(publication_year AS CHAR) LIKE ?";
+                break;
+            case IS_AVAILABLE:
+                sql = "SELECT * FROM documents WHERE is_available = ?";
+                break;
+            case ALL_FIELDS:
+            default:
+                sql = """
+                        SELECT * FROM documents
+                        WHERE CAST(id AS CHAR) LIKE ?
+                           OR LOWER(title) LIKE ?
+                           OR LOWER(author) LIKE ?
+                           OR LOWER(language) LIKE ?
+                           OR CAST(pages AS CHAR) LIKE ?
+                           OR CAST(publication_year AS CHAR) LIKE ?
+                           OR is_available = ?
+                        """;
+                break;
         }
 
-        try (ResultSet rs = pstmt.executeQuery()) {
-            while (rs.next()) {
-                documents.add(new Document(
-                        rs.getInt("id"),
-                        rs.getString("title"),
-                        rs.getString("language"),
-                        rs.getInt("pages"),
-                        rs.getString("author"),
-                        rs.getInt("publication_year"),
-                        rs.getBoolean("is_available")));
+        try (Connection conn = DatabaseConnection.getConnection();
+                PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            String like = "%" + keyword.toLowerCase() + "%";
+
+            if (filter == DocumentFilter.ALL_FIELDS) {
+                boolean availableMatch = startsWithIgnoreCase("true", keyword)
+                        || startsWithIgnoreCase("available", keyword);
+                pstmt.setString(1, like); // id
+                pstmt.setString(2, like); // title
+                pstmt.setString(3, like); // author
+                pstmt.setString(4, like); // language
+                pstmt.setString(5, like); // pages
+                pstmt.setString(6, like); // publication_year
+                pstmt.setBoolean(7, availableMatch);
+            } else if (filter == DocumentFilter.IS_AVAILABLE) {
+                boolean availableMatch = startsWithIgnoreCase("true", keyword)
+                        || startsWithIgnoreCase("available", keyword);
+                pstmt.setBoolean(1, availableMatch);
+            } else {
+                pstmt.setString(1, like);
             }
+
+            try (ResultSet rs = pstmt.executeQuery()) {
+                while (rs.next()) {
+                    documents.add(new Document(
+                            rs.getInt("id"),
+                            rs.getString("title"),
+                            rs.getString("language"),
+                            rs.getInt("pages"),
+                            rs.getString("author"),
+                            rs.getInt("publication_year"),
+                            rs.getBoolean("is_available")));
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
-    } catch (SQLException e) {
-        e.printStackTrace();
+
+        return documents;
     }
 
-    return documents;
-}
+    // Hàm helper để so sánh bắt đầu bằng (không phân biệt hoa thường)
+    private boolean startsWithIgnoreCase(String target, String input) {
+        return target.toLowerCase().startsWith(input.toLowerCase());
+    }
+
 }
