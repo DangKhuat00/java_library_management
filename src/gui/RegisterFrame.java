@@ -185,7 +185,7 @@ public class RegisterFrame extends JFrame {
         JOptionPane.showMessageDialog(this, "Đăng ký thất bại! Tài khoản có thể đã tồn tại.");
       }
     });
-  
+
     // Sự kiện nút Quay lại
     btnBack.addActionListener(e -> {
       new LoginFrame().setVisible(true);

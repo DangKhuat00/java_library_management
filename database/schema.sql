@@ -46,3 +46,5 @@ CREATE TABLE accounts (
 );
 ALTER TABLE accounts
 ADD COLUMN phone VARCHAR(15) AFTER password;
+ALTER TABLE accounts
+ADD COLUMN email VARCHAR(100);
