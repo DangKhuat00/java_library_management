@@ -6,7 +6,8 @@ echo ========================================
 cd src
 
 echo ⚙️  Compiling Java files...
-javac -cp ".;../lib/*" gui/*.java model/*.java dao/*.java config/*.java
+javac -encoding UTF-8 -cp ".;../lib/*" gui/*.java model/*.java dao/*.java config/*.java
+
 
 if %ERRORLEVEL% NEQ 0 (
     echo ❌ Compilation failed!
