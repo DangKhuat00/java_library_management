@@ -15,7 +15,6 @@ CREATE TABLE users (
 );
 
 -- Create documents table
--- Create documents table
 CREATE TABLE documents (
     id INT AUTO_INCREMENT PRIMARY KEY,
     title VARCHAR(255) NOT NULL,
@@ -39,7 +38,22 @@ CREATE TABLE borrowed_documents (
 
 ALTER TABLE users ADD CONSTRAINT unique_phone UNIQUE (phoneNumber);
 
+-- Create accounts table
+CREATE TABLE accounts (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    username VARCHAR(50) NOT NULL UNIQUE,
+    password VARCHAR(255) NOT NULL,
+    user_id INT,
+    FOREIGN KEY (user_id) REFERENCES users(id)
+);
 
+ALTER TABLE accounts
+ADD COLUMN phone VARCHAR(15) AFTER password;
+
+ALTER TABLE accounts
+ADD COLUMN email VARCHAR(100);
+
+-- Insert sample documents
 INSERT INTO documents (title, language, pages, author, publication_year, is_available) VALUES
 ('Truyện Kiều', 'Tiếng Việt', 254, 'Nguyễn Du', 1820, TRUE),
 ('Nỗi Buồn Chiến Tranh', 'Tiếng Việt', 283, 'Bảo Ninh', 1991, TRUE),
