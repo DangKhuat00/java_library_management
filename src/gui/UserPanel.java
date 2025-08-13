@@ -1,6 +1,7 @@
 package gui;
 
 import model.User;
+import model.UserFilter;
 import model.Library;
 
 import javax.swing.*;
@@ -62,7 +63,8 @@ public class UserPanel extends JPanel {
         tfSearch.setPreferredSize(new Dimension(250, 28)); // Giảm chiều rộng để cân đối
         btnSearch = new JButton("🔍 Search");
         btnReset = new JButton("Reset");
-        cbFilter = new JComboBox<>(new String[] { "All Fields", "Name", "Email", "Phone" });
+        cbFilter = new JComboBox<>(new String[] { "All Fields", "Id", "Name", "Email", "PhoneNumber", "BorrowLimit",
+                "BorrowedCount" });
         JLabel lblFilter = new JLabel("Filter by:");
 
         // Thêm các thành phần theo thứ tự mới: Filter -> Search
@@ -104,7 +106,7 @@ public class UserPanel extends JPanel {
         add(northPanel, BorderLayout.NORTH);
 
         // ===== Bảng dữ liệu =====
-        String[] columns = { "ID", "Name", "Email", "Phone", "Borrow Limit", "Borrowed Count" };
+        String[] columns = { "ID", "Name", "Email", "PhoneNumber", "BorrowLimit", "BorrowedCount" };
         tableModel = new DefaultTableModel(columns, 0) {
             @Override
             public boolean isCellEditable(int row, int col) {
@@ -178,21 +180,22 @@ public class UserPanel extends JPanel {
         btnClear.addActionListener(e -> clearForm());
 
         btnAdd.addActionListener(e -> {
-            if (validateInput()) {
-                User user = new User(
-                        tfName.getText().trim(),
-                        tfEmail.getText().trim(),
-                        tfPhone.getText().trim(),
-                        Integer.parseInt(tfBorrowLimit.getText().trim()),
-                        0 // THAY ĐỔI: Người dùng mới luôn có 0 sách đã mượn
-                );
-                if (library.addUser(user)) {
-                    JOptionPane.showMessageDialog(this, "User added successfully.");
-                    loadAllUsers();
-                    clearForm();
-                } else {
-                    JOptionPane.showMessageDialog(this, "Failed to add user.");
-                }
+            if (!validateInput())
+                return;
+
+            User user = new User(
+                    tfName.getText().trim(),
+                    tfEmail.getText().trim(),
+                    tfPhone.getText().trim(),
+                    Integer.parseInt(tfBorrowLimit.getText().trim()),
+                    0);
+
+            if (library.addUser(user)) {
+                JOptionPane.showMessageDialog(this, "User added successfully.");
+                loadAllUsers();
+                clearForm();
+            } else {
+                JOptionPane.showMessageDialog(this, "Phone number already exists or failed to add user.");
             }
         });
 
@@ -244,9 +247,36 @@ public class UserPanel extends JPanel {
                 JOptionPane.showMessageDialog(this, "Please enter a search keyword.");
                 return;
             }
-            String filter = cbFilter.getSelectedItem().toString();
+
+            // Xác định bộ lọc
+            UserFilter filter;
+            switch (cbFilter.getSelectedItem().toString()) {
+                case "Id":
+                    filter = UserFilter.ID;
+                    break;
+                case "Name":
+                    filter = UserFilter.NAME;
+                    break;
+                case "Email":
+                    filter = UserFilter.EMAIL;
+                    break;
+                case "PhoneNumber":
+                    filter = UserFilter.PHONE_NUMBER;
+                    break;
+                case "BorrowLimit":
+                    filter = UserFilter.BORROW_LIMIT;
+                    break;
+                case "BorrowedCount":
+                    filter = UserFilter.BORROWED_COUNT;
+                    break;
+                default:
+                    filter = UserFilter.ALL_FIELDS;
+            }
+
+            // Lấy dữ liệu tìm kiếm
             List<User> users = library.findUsers(keyword, filter);
 
+            // Đổ dữ liệu vào bảng
             tableModel.setRowCount(0);
             for (User user : users) {
                 tableModel.addRow(new Object[] {
@@ -258,12 +288,31 @@ public class UserPanel extends JPanel {
                         user.getBorrowedBooksCount()
                 });
             }
+
+            // Gán renderer highlight mới
+            for (int i = 0; i < table.getColumnCount(); i++) {
+                table.getColumnModel().getColumn(i)
+                        .setCellRenderer(new HighlightRenderer(keyword, cbFilter.getSelectedItem().toString()));
+            }
+
+            table.repaint();
         });
 
         btnReset.addActionListener(e -> {
+            // Xóa ô tìm kiếm + reset combobox
             tfSearch.setText("");
             cbFilter.setSelectedIndex(0);
+
+            // Nạp lại toàn bộ user
             loadAllUsers();
+
+            // Xóa highlight bằng renderer rỗng
+            for (int i = 0; i < table.getColumnCount(); i++) {
+                table.getColumnModel().getColumn(i)
+                        .setCellRenderer(new HighlightRenderer("", ""));
+            }
+
+            table.repaint();
         });
 
         table.getSelectionModel().addListSelectionListener(e -> {

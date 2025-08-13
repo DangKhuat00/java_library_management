@@ -13,14 +13,15 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
+// ========================== BorrowPanel ==========================
 public class BorrowPanel extends JPanel {
     private final Library library;
     private JTable table;
     private DefaultTableModel tableModel;
 
-    private JTextField tfUserId, tfDocId, tfDocTitle, tfBorrowDate, tfReturnDate, tfSearch;
+    private RoundedTextField tfUserId, tfDocId, tfDocTitle, tfBorrowDate, tfReturnDate, tfSearch;
     private JComboBox<String> cbFilter;
-    private JButton btnBorrow, btnReturn, btnClear, btnSearch, btnReset;
+    private RoundedButton btnBorrow, btnReturn, btnClear, btnSearch, btnReset;
     private final SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 
     public BorrowPanel() {
@@ -35,11 +36,11 @@ public class BorrowPanel extends JPanel {
         setBorder(BorderFactory.createEmptyBorder(8, 8, 8, 8));
 
         // ===== Form nhập (bên trái) =====
-        JPanel formPanel = new JPanel(new GridLayout(5, 1, 0, 8));
+        JPanel formPanel = new BackgroundPanel("assets/bg_form.png"); // Thêm ảnh nền
+        formPanel.setLayout(new GridLayout(5, 1, 0, 8));
+
         tfUserId = createField("User ID:", formPanel, 200, true);
         tfDocId = createField("Document ID:", formPanel, 200, true);
-
-        // THAY ĐỔI: Các trường này sẽ không thể chỉnh sửa
         tfDocTitle = createField("Document Title:", formPanel, 200, false);
         tfBorrowDate = createField("Borrow Date:", formPanel, 200, false);
         tfReturnDate = createField("Return Date:", formPanel, 200, false);
@@ -50,12 +51,13 @@ public class BorrowPanel extends JPanel {
 
         // --- Panel Lọc và Tìm kiếm ---
         JPanel searchAndFilterPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 5, 0));
-        tfSearch = new JTextField();
+        tfSearch = new RoundedTextField();
         tfSearch.setPreferredSize(new Dimension(250, 28));
-        btnSearch = new JButton("🔍 Search");
-        btnReset = new JButton("Reset");
-        cbFilter = new JComboBox<>(new String[] { "All Fields", "User ID", "Document ID", "Document Title" });
+        btnSearch = new RoundedButton("🔍 Search");
+        btnReset = new RoundedButton("Reset");
+        cbFilter = new JComboBox<>(new String[]{"All Fields", "User ID", "Document ID", "Document Title"});
         JLabel lblFilter = new JLabel("Filter by:");
+        lblFilter.setFont(new Font("Segoe UI", Font.BOLD, 13));
 
         searchAndFilterPanel.add(lblFilter);
         searchAndFilterPanel.add(cbFilter);
@@ -66,9 +68,9 @@ public class BorrowPanel extends JPanel {
 
         // --- Panel Nút chức năng ---
         JPanel actionButtonPanel = new JPanel(new GridLayout(1, 3, 10, 5));
-        btnBorrow = new JButton("Borrow");
-        btnReturn = new JButton("Return");
-        btnClear = new JButton("Clear Form");
+        btnBorrow = new RoundedButton("Borrow");
+        btnReturn = new RoundedButton("Return");
+        btnClear = new RoundedButton("Clear Form");
         actionButtonPanel.add(btnBorrow);
         actionButtonPanel.add(btnReturn);
         actionButtonPanel.add(btnClear);
@@ -91,11 +93,12 @@ public class BorrowPanel extends JPanel {
         northPanel.add(rightPanel, BorderLayout.CENTER);
         add(northPanel, BorderLayout.NORTH);
 
+        // ===== Bảng =====
         tableModel = new DefaultTableModel(
-                new String[] { "User ID", "Doc ID", "Document Title", "Borrow Date", "Return Date" }, 0) {
+                new String[]{"User ID", "Doc ID", "Document Title", "Borrow Date", "Return Date"}, 0) {
             @Override
             public boolean isCellEditable(int row, int column) {
-                return false; // Toàn bộ bảng không thể sửa
+                return false;
             }
         };
         table = new JTable(tableModel);
@@ -105,14 +108,12 @@ public class BorrowPanel extends JPanel {
     }
 
     private void setupEvents() {
-        // --- Sự kiện cho các nút ---
         btnBorrow.addActionListener(e -> borrowDocument());
         btnReturn.addActionListener(e -> returnDocument());
         btnClear.addActionListener(e -> clearForm());
         btnSearch.addActionListener(e -> searchBorrowRecords());
         btnReset.addActionListener(e -> resetSearch());
 
-        // --- Tự động điền tên sách khi nhập xong Document ID ---
         tfDocId.addFocusListener(new FocusAdapter() {
             @Override
             public void focusLost(FocusEvent e) {
@@ -120,7 +121,6 @@ public class BorrowPanel extends JPanel {
             }
         });
 
-        // --- Điền form khi chọn một dòng trong bảng ---
         table.getSelectionModel().addListSelectionListener(e -> {
             if (!e.getValueIsAdjusting() && table.getSelectedRow() != -1) {
                 int row = table.getSelectedRow();
@@ -134,8 +134,7 @@ public class BorrowPanel extends JPanel {
         });
     }
 
-    // --- Các hàm xử lý logic ---
-
+    // ========================== Logic ==========================
     private void borrowDocument() {
         String userId = tfUserId.getText().trim();
         String docId = tfDocId.getText().trim();
@@ -144,13 +143,10 @@ public class BorrowPanel extends JPanel {
                     JOptionPane.ERROR_MESSAGE);
             return;
         }
-        // Ngày mượn sẽ được xử lý tự động trong DAO
         if (library.borrowDocument(userId, docId)) {
-            // Thông báo thành công đã có trong lớp Library, không cần lặp lại
             loadBorrowData();
             clearForm();
         }
-        // Thông báo lỗi cũng đã có trong lớp Library
     }
 
     private void returnDocument() {
@@ -161,7 +157,6 @@ public class BorrowPanel extends JPanel {
                     JOptionPane.ERROR_MESSAGE);
             return;
         }
-        // Ngày trả sẽ được xử lý tự động trong DAO
         if (library.returnDocument(userId, docId)) {
             loadBorrowData();
             clearForm();
@@ -176,7 +171,7 @@ public class BorrowPanel extends JPanel {
                 Document doc = library.getDocumentById(docId);
                 if (doc != null) {
                     tfDocTitle.setText(doc.getTitle());
-                    tfBorrowDate.setText(sdf.format(new Date())); // Tự điền ngày hiện tại
+                    tfBorrowDate.setText(sdf.format(new Date()));
                 } else {
                     tfDocTitle.setText("Document not found");
                 }
@@ -192,12 +187,10 @@ public class BorrowPanel extends JPanel {
             JOptionPane.showMessageDialog(this, "Please enter a search keyword.");
             return;
         }
-        // Implement search logic if you have it in your Library/DAO
-        // For now, let's assume a client-side search
         List<BorrowRecord> allRecords = library.getAllBorrowRecords();
         String filter = cbFilter.getSelectedItem().toString();
 
-        tableModel.setRowCount(0); // Clear table
+        tableModel.setRowCount(0);
         allRecords.stream()
                 .filter(record -> matchesFilter(record, keyword, filter))
                 .forEach(this::addBorrowRecordToTable);
@@ -209,18 +202,18 @@ public class BorrowPanel extends JPanel {
         loadBorrowData();
     }
 
-    // --- Các hàm tiện ích ---
-
-    private JTextField createField(String label, JPanel parent, int width, boolean editable) {
+    private RoundedTextField createField(String label, JPanel parent, int width, boolean editable) {
         JPanel fieldPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 5, 0));
         JLabel lb = new JLabel(label);
+        lb.setFont(new Font("Segoe UI", Font.BOLD, 13));
         lb.setPreferredSize(new Dimension(150, 28));
-        JTextField tf = new JTextField();
+        RoundedTextField tf = new RoundedTextField();
         tf.setPreferredSize(new Dimension(width, 28));
         tf.setEditable(editable);
         if (!editable) {
-            tf.setBackground(new Color(230, 230, 230)); // Màu xám cho trường không thể sửa
+            tf.setBackground(new Color(230, 230, 230));
         }
+        fieldPanel.setOpaque(false);
         fieldPanel.add(lb);
         fieldPanel.add(tf);
         parent.add(fieldPanel);
@@ -234,7 +227,7 @@ public class BorrowPanel extends JPanel {
     }
 
     private void addBorrowRecordToTable(BorrowRecord b) {
-        tableModel.addRow(new Object[] {
+        tableModel.addRow(new Object[]{
                 b.userId,
                 b.documentId,
                 b.documentTitle,
@@ -252,7 +245,7 @@ public class BorrowPanel extends JPanel {
                 return record.documentId.toLowerCase().contains(lowerKeyword);
             case "Document Title":
                 return record.documentTitle.toLowerCase().contains(lowerKeyword);
-            default: // All Fields
+            default:
                 return record.userId.toLowerCase().contains(lowerKeyword) ||
                         record.documentId.toLowerCase().contains(lowerKeyword) ||
                         record.documentTitle.toLowerCase().contains(lowerKeyword);
@@ -266,5 +259,78 @@ public class BorrowPanel extends JPanel {
         tfBorrowDate.setText("");
         tfReturnDate.setText("");
         table.clearSelection();
+    }
+}
+
+// ========================== RoundedButton ==========================
+class RoundedButton extends JButton {
+    public RoundedButton(String text) {
+        super(text);
+        setContentAreaFilled(false);
+        setFocusPainted(false);
+        setBorderPainted(false);
+        setForeground(Color.WHITE);
+        setFont(new Font("Segoe UI", Font.BOLD, 14));
+    }
+
+    @Override
+    protected void paintComponent(Graphics g) {
+        Graphics2D g2 = (Graphics2D) g.create();
+        g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+
+        GradientPaint gp = new GradientPaint(0, 0, new Color(66, 133, 244),
+                                             0, getHeight(), new Color(30, 87, 153));
+        g2.setPaint(gp);
+        g2.fillRoundRect(0, 0, getWidth(), getHeight(), 20, 20);
+
+        super.paintComponent(g);
+        g2.dispose();
+    }
+}
+
+// ========================== RoundedTextField ==========================
+class RoundedTextField extends JTextField {
+    public RoundedTextField() {
+        setOpaque(false);
+        setBorder(BorderFactory.createEmptyBorder(5, 10, 5, 10));
+        setFont(new Font("Segoe UI", Font.PLAIN, 14));
+    }
+
+    public RoundedTextField(int columns) {
+        this();
+        setColumns(columns);
+    }
+
+    @Override
+    protected void paintComponent(Graphics g) {
+        Graphics2D g2 = (Graphics2D) g.create();
+        g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+        g2.setColor(Color.WHITE);
+        g2.fillRoundRect(0, 0, getWidth(), getHeight(), 15, 15);
+        g2.setColor(Color.GRAY);
+        g2.drawRoundRect(0, 0, getWidth() - 1, getHeight() - 1, 15, 15);
+        super.paintComponent(g);
+        g2.dispose();
+    }
+}
+
+// ========================== BackgroundPanel ==========================
+class BackgroundPanel extends JPanel {
+    private Image backgroundImage;
+
+    public BackgroundPanel(String imagePath) {
+        try {
+            backgroundImage = new ImageIcon(imagePath).getImage();
+        } catch (Exception e) {
+            System.out.println("Không thể tải ảnh nền: " + imagePath);
+        }
+    }
+
+    @Override
+    protected void paintComponent(Graphics g) {
+        super.paintComponent(g);
+        if (backgroundImage != null) {
+            g.drawImage(backgroundImage, 0, 0, getWidth(), getHeight(), this);
+        }
     }
 }
