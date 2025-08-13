@@ -31,6 +31,7 @@ public class HighlightRenderer extends DefaultTableCellRenderer {
 
         JLabel label = (JLabel) super.getTableCellRendererComponent(
                 table, value, isSelected, hasFocus, row, column);
+                
 
         String columnName = table.getColumnName(column);
 

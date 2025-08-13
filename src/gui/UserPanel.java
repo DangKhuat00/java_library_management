@@ -10,7 +10,7 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.table.JTableHeader;
 import java.awt.*;
 import java.util.List;
-import gui.RoundedButton;
+
 public class UserPanel extends JPanel {
     private Library library;
     private JTable table;
@@ -47,9 +47,8 @@ public class UserPanel extends JPanel {
         tfEmail = createField("Email:", formPanel, 250);
         tfPhone = createField("Phone:", formPanel, 250);
         tfBorrowLimit = createField("Borrow Limit:", formPanel, 250);
-        tfBorrowLimit.setText("10"); // Mặc định giới hạn mượn
+        tfBorrowLimit.setText("10");
         tfBorrowedCount = createField("Borrowed Count:", formPanel, 250);
-
         tfBorrowedCount.setText("0");
         tfBorrowedCount.setEditable(false);
 
@@ -67,7 +66,8 @@ public class UserPanel extends JPanel {
         btnSearch.setPreferredSize(BTN_SIZE_SMALL);
         btnReset = new RoundedButton("Reset");
         btnReset.setPreferredSize(BTN_SIZE_SMALL);
-        cbFilter = new JComboBox<>(new String[] { "All Fields", "Id", "Name", "Email", "PhoneNumber", "BorrowLimit", "BorrowedCount" });
+        cbFilter = new JComboBox<>(
+                new String[] { "All Fields", "Id", "Name", "Email", "PhoneNumber", "BorrowLimit", "BorrowedCount" });
         cbFilter.setPreferredSize(new Dimension(140, 30));
         JLabel lblFilter = new JLabel("Filter by:");
         lblFilter.setFont(new Font("Segoe UI", Font.BOLD, 13));
@@ -108,7 +108,6 @@ public class UserPanel extends JPanel {
         rightPanel.add(Box.createVerticalGlue());
 
         northPanel.add(rightPanel, BorderLayout.CENTER);
-
         add(northPanel, BorderLayout.NORTH);
 
         // ===== Bảng dữ liệu =====
@@ -125,7 +124,7 @@ public class UserPanel extends JPanel {
         table.setShowGrid(false);
         table.setDefaultRenderer(Object.class, new GridCellRenderer());
 
-        // Header: in đậm, chữ hoa, căn giữa, kẻ vạch nhẹ
+        // Header style
         JTableHeader header = table.getTableHeader();
         header.setReorderingAllowed(false);
         header.setDefaultRenderer(new HeaderCellRenderer(table));
@@ -153,21 +152,21 @@ public class UserPanel extends JPanel {
         List<User> users = library.getAllUsers();
         for (User user : users) {
             tableModel.addRow(new Object[] {
-                user.getId(),
-                user.getName(),
-                user.getEmail(),
-                user.getPhoneNumber(),
-                user.getBorrowLimit(),
-                user.getBorrowedBooksCount()
+                    user.getId(),
+                    user.getName(),
+                    user.getEmail(),
+                    user.getPhoneNumber(),
+                    user.getBorrowLimit(),
+                    user.getBorrowedBooksCount()
             });
         }
     }
 
     private boolean validateInput() {
         if (tfName.getText().trim().isEmpty() ||
-            tfEmail.getText().trim().isEmpty() ||
-            tfPhone.getText().trim().isEmpty() ||
-            tfBorrowLimit.getText().trim().isEmpty()) {
+                tfEmail.getText().trim().isEmpty() ||
+                tfPhone.getText().trim().isEmpty() ||
+                tfBorrowLimit.getText().trim().isEmpty()) {
             JOptionPane.showMessageDialog(this, "Please fill all fields except Borrowed Count.");
             return false;
         }
@@ -198,11 +197,11 @@ public class UserPanel extends JPanel {
                 return;
 
             User user = new User(
-                tfName.getText().trim(),
-                tfEmail.getText().trim(),
-                tfPhone.getText().trim(),
-                Integer.parseInt(tfBorrowLimit.getText().trim()),
-                0);
+                    tfName.getText().trim(),
+                    tfEmail.getText().trim(),
+                    tfPhone.getText().trim(),
+                    Integer.parseInt(tfBorrowLimit.getText().trim()),
+                    0);
 
             if (library.addUser(user)) {
                 JOptionPane.showMessageDialog(this, "User added successfully.");
@@ -220,12 +219,12 @@ public class UserPanel extends JPanel {
             }
             if (validateInput()) {
                 User user = new User(
-                    selectedId,
-                    tfName.getText().trim(),
-                    tfEmail.getText().trim(),
-                    tfPhone.getText().trim(),
-                    Integer.parseInt(tfBorrowLimit.getText().trim()),
-                    Integer.parseInt(tfBorrowedCount.getText().trim()));
+                        selectedId,
+                        tfName.getText().trim(),
+                        tfEmail.getText().trim(),
+                        tfPhone.getText().trim(),
+                        Integer.parseInt(tfBorrowLimit.getText().trim()),
+                        Integer.parseInt(tfBorrowedCount.getText().trim()));
                 if (library.updateUser(user)) {
                     JOptionPane.showMessageDialog(this, "User updated successfully.");
                     loadAllUsers();
@@ -242,7 +241,7 @@ public class UserPanel extends JPanel {
                 return;
             }
             int confirm = JOptionPane.showConfirmDialog(
-                this, "Are you sure to delete this user?", "Confirm", JOptionPane.YES_NO_OPTION);
+                    this, "Are you sure to delete this user?", "Confirm", JOptionPane.YES_NO_OPTION);
             if (confirm == JOptionPane.YES_OPTION) {
                 if (library.deleteUser(selectedId)) {
                     JOptionPane.showMessageDialog(this, "User removed successfully.");
@@ -262,47 +261,49 @@ public class UserPanel extends JPanel {
             }
 
             UserFilter filter;
-            switch (cbFilter.getSelectedItem().toString()) {
-                case "Id":
-                    filter = UserFilter.ID;
-                    break;
-                case "Name":
-                    filter = UserFilter.NAME;
-                    break;
-                case "Email":
-                    filter = UserFilter.EMAIL;
-                    break;
-                case "PhoneNumber":
-                    filter = UserFilter.PHONE_NUMBER;
-                    break;
-                case "BorrowLimit":
-                    filter = UserFilter.BORROW_LIMIT;
-                    break;
-                case "BorrowedCount":
-                    filter = UserFilter.BORROWED_COUNT;
-                    break;
-                default:
-                    filter = UserFilter.ALL_FIELDS;
+            String filterText = cbFilter.getSelectedItem().toString();
+            switch (filterText) {
+                case "Id": filter = UserFilter.ID; break;
+                case "Name": filter = UserFilter.NAME; break;
+                case "Email": filter = UserFilter.EMAIL; break;
+                case "PhoneNumber": filter = UserFilter.PHONE_NUMBER; break;
+                case "BorrowLimit": filter = UserFilter.BORROW_LIMIT; break;
+                case "BorrowedCount": filter = UserFilter.BORROWED_COUNT; break;
+                default: filter = UserFilter.ALL_FIELDS;
             }
 
             List<User> users = library.findUsers(keyword, filter);
             tableModel.setRowCount(0);
             for (User user : users) {
                 tableModel.addRow(new Object[] {
-                    user.getId(),
-                    user.getName(),
-                    user.getEmail(),
-                    user.getPhoneNumber(),
-                    user.getBorrowLimit(),
-                    user.getBorrowedBooksCount()
+                        user.getId(),
+                        user.getName(),
+                        user.getEmail(),
+                        user.getPhoneNumber(),
+                        user.getBorrowLimit(),
+                        user.getBorrowedBooksCount()
                 });
             }
+
+            // Áp dụng HighlightRenderer với grid style
+            HighlightGridRenderer highlightRenderer = new HighlightGridRenderer(keyword, filterText);
+            for (int i = 0; i < table.getColumnCount(); i++) {
+                table.getColumnModel().getColumn(i).setCellRenderer(highlightRenderer);
+            }
+            table.repaint();
         });
 
         btnReset.addActionListener(e -> {
             tfSearch.setText("");
             cbFilter.setSelectedIndex(0);
             loadAllUsers();
+            
+            // Khôi phục GridCellRenderer
+            GridCellRenderer gridRenderer = new GridCellRenderer();
+            for (int i = 0; i < table.getColumnCount(); i++) {
+                table.getColumnModel().getColumn(i).setCellRenderer(gridRenderer);
+            }
+            table.repaint();
         });
 
         table.getSelectionModel().addListSelectionListener(e -> {
@@ -318,7 +319,7 @@ public class UserPanel extends JPanel {
         });
     }
 
-    // === Renderer cho header: in đậm, chữ hoa, căn giữa, viền nhẹ ===
+    // === Renderer cho header ===
     private static class HeaderCellRenderer extends DefaultTableCellRenderer {
         private static final Color GRID = new Color(160, 160, 160);
         private static final Color BG = new Color(240, 240, 240);
@@ -333,10 +334,9 @@ public class UserPanel extends JPanel {
 
         @Override
         public Component getTableCellRendererComponent(JTable tbl, Object value, boolean isSelected,
-            boolean hasFocus, int row, int column) {
+                boolean hasFocus, int row, int column) {
             super.getTableCellRendererComponent(tbl, value, isSelected, hasFocus, row, column);
             setBackground(BG);
-
             if (value != null) {
                 setText(value.toString().toUpperCase());
             }
@@ -347,7 +347,7 @@ public class UserPanel extends JPanel {
         }
     }
 
-    // === Renderer cho cell: căn giữa dữ liệu, viền nhẹ ===
+    // === Renderer cho cell với grid style ===
     private static class GridCellRenderer extends DefaultTableCellRenderer {
         private static final Color GRID = new Color(160, 160, 160);
         private static final Color ALT_ROW = new Color(248, 248, 248);
@@ -358,16 +358,14 @@ public class UserPanel extends JPanel {
 
         @Override
         public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected,
-            boolean hasFocus, int row, int column) {
+                boolean hasFocus, int row, int column) {
             Component c = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
             if (c instanceof JComponent) {
                 JComponent jc = (JComponent) c;
                 jc.setOpaque(true);
-
                 if (!isSelected) {
                     jc.setBackground((row % 2 == 0) ? ALT_ROW : Color.WHITE);
                 }
-
                 int right = (column < table.getColumnCount() - 1) ? 1 : 0;
                 jc.setBorder(BorderFactory.createMatteBorder(0, 0, 1, right, GRID));
             }
@@ -377,5 +375,32 @@ public class UserPanel extends JPanel {
             return c;
         }
     }
-}
 
+    // === Renderer kết hợp highlight và grid style ===
+    private static class HighlightGridRenderer extends HighlightRenderer {
+        private static final Color GRID = new Color(160, 160, 160);
+        private static final Color ALT_ROW = new Color(248, 248, 248);
+
+        public HighlightGridRenderer(String keyword, String context) {
+            super(keyword, context);
+        }
+
+        @Override
+        public Component getTableCellRendererComponent(JTable table, Object value, 
+                boolean isSelected, boolean hasFocus, int row, int column) {
+            Component c = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+            
+            // Áp dụng style grid
+            if (c instanceof JComponent) {
+                JComponent jc = (JComponent)c;
+                if (!isSelected) {
+                    jc.setBackground((row % 2 == 0) ? ALT_ROW : Color.WHITE);
+                }
+                jc.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 
+                    (column < table.getColumnCount() - 1) ? 1 : 0, GRID));
+            }
+            ((JLabel)c).setHorizontalAlignment(CENTER);
+            return c;
+        }
+    }
+}

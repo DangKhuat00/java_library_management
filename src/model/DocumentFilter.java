@@ -7,6 +7,5 @@ public enum DocumentFilter {
     LANGUAGE,
     PAGES,
     AUTHOR,
-    PUBLICATION_YEAR,
-    IS_AVAILABLE
+    PUBLICATION_YEAR
 }

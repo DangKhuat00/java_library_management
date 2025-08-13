@@ -176,21 +176,17 @@ public class DocumentDAO {
             case PUBLICATION_YEAR:
                 sql = "SELECT * FROM documents WHERE CAST(publication_year AS CHAR) LIKE ?";
                 break;
-            case IS_AVAILABLE:
-                sql = "SELECT * FROM documents WHERE is_available = ?";
-                break;
             case ALL_FIELDS:
             default:
                 sql = "SELECT * FROM documents " +
-                    "WHERE CAST(id AS CHAR) LIKE ? " +
-                    "   OR LOWER(title) LIKE ? " +
-                    "   OR LOWER(author) LIKE ? " +
-                    "   OR LOWER(language) LIKE ? " +
-                    "   OR CAST(pages AS CHAR) LIKE ? " +
-                    "   OR CAST(publication_year AS CHAR) LIKE ? " +
-                    "   OR is_available = ?";
+                        "WHERE CAST(id AS CHAR) LIKE ? " +
+                        "   OR LOWER(title) LIKE ? " +
+                        "   OR LOWER(author) LIKE ? " +
+                        "   OR LOWER(language) LIKE ? " +
+                        "   OR CAST(pages AS CHAR) LIKE ? " +
+                        "   OR CAST(publication_year AS CHAR) LIKE ?";
                 break;
-            }
+        }
 
         try (Connection conn = DatabaseConnection.getConnection();
                 PreparedStatement pstmt = conn.prepareStatement(sql)) {
@@ -198,19 +194,12 @@ public class DocumentDAO {
             String like = "%" + keyword.toLowerCase() + "%";
 
             if (filter == DocumentFilter.ALL_FIELDS) {
-                boolean availableMatch = startsWithIgnoreCase("true", keyword)
-                        || startsWithIgnoreCase("available", keyword);
                 pstmt.setString(1, like); // id
                 pstmt.setString(2, like); // title
                 pstmt.setString(3, like); // author
                 pstmt.setString(4, like); // language
                 pstmt.setString(5, like); // pages
                 pstmt.setString(6, like); // publication_year
-                pstmt.setBoolean(7, availableMatch);
-            } else if (filter == DocumentFilter.IS_AVAILABLE) {
-                boolean availableMatch = startsWithIgnoreCase("true", keyword)
-                        || startsWithIgnoreCase("available", keyword);
-                pstmt.setBoolean(1, availableMatch);
             } else {
                 pstmt.setString(1, like);
             }
@@ -233,10 +222,4 @@ public class DocumentDAO {
 
         return documents;
     }
-
-    // Hàm helper để so sánh bắt đầu bằng (không phân biệt hoa thường)
-    private boolean startsWithIgnoreCase(String target, String input) {
-        return target.toLowerCase().startsWith(input.toLowerCase());
-    }
-
 }
