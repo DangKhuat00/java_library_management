@@ -2,6 +2,7 @@ package gui;
 
 import model.Document;
 import model.Library;
+import model.DocumentFilter;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
@@ -74,7 +75,8 @@ public class DocumentPanel extends JPanel {
         btnSearch = new JButton("🔍 Search");
         btnReset = new JButton("Reset");
         cbFilter = new JComboBox<>(
-                new String[] { "All Fields", "Title", "Author", "Language", "Year", "Pages", "Available" });
+                new String[] { "All Fields", "Id", "Title", "Language", "Pages", "Author", "PublicationYear",
+                        "Available" });
         JLabel lblFilter = new JLabel("Filter by:");
 
         searchAndFilterPanel.add(lblFilter);
@@ -110,7 +112,7 @@ public class DocumentPanel extends JPanel {
         add(northPanel, BorderLayout.NORTH);
 
         // Cập nhật tên cột
-        String[] columns = { "ID", "Title", "Author", "Year", "Language", "Pages", "Available" };
+        String[] columns = { "Id", "Title", "Language", "Pages", "Author", "PublicationYear", "Available" };
         tableModel = new DefaultTableModel(columns, 0) {
             @Override
             public boolean isCellEditable(int row, int col) {
@@ -163,14 +165,15 @@ public class DocumentPanel extends JPanel {
         tableModel.setRowCount(0);
         for (Document doc : docs) {
             tableModel.addRow(new Object[] {
-                    doc.getId(),
-                    doc.getTitle(),
-                    doc.getAuthor(),
-                    doc.getPublicationYear(),
-                    doc.getLanguage(),
-                    doc.getPages(),
-                    doc.isAvailable() // Cập nhật ở đây
+                    doc.getId(), // Id
+                    doc.getTitle(), // Title
+                    doc.getLanguage(), // Language
+                    doc.getPages(), // Pages
+                    doc.getAuthor(), // Author
+                    doc.getPublicationYear(), // PublicationYear
+                    doc.isAvailable() // Available
             });
+
         }
     }
 
@@ -284,23 +287,76 @@ public class DocumentPanel extends JPanel {
                 JOptionPane.showMessageDialog(this, "Please enter a search keyword.");
                 return;
             }
-            String filter = cbFilter.getSelectedItem().toString();
-            if (filter.equals("Year")) { // Đảm bảo tên cột đúng với DB
-                filter = "publication_year";
+
+            DocumentFilter filter;
+            switch (cbFilter.getSelectedItem().toString()) {
+                case "Id":
+                    filter = DocumentFilter.ID;
+                    break;
+                case "Title":
+                    filter = DocumentFilter.TITLE;
+                    break;
+                case "Language":
+                    filter = DocumentFilter.LANGUAGE;
+                    break;
+                case "Pages":
+                    filter = DocumentFilter.PAGES;
+                    break;
+                case "Author":
+                    filter = DocumentFilter.AUTHOR;
+                    break;
+                case "PublicationYear":
+                    filter = DocumentFilter.PUBLICATION_YEAR;
+                    break;
+                case "Available":
+                    filter = DocumentFilter.IS_AVAILABLE;
+                    break;
+                default:
+                    filter = DocumentFilter.ALL_FIELDS;
+                    break;
             }
-            List<Document> docs;
-            if (filter.equals("All Fields")) {
-                docs = library.findDocuments(keyword);
-            } else {
-                docs = library.findDocumentsByField(filter, keyword);
+
+            // Tìm kiếm document
+            List<Document> docs = library.findDocuments(keyword, filter);
+
+            // Cập nhật bảng
+            tableModel.setRowCount(0);
+            for (Document doc : docs) {
+                tableModel.addRow(new Object[] {
+                        doc.getId(), // Id
+                        doc.getTitle(), // Title
+                        doc.getLanguage(), // Language
+                        doc.getPages(), // Pages
+                        doc.getAuthor(), // Author
+                        doc.getPublicationYear(), // PublicationYear
+                        doc.isAvailable() // Available
+                });
+
             }
-            loadDocumentsToTable(docs);
+
+            // Highlight
+            for (int i = 0; i < table.getColumnCount(); i++) {
+                table.getColumnModel().getColumn(i)
+                        .setCellRenderer(new HighlightRenderer(keyword, cbFilter.getSelectedItem().toString()));
+            }
+
+            table.repaint();
         });
 
         btnReset.addActionListener(e -> {
             tfSearch.setText("");
             cbFilter.setSelectedIndex(0);
+
+            // Tải lại toàn bộ dữ liệu
             loadAllDocuments();
+
+            // Xóa highlight bằng cách set renderer keyword rỗng
+            for (int i = 0; i < table.getColumnCount(); i++) {
+                table.getColumnModel().getColumn(i)
+                        .setCellRenderer(new HighlightRenderer("", ""));
+            }
+
+            table.repaint();
         });
 
         btnClear.addActionListener(e -> clearForm());

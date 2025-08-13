@@ -9,17 +9,35 @@ import model.Account;
 public class AccountDAO {
 
   public boolean register(Account account) {
-    String sql = "INSERT INTO accounts (username, password, phone, email, role) VALUES (?, ?, ?, ?, ?)";
-    try (Connection conn = DatabaseConnection.getConnection();
-        PreparedStatement stmt = conn.prepareStatement(sql)) {
+    String sqlAccount = "INSERT INTO accounts (username, password, phone, email, role) VALUES (?, ?, ?, ?, ?)";
+    String sqlUser = "INSERT INTO users (name, email, phoneNumber, borrowLimit, borrowedBooksCount) VALUES (?, ?, ?, ?, ?)";
 
-      stmt.setString(1, account.getUsername());
-      stmt.setString(2, account.getPassword()); // Có thể mã hóa password ở đây
-      stmt.setString(3, account.getPhone());
-      stmt.setString(4, account.getEmail());
-      stmt.setString(5, account.getRole());
+    try (Connection conn = DatabaseConnection.getConnection()) {
+      conn.setAutoCommit(false); // Bắt đầu transaction
 
-      return stmt.executeUpdate() > 0;
+      // 1. Lưu vào bảng accounts
+      try (PreparedStatement stmtAcc = conn.prepareStatement(sqlAccount)) {
+        stmtAcc.setString(1, account.getUsername());
+        stmtAcc.setString(2, account.getPassword()); // Có thể mã hóa password ở đây
+        stmtAcc.setString(3, account.getPhone());
+        stmtAcc.setString(4, account.getEmail());
+        stmtAcc.setString(5, account.getRole());
+        stmtAcc.executeUpdate();
+      }
+
+      // 2. Lưu vào bảng users
+      try (PreparedStatement stmtUser = conn.prepareStatement(sqlUser)) {
+        stmtUser.setString(1, account.getUsername()); // name
+        stmtUser.setString(2, account.getEmail()); // email
+        stmtUser.setString(3, account.getPhone()); // phoneNumber
+        stmtUser.setInt(4, 10); // borrowLimit
+        stmtUser.setInt(5, 0); // borrowedBooksCount
+        stmtUser.executeUpdate();
+      }
+
+      conn.commit(); // Xác nhận lưu cả hai bảng
+      return true;
+
     } catch (SQLException e) {
       e.printStackTrace();
       return false;
@@ -50,4 +68,5 @@ public class AccountDAO {
     }
     return null;
   }
+
 }

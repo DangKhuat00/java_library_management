@@ -51,41 +51,21 @@ public class Library {
 
     public Document getDocumentById(int id) {
         // Tối ưu hơn là tạo hàm getById trong DAO, nhưng cách này vẫn hoạt động
-        return documentDAO.getAllDocuments().stream()
-                .filter(doc -> doc.getId() == id)
-                .findFirst()
-                .orElse(null);
+        return documentDAO.getDocumentById(id);
     }
 
-    public List<Document> findDocuments(String keyword) {
-        return documentDAO.findDocument(keyword);
-    }
-
-    public List<Document> findDocumentsByField(String filter, String keyword) {
-        String dbField;
-        switch (filter) {
-            case "Title":
-                dbField = "title";
-                break;
-            case "Author":
-                dbField = "author";
-                break;
-            case "Language":
-                dbField = "language";
-                break;
-            case "Year":
-                dbField = "publication_year"; // Tên cột trong DB
-                break;
-            default: // "All Fields"
-                return findDocuments(keyword);
-        }
-        return documentDAO.findDocumentsByField(dbField, keyword);
+    public List<Document> findDocuments(String keyword, DocumentFilter filter) {
+        return documentDAO.searchDocuments(keyword, filter);
     }
 
     // ========== USER METHODS ==========
 
     public boolean addUser(User user) {
         return userDAO.insertUser(user);
+    }
+
+    public boolean phoneExists(String phone) {
+        return userDAO.phoneExists(phone);
     }
 
     public boolean deleteUser(int id) {
@@ -104,7 +84,7 @@ public class Library {
         return userDAO.getUserById(id);
     }
 
-    public List<User> findUsers(String keyword, String filter) {
+    public List<User> findUsers(String keyword, UserFilter filter) {
         return userDAO.searchUsers(keyword, filter);
     }
 
