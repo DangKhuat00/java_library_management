@@ -15,7 +15,7 @@ public class DatabaseConfig {
     // Thong tin ket noi co so du lieu
     public static final String DB_URL = "jdbc:mysql://127.0.0.1:3306/library_management"; // Duong dan ket noi
     public static final String DB_USERNAME = "root"; // Ten dang nhap
-    public static final String DB_PASSWORD = "root"; // Mat khau
+    public static final String DB_PASSWORD = "Duy15122011"; // Mat khau
     public static final String DB_DRIVER = "com.mysql.cj.jdbc.Driver"; // Ten driver
 
     // Cau hinh pool ket noi

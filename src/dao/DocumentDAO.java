@@ -181,18 +181,16 @@ public class DocumentDAO {
                 break;
             case ALL_FIELDS:
             default:
-                sql = """
-                        SELECT * FROM documents
-                        WHERE CAST(id AS CHAR) LIKE ?
-                           OR LOWER(title) LIKE ?
-                           OR LOWER(author) LIKE ?
-                           OR LOWER(language) LIKE ?
-                           OR CAST(pages AS CHAR) LIKE ?
-                           OR CAST(publication_year AS CHAR) LIKE ?
-                           OR is_available = ?
-                        """;
+                sql = "SELECT * FROM documents " +
+                    "WHERE CAST(id AS CHAR) LIKE ? " +
+                    "   OR LOWER(title) LIKE ? " +
+                    "   OR LOWER(author) LIKE ? " +
+                    "   OR LOWER(language) LIKE ? " +
+                    "   OR CAST(pages AS CHAR) LIKE ? " +
+                    "   OR CAST(publication_year AS CHAR) LIKE ? " +
+                    "   OR is_available = ?";
                 break;
-        }
+            }
 
         try (Connection conn = DatabaseConnection.getConnection();
                 PreparedStatement pstmt = conn.prepareStatement(sql)) {
