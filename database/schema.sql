@@ -40,10 +40,7 @@ CREATE TABLE borrowed_documents (
     CREATE TABLE accounts (
         id INT AUTO_INCREMENT PRIMARY KEY,
         username VARCHAR(50) NOT NULL UNIQUE,
-        password VARCHAR(255) NOT NULL,
-        user_id INT,
-
-        FOREIGN KEY (user_id) REFERENCES users(id)
+        password VARCHAR(255) NOT NULL
     );
     ALTER TABLE accounts
     ADD COLUMN phone VARCHAR(15) AFTER password;
