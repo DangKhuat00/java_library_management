@@ -330,8 +330,8 @@ public class BorrowPanel extends JPanel {
 
         public HeaderCellRenderer(JTable table) {
             this.table = table;
-            setHorizontalAlignment(CENTER); // căn giữa header
-            setFont(new Font("Segoe UI", Font.BOLD, 13)); // giống label chỗ nhập
+            setHorizontalAlignment(CENTER);
+            setFont(new Font("Segoe UI", Font.BOLD, 13));
             setOpaque(true);
         }
 
@@ -341,29 +341,22 @@ public class BorrowPanel extends JPanel {
             super.getTableCellRendererComponent(tbl, value, isSelected, hasFocus, row, column);
             setBackground(BG);
 
-            // Header luôn viết hoa
             if (value != null) {
                 setText(value.toString().toUpperCase());
             }
-
-            // Đảm bảo font luôn đậm và rõ
             setFont(new Font("Segoe UI", Font.BOLD, 13));
-
-            // Vạch dọc ngăn từng header (kẻ mép phải cho mọi cột trừ cột cuối)
             int right = (column < table.getColumnCount() - 1) ? 1 : 0;
             setBorder(BorderFactory.createMatteBorder(0, 0, 1, right, GRID));
             return this;
         }
     }
 
-    // ========================== GridCellRenderer (căn giữa nội dung bảng)
-    // ==========================
     private static class GridCellRenderer extends DefaultTableCellRenderer {
         private static final Color GRID = new Color(160, 160, 160);
         private static final Color ALT_ROW = new Color(248, 248, 248);
 
         public GridCellRenderer() {
-            setHorizontalAlignment(CENTER); // căn giữa các cell
+            setHorizontalAlignment(CENTER);
         }
 
         @Override
@@ -378,15 +371,106 @@ public class BorrowPanel extends JPanel {
                     jc.setBackground((row % 2 == 0) ? ALT_ROW : Color.WHITE);
                 }
 
-                // kẻ vạch ngang và vạch dọc giữa các ô
                 int right = (column < table.getColumnCount() - 1) ? 1 : 0;
-                jc.setBorder(BorderFactory.createMatteBorder(0, 0, 1, right, GRID));
+                int bottom = 1;
+                jc.setBorder(BorderFactory.createMatteBorder(0, 0, bottom, right, GRID));
             }
-            // Đảm bảo căn giữa cả khi ở đây
             if (c instanceof JLabel) {
                 ((JLabel) c).setHorizontalAlignment(CENTER);
             }
             return c;
+        }
+    }
+
+    private static class CheckBoxCellRenderer extends JPanel implements javax.swing.table.TableCellRenderer {
+        private final JCheckBox checkBox = new JCheckBox();
+        private static final Color GRID = new Color(160, 160, 160);
+        private static final Color ALT_ROW = new Color(248, 248, 248);
+
+        public CheckBoxCellRenderer() {
+            setLayout(new GridBagLayout());
+            checkBox.setHorizontalAlignment(JCheckBox.CENTER);
+            checkBox.setOpaque(false);
+            setOpaque(true);
+            add(checkBox);
+        }
+
+        @Override
+        public Component getTableCellRendererComponent(
+                JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+            checkBox.setSelected(Boolean.TRUE.equals(value));
+            setBackground(!isSelected ? (row % 2 == 0 ? ALT_ROW : Color.WHITE) : table.getSelectionBackground());
+            int right = (column < table.getColumnCount() - 1) ? 1 : 0;
+            int bottom = 1;
+            setBorder(BorderFactory.createMatteBorder(0, 0, bottom, right, GRID));
+            return this;
+        }
+    }
+
+    private static class HighlightRenderer extends GridCellRenderer {
+        private String keyword;
+        private final String context;
+
+        public HighlightRenderer(String keyword, String context) {
+            setKeyword(keyword);
+            this.context = context;
+        }
+
+        public void setKeyword(String keyword) {
+            this.keyword = (keyword != null) ? keyword.trim().toLowerCase() : "";
+        }
+
+        @Override
+        public Component getTableCellRendererComponent(
+                JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+
+            JLabel label = (JLabel) super.getTableCellRendererComponent(
+                    table, value, isSelected, hasFocus, row, column);
+
+            String columnName = table.getColumnName(column);
+
+            if (!"All Fields".equalsIgnoreCase(context) &&
+                    !columnName.equalsIgnoreCase(context)) {
+                label.setText(value != null ? value.toString() : "");
+                return label;
+            }
+
+            if (value != null && keyword != null && !keyword.isEmpty()) {
+                String cellText = value.toString();
+                String cellTextNoAccent = removeDiacritics(cellText).toLowerCase();
+                String keywordNoAccent = removeDiacritics(keyword).toLowerCase();
+
+                int index = cellTextNoAccent.indexOf(keywordNoAccent);
+
+                if (index >= 0) {
+                    String before = cellText.substring(0, index);
+                    String match = cellText.substring(index, index + keyword.length());
+                    String after = cellText.substring(index + keyword.length());
+
+                    label.setText("<html>" + escapeHtml(before)
+                            + "<span style='background-color:yellow; font-weight:bold;'>" + escapeHtml(match)
+                            + "</span>"
+                            + escapeHtml(after) + "</html>");
+                } else {
+                    label.setText(cellText);
+                }
+            } else if (value != null) {
+                label.setText(value.toString());
+            }
+
+            return label;
+        }
+
+        private String removeDiacritics(String s) {
+            String normalized = Normalizer.normalize(s, Normalizer.Form.NFD);
+            Pattern pattern = Pattern.compile("\\p{InCombiningDiacriticalMarks}+");
+            return pattern.matcher(normalized).replaceAll("");
+        }
+
+        private String escapeHtml(String s) {
+            return s.replace("&", "&amp;")
+                    .replace("<", "&lt;")
+                    .replace(">", "&gt;");
         }
     }
 }
