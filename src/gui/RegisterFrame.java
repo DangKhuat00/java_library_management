@@ -1,31 +1,44 @@
+// Goi package gui
 package gui;
 
+// Import cac thu vien can thiet
 import javax.swing.*;
 import java.awt.*;
 import javax.swing.border.Border;
 import dao.AccountDAO;
 import model.Account;
 
+/**
+ * Giao dien dang ky tai khoan moi
+ * Cho phep nguoi dung tao tai khoan moi trong he thong
+ */
 public class RegisterFrame extends JFrame {
+  // Cac truong nhap lieu
   private JTextField txtUsername;
   private JPasswordField txtPassword;
   private JTextField txtPhone;
   private JTextField txtEmail;
   private JComboBox<String> cbRole;
 
+  /**
+   * Khoi tao cua so dang ky
+   */
   public RegisterFrame() {
+    // Thiet lap thuoc tinh cua so
     setTitle("Đăng ký tài khoản");
-    setSize(800, 600); // tăng chiều cao để không mất nút
+    setSize(800, 600); // tang chieu cao de khong mat nut
     setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     setLocationRelativeTo(null);
     setResizable(false);
 
-    // Nền ảnh
+    // Panel nen voi hinh anh
     JPanel backgroundPanel = new JPanel() {
       ImageIcon backgroundImage = new ImageIcon(getClass().getResource("/images/background.jpg"));
+      
       @Override
       protected void paintComponent(Graphics g) {
         super.paintComponent(g);
+        // Ve hinh nen neu co
         if (backgroundImage != null) {
           g.drawImage(backgroundImage.getImage(), 0, 0, getWidth(), getHeight(), this);
         }
@@ -33,11 +46,12 @@ public class RegisterFrame extends JFrame {
     };
     backgroundPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 0, 60));
 
-    // Form trắng bo tròn
+    // Form trang bo tron
     JPanel formPanel = new JPanel(new GridBagLayout()) {
       @Override
       protected void paintComponent(Graphics g) {
         super.paintComponent(g);
+        // Ve nen trang bo tron
         Graphics2D g2 = (Graphics2D) g.create();
         g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
         g2.setColor(Color.WHITE);
@@ -46,18 +60,20 @@ public class RegisterFrame extends JFrame {
       }
     };
     formPanel.setOpaque(false);
-    formPanel.setPreferredSize(new Dimension(450, 540)); // tăng chiều cao form
+    formPanel.setPreferredSize(new Dimension(450, 540)); // tang chieu cao form
 
+    // Thiet lap layout va khoang cach
     GridBagConstraints gbc = new GridBagConstraints();
     gbc.insets = new Insets(10, 20, 10, 20);
     gbc.fill = GridBagConstraints.HORIZONTAL;
 
+    // Tao vien bo tron
     Border roundedBorder = BorderFactory.createCompoundBorder(
         BorderFactory.createLineBorder(new Color(200, 200, 200), 1, true),
         BorderFactory.createEmptyBorder(5, 10, 5, 10)
     );
 
-    // Tiêu đề
+    // Tieu de form dang ky
     JLabel lblTitle = new JLabel("Register", SwingConstants.CENTER);
     lblTitle.setFont(new Font("Arial", Font.BOLD, 28));
     lblTitle.setForeground(new Color(0, 102, 255));
@@ -66,7 +82,7 @@ public class RegisterFrame extends JFrame {
     gbc.gridwidth = 2;
     formPanel.add(lblTitle, gbc);
 
-    // Username
+    // Label va truong nhap ten dang nhap
     JLabel lblUsername = new JLabel("Username:");
     lblUsername.setFont(new Font("Arial", Font.PLAIN, 14));
     gbc.gridy = 1;
@@ -76,12 +92,12 @@ public class RegisterFrame extends JFrame {
 
     txtUsername = new JTextField();
     txtUsername.setFont(new Font("Arial", Font.PLAIN, 14));
-    txtUsername.setPreferredSize(new Dimension(240, 30)); // rộng hơn
+    txtUsername.setPreferredSize(new Dimension(240, 30)); // rong hon
     txtUsername.setBorder(roundedBorder);
     gbc.gridx = 1;
     formPanel.add(txtUsername, gbc);
 
-    // Password
+    // Label va truong nhap mat khau
     JLabel lblPassword = new JLabel("Password:");
     lblPassword.setFont(new Font("Arial", Font.PLAIN, 14));
     gbc.gridy = 2;
@@ -90,12 +106,12 @@ public class RegisterFrame extends JFrame {
 
     txtPassword = new JPasswordField();
     txtPassword.setFont(new Font("Arial", Font.PLAIN, 14));
-    txtPassword.setPreferredSize(new Dimension(240, 30)); // rộng hơn
+    txtPassword.setPreferredSize(new Dimension(240, 30)); // rong hon
     txtPassword.setBorder(roundedBorder);
     gbc.gridx = 1;
     formPanel.add(txtPassword, gbc);
 
-    // Phone
+    // Label va truong nhap so dien thoai
     JLabel lblPhone = new JLabel("Phone:");
     lblPhone.setFont(new Font("Arial", Font.PLAIN, 14));
     gbc.gridy = 3;
@@ -109,7 +125,7 @@ public class RegisterFrame extends JFrame {
     gbc.gridx = 1;
     formPanel.add(txtPhone, gbc);
 
-    // Email
+    // Label va truong nhap email
     JLabel lblEmail = new JLabel("Email:");
     lblEmail.setFont(new Font("Arial", Font.PLAIN, 14));
     gbc.gridy = 4;
@@ -123,7 +139,7 @@ public class RegisterFrame extends JFrame {
     gbc.gridx = 1;
     formPanel.add(txtEmail, gbc);
 
-    // Role
+    // Label va dropdown lua chon vai tro
     JLabel lblRole = new JLabel("Role:");
     lblRole.setFont(new Font("Arial", Font.PLAIN, 14));
     gbc.gridy = 5;
@@ -137,7 +153,7 @@ public class RegisterFrame extends JFrame {
     gbc.gridx = 1;
     formPanel.add(cbRole, gbc);
 
-    // Nút Đăng ký
+    // Nut dang ky
     JButton btnRegister = new JButton("Đăng ký");
     btnRegister.setForeground(new Color(0, 102, 255));
     btnRegister.setFont(new Font("Arial", Font.BOLD, 14));
@@ -148,7 +164,7 @@ public class RegisterFrame extends JFrame {
     gbc.gridwidth = 2;
     formPanel.add(btnRegister, gbc);
 
-    // Nút Quay lại
+    // Nut quay lai
     JButton btnBack = new JButton("Quay lại");
     btnBack.setForeground(new Color(0, 102, 255));
     btnBack.setFont(new Font("Arial", Font.BOLD, 14));
@@ -157,28 +173,33 @@ public class RegisterFrame extends JFrame {
     gbc.gridy = 7;
     formPanel.add(btnBack, gbc);
 
-    // Thêm form vào nền
+    // Them form vao nen
     backgroundPanel.add(formPanel);
     add(backgroundPanel);
 
-    // Sự kiện nút Đăng ký
+    // Su kien nut dang ky
     btnRegister.addActionListener(e -> {
+      // Lay thong tin tu cac truong nhap lieu
       String username = txtUsername.getText().trim();
       String password = new String(txtPassword.getPassword()).trim();
       String phone = txtPhone.getText().trim();
       String email = txtEmail.getText().trim();
       String role = cbRole.getSelectedItem().toString();
 
+      // Kiem tra tinh hop le cua du lieu
       if (username.isEmpty() || password.isEmpty() || phone.isEmpty() || email.isEmpty()) {
         JOptionPane.showMessageDialog(this, "Vui lòng nhập đầy đủ thông tin!");
         return;
       }
 
+      // Thuc hien dang ky thong qua DAO
       AccountDAO dao = new AccountDAO();
       boolean success = dao.register(new Account(username, password, phone, email, role));
 
+      // Xu ly ket qua dang ky
       if (success) {
         JOptionPane.showMessageDialog(this, "Đăng ký thành công!");
+        // Chuyen ve cua so dang nhap
         new LoginFrame().setVisible(true);
         dispose();
       } else {
@@ -186,8 +207,9 @@ public class RegisterFrame extends JFrame {
       }
     });
 
-    // Sự kiện nút Quay lại
+    // Su kien nut quay lai
     btnBack.addActionListener(e -> {
+      // Quay ve cua so dang nhap
       new LoginFrame().setVisible(true);
       dispose();
     });

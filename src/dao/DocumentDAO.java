@@ -1,5 +1,3 @@
-
-// Goi package dao
 package dao;
 
 // Import cac thu vien can thiet
@@ -9,14 +7,19 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
-// Lop xu ly cac thao tac voi tai lieu
+/**
+ * Lop xu ly cac thao tac voi tai lieu
+ * Xu ly them, sua, xoa, tim kiem tai lieu trong co so du lieu
+ */
 public class DocumentDAO {
 
     /**
      * Them mot tai lieu moi vao co so du lieu
      * Cot is_available se tu dong duoc gan gia tri TRUE theo mac dinh cua DB
+     * 
+     * @param document doi tuong Document can them
+     * @return true neu them thanh cong
      */
-    // Ham them tai lieu moi
     public boolean insertDocument(Document document) {
         // Khong can chen is_available vi DB tu gan TRUE
         String sql = "INSERT INTO documents (title, language, pages, author, publication_year) VALUES (?, ?, ?, ?, ?)";
@@ -44,8 +47,9 @@ public class DocumentDAO {
 
     /**
      * Lay tat ca tai lieu tu co so du lieu
+     * 
+     * @return danh sach Document
      */
-    // Ham lay tat ca tai lieu
     public List<Document> getAllDocuments() {
         List<Document> documents = new ArrayList<>(); // Danh sach luu tai lieu
         String sql = "SELECT * FROM documents ORDER BY id DESC";
@@ -77,8 +81,10 @@ public class DocumentDAO {
 
     /**
      * Cap nhat thong tin mot tai lieu, bao gom ca trang thai co san
+     * 
+     * @param document doi tuong Document can cap nhat
+     * @return true neu cap nhat thanh cong
      */
-    // Ham cap nhat tai lieu
     public boolean updateDocument(Document document) {
         String sql = "UPDATE documents SET title = ?, language = ?, pages = ?, author = ?, publication_year = ?, is_available = ? WHERE id = ?";
 
@@ -106,8 +112,10 @@ public class DocumentDAO {
 
     /**
      * Xoa mot tai lieu khoi co so du lieu
+     * 
+     * @param id ma tai lieu can xoa
+     * @return true neu xoa thanh cong
      */
-    // Ham xoa tai lieu
     public boolean deleteDocument(int id) {
         String sql = "DELETE FROM documents WHERE id = ?";
 
@@ -125,16 +133,24 @@ public class DocumentDAO {
         }
     }
 
+    /**
+     * Lay tai lieu theo ID
+     * 
+     * @param id ma tai lieu can tim
+     * @return doi tuong Document neu tim thay, null neu khong tim thay
+     */
     public Document getDocumentById(int id) {
         String sql = "SELECT * FROM documents WHERE id = ?";
 
         try (Connection conn = DatabaseConnection.getConnection();
                 PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
-            pstmt.setInt(1, id); // Gán giá trị id
+            // Gan gia tri id vao cau lenh
+            pstmt.setInt(1, id);
 
             try (ResultSet rs = pstmt.executeQuery()) {
                 if (rs.next()) {
+                    // Tao doi tuong Document tu ket qua truy van
                     return new Document(
                             rs.getInt("id"),
                             rs.getString("title"),
@@ -147,16 +163,26 @@ public class DocumentDAO {
             }
 
         } catch (SQLException e) {
+            // In ra loi neu co loi khi lay theo ID
             System.err.println("Error getting document by ID: " + e.getMessage());
         }
 
+        // Tra ve null neu khong tim thay
         return null;
     }
 
+    /**
+     * Tim kiem tai lieu theo tu khoa va bo loc
+     * 
+     * @param keyword tu khoa tim kiem
+     * @param filter  bo loc tim kiem (theo truong nao)
+     * @return danh sach Document phu hop
+     */
     public List<Document> searchDocuments(String keyword, DocumentFilter filter) {
-        List<Document> documents = new ArrayList<>();
+        List<Document> documents = new ArrayList<>(); // Danh sach ket qua
         String sql;
 
+        // Xay dung cau lenh SQL theo bo loc
         switch (filter) {
             case ID:
                 sql = "SELECT * FROM documents WHERE CAST(id AS CHAR) LIKE ?";
@@ -178,6 +204,7 @@ public class DocumentDAO {
                 break;
             case ALL_FIELDS:
             default:
+                // Tim kiem tren tat ca cac truong
                 sql = "SELECT * FROM documents " +
                         "WHERE CAST(id AS CHAR) LIKE ? " +
                         "   OR LOWER(title) LIKE ? " +
@@ -191,9 +218,11 @@ public class DocumentDAO {
         try (Connection conn = DatabaseConnection.getConnection();
                 PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
+            // Tao pattern tim kiem
             String like = "%" + keyword.toLowerCase() + "%";
 
             if (filter == DocumentFilter.ALL_FIELDS) {
+                // Gan pattern cho tat ca cac truong
                 pstmt.setString(1, like); // id
                 pstmt.setString(2, like); // title
                 pstmt.setString(3, like); // author
@@ -201,10 +230,12 @@ public class DocumentDAO {
                 pstmt.setString(5, like); // pages
                 pstmt.setString(6, like); // publication_year
             } else {
+                // Gan pattern cho mot truong cu the
                 pstmt.setString(1, like);
             }
 
             try (ResultSet rs = pstmt.executeQuery()) {
+                // Duyet ket qua va tao danh sach Document
                 while (rs.next()) {
                     documents.add(new Document(
                             rs.getInt("id"),
@@ -217,6 +248,7 @@ public class DocumentDAO {
                 }
             }
         } catch (SQLException e) {
+            // In ra loi neu co loi khi tim kiem
             e.printStackTrace();
         }
 
