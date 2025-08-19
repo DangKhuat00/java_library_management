@@ -52,7 +52,7 @@ public class DocumentDAO {
      */
     public List<Document> getAllDocuments() {
         List<Document> documents = new ArrayList<>(); // Danh sach luu tai lieu
-        String sql = "SELECT * FROM documents ORDER BY id DESC";
+        String sql = "SELECT * FROM documents ORDER BY id DESC"; // Lấy tất cả, sắp xếp theo ID giảm dần
 
         try (Connection conn = DatabaseConnection.getConnection();
                 Statement stmt = conn.createStatement();

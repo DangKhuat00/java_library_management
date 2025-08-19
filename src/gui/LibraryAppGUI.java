@@ -3,6 +3,9 @@ package gui;
 import javax.swing.*;
 import java.awt.*;
 
+/**
+ * Cai dat giao dien he thong va khoi dong man hinh dang nhap.
+ */
 public class LibraryAppGUI {
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {
