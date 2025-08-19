@@ -178,11 +178,6 @@ java -cp ".;../lib/*" gui.LibraryAppGUI
 
 Dự án này được phân phối dưới MIT License. Xem file `LICENSE` để biết thêm chi tiết.
 
-## 👤 Tác giả
-
-- **GitHub**: [@yourusername](https://github.com/yourusername)
-- **Email**: your.email@example.com
-
 ## 🙏 Cảm ơn
 
 - Java Swing Community
