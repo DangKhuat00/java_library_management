@@ -1,4 +1,4 @@
-package librarymanage.java_library_management.src.model;
+package librarymanage.java_library_management.document.model;
 
 
 import java.sql.SQLOutput;
