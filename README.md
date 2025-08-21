@@ -2,6 +2,8 @@
 
 Hệ thống quản lý thư viện được phát triển bằng Java Swing với giao diện người dùng thân thiện và tích hợp cơ sở dữ liệu MySQL.
 
+🎬 **Video demo:** https://www.youtube.com/watch?v=OUgyq8-ZMrs
+
 ![Class Diagram](src/images/Bieu_do_lop.png)
 
 ## ✨ Tính năng chính
