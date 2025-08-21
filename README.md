@@ -4,6 +4,7 @@ Hệ thống quản lý thư viện được phát triển bằng Java Swing v�
 
 🎬 **Video demo:** https://www.youtube.com/watch?v=OUgyq8-ZMrs
 
+## Diagram class
 ![Class Diagram](src/images/Bieu_do_lop.png)
 
 ## ✨ Tính năng chính
